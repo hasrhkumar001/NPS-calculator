@@ -1,13 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NPS Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-</head>
-<body>
+
     <div class="container my-4">
         <div class="container my-4 bg-light shadow">
             <!-- Existing form for filters (IDS Group, CSAT, Date range) -->
@@ -192,32 +183,4 @@
     
 </div>
 
-<script>
-function filterDashboard() {
-    var selectedIdsGroup = $('#idsGroup').val();
-    var selectedCSAT = $('#csat').val();
-    var dateFrom = $('#dateFrom').val();
-    var dateTo = $('#dateTo').val();
-    // AJAX call to fetch updated data
-   
-    // Reset counts
-    let totalSurveys = 0;
-    let promoters = 0;
-    let neutrals = 0;
-    let detractors = 0;
 
-    
-
-    // Update totals
-    $('#totalSurveys').text(totalSurveys);
-    $('#promoters').text(promoters);
-    $('#neutrals').text(neutrals);
-    $('#detractors').text(detractors);
-
-    // Calculate and display NPS
-    var nps = promoters - detractors;
-    $('#overallNPS').text(nps + '%');
-}
-</script>
-</body>
-</html>

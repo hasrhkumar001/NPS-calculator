@@ -44,7 +44,7 @@ class Dashboard extends Component
 
     private function calculateNPS()
     {
-        $this->totalSurveys = UserSubmission::where('status', 'done')->count();
+        $this->totalSurveys = $this->userSubmissions->where('status', 'done')->count();
         $this->total = array_sum($this->responseCounts);
 
         $this->promoters = ($this->responseCounts[9] ?? 0) + ($this->responseCounts[10] ?? 0);
@@ -74,7 +74,8 @@ class Dashboard extends Component
             $this->userSubmissions = UserSubmission::all();
             // dd($this->userSubmissions);
         }
-        
+        $this->calculateNPS();
+       
     }
 
     public function render()
