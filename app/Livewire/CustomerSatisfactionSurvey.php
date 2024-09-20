@@ -52,6 +52,7 @@ class CustomerSatisfactionSurvey extends Component
             session()->flash('error', 'You have already submitted the form.');
             return;
         }
+        
         Mail::to($this->clientEmailAddress)->send(new SurveyEmail($this->clientContactName, $this->idsLeadManager));
 
         // Store the form data in the database

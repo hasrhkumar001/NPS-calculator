@@ -52,7 +52,7 @@
                 <!-- Conditional IDS Group Selection (disabled for 'admin' role) -->
                 <div class="mb-3">
                     <label for="idsGroup" class="form-label">IDS Group</label>
-                    <select id="idsGroup" class="form-select">
+                    <select id="idsGroup" class="form-select" wire:model="idsGroup">
                         <option value="">Select IDS Group</option>
                         @foreach ($idsGroups as $group)
                             <option value="{{ $group->name }}">{{ $group->name }}</option>

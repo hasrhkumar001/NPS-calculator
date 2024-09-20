@@ -17,11 +17,11 @@
                             <!-- CSAT Selection -->
                             <div class="col-md-6 mb-3">
                                 <label for="csat" class="form-label">CSAT</label>
-                                <select id="csat" class="form-select">
-                                    <option selected disabled>Select CSAT</option>
-                                    <option value="monthly">Monthly</option>
-                                    <option value="quarterly">Quarterly</option>
-                                    <option value="yearly">Yearly</option>
+                                <select id="csat" class="form-select" wire:model="csat">
+                                    <option  value="">Select CSAT</option>
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Quaterly">Quaterly</option>
+                                    <option value="Yearly">Yearly</option>
                                 </select>
                             </div>
                         </div>
@@ -30,21 +30,23 @@
                         <div class="row px-5 py-3">
                             <div class="col-md-6 mb-3">
                                 <label for="dateFrom" class="form-label">Date From</label>
-                                <input type="date" id="dateFrom" class="form-control" placeholder="Select Date" >
+                                <input type="date" id="dateFrom" wire:model="dateFrom" class="form-control" placeholder="Select Date" >
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="dateTo" class="form-label">Date To</label>
-                                <input type="date" id="dateTo" class="form-control" placeholder="Select Date" >
+                                <input type="date" id="dateTo" wire:model="dateTo" class="form-control" placeholder="Select Date" >
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <div class=" px-5 py-3 text-end">
+                            <button type="submit" class="btn px-5 py-2 btn-primary fs-5">Filter</button>
+                        </div>      
                     </div>
 
                     
             </form>
 
         <!-- NPS and Total Survey Info -->
-        <div class="row mb-4">
+        <div class="row mb-4 ">
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-body text-center">
@@ -62,11 +64,25 @@
                 </div>
             </div>
             <div class="col-md-4">
+            @if($nps > 60)
                 <div class="card bg-success">
                     <div class="card-body text-center">
                         <h1 class="text-white">😃</h1>
                     </div>
                 </div>
+            @elseif($nps > 30 && $nps <= 60)
+                <div class="card bg-warning">
+                    <div class="card-body text-center">
+                        <h1 class="text-white">😐</h1>
+                    </div>
+                </div>
+            @else
+                <div class="card bg-danger">
+                    <div class="card-body text-center">
+                        <h1 class="text-white">🙁</h1>
+                    </div>
+                </div>
+            @endif
             </div>
         </div>
 
