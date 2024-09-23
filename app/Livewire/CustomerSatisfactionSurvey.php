@@ -68,13 +68,6 @@ class CustomerSatisfactionSurvey extends Component
         ]);
        
 
-       
-        
-            
-
-
-        
-
         // You can add a success message or redirect
         session()->flash('message', 'Survey email has been sent to the client.');
     }

@@ -1,14 +1,20 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
         <!-- Brand -->
-        <a class="navbar-brand" href="/admin/dashboard">IDS</a>
+        @if($role === 'admin')
+        <a class="navbar-brand" href="/admin/dashboard">IDS InfoTech</a>
+        
+        @else
+        <a class="navbar-brand" href="/dashboard">IDS InfoTech</a>
+        @endif
 
         <!-- Toggle Button (for smaller screens) -->
         @if($role)
+        
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-
+        
         <!-- Collapsible Content -->
         <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
             <ul class="navbar-nav">
@@ -30,6 +36,7 @@
                     </ul>
                 </li>
             </ul>
+            
         </div>
         @endif
     </div>

@@ -1,49 +1,47 @@
 <div class="container my-3">
-  @if (session()->has('message'))
-        <div class="alert alert-success">
-            {{ session('message') }}
+  <div class="">
+    <div class=" justify-content-center">
+      <div class="row">
+        <div class="col"><h2>{{ ucfirst($selectedRole) }} List</h2></div>
+        <div class="col d-flex justify-content-end">
+          <!-- Dropdown for selecting Users or Admins with wire:change event -->
+          <select wire:change="updateListBasedOnRole" wire:model="selectedRole" class="form-select me-2" style="width: 200px;">
+            <option value="users">Users</option>
+            <option value="admins">Admins</option>
+          </select>
+          <a href="/add-users" class="btn btn-success float-end mx-2">Add New User</a>
         </div>
-    @endif
-    <div class="card">
-        <div class="card-header justify-content-baseline">
-            <div class="row">
-           <div class="col"><h2>Users List</h2></div>
-           <div class="col">
-           
-           <a href="/add-users" wire:navigate  class=" btn btn-success float-end mx-2">Add New User</a>
-           
-</div>
-</div>
-        </div>
-        <div class="card-body ">
-        <table class="table table-hover">
-  <thead>
-    <tr class="text-center">
-      <th scope="col">Serial No.</th>
-      <th scope="col">User Name</th>
-      <th scope="col">Email</th>
-      
-      
-      <th scope="col" colspan="2">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-      @foreach($users as $item)
-    <tr class="text-center">
-      <th scope="row">{{$loop->iteration}}</th>
-      
-      <td >{{$item->name}}</td>
-      <td >{{$item->email}}</td>
-      
-      
-      
-      <td ><button class="btn btn-danger btn-sm shadow" wire:click="delete({{$item->id}})" wire:confirm="Are you sure you want to delete this? ">DELETE</button></td>
-    </tr>
-    @endforeach
-    
-  </tbody>
-</table>
-        </div>
+      </div>
     </div>
 
+    <div class="card-body">
+      <table class="table table-bordered my-3">
+        <thead>
+          <tr class="text-center">
+            <th scope="col">Serial No.</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col" colspan="2">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @foreach($list as $item)
+            <tr class="text-center">
+              <th scope="row">{{ $loop->iteration }}</th>
+              <td>{{ $item->name }}</td>
+              <td>{{ $item->email }}</td>
+              <td>
+                <!-- Delete action -->
+                @if($selectedRole == 'users')
+                  <button class="btn btn-danger btn-sm shadow" wire:click="delete({{ $item->id }})">DELETE</button>
+                @elseif($selectedRole == 'admins')
+                  <button class="btn btn-danger btn-sm shadow" wire:click="deleteAdmin({{ $item->id }})">DELETE</button>
+                @endif
+              </td>
+            </tr>
+          @endforeach
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

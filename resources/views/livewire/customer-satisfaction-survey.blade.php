@@ -1,3 +1,5 @@
+<div>
+   
 <div class="card">
         <div class="card-header  bg-primary text-white">
             <h2 class="mb-0 container p-5 display-3 text-center">Customer Satisfaction Survey</h2>
@@ -5,6 +7,16 @@
         <div class="container mt-4">
     
         <div class="card-body">
+                @if (session()->has('message'))
+                    <div class="alert alert-success">
+                        {{ session('message') }}
+                    </div>
+                @endif
+                @if (session()->has('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
             <p class="text-center">Welcome {{ auth()->user()->name }}</p>
 
             <form wire:submit.prevent="submit">
@@ -74,4 +86,5 @@
             </form>
         </div>
     </div>
+</div>
 </div>

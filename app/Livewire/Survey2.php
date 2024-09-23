@@ -49,10 +49,7 @@ class Survey2 extends Component
 
         // Check if the user has already submitted the survey
         $userSubmission = UserSubmission::where('user_id', $userId)->first();
-        if (!$userSubmission || $userSubmission->status == 'done') {
-            session()->flash('error', 'You have already submitted the survey.');
-            return;
-        }
+        
 
         // Save each response
         foreach ($this->responses as $questionIndex => $response) {
@@ -86,19 +83,16 @@ class Survey2 extends Component
             'additional_comments' => 'testing', // Replace this with actual comment if available
         ];
 
-         // Send email
-         Mail::to($userSubmission->clientEmailAddress)->send(new ResponseEmail($surveyData));
+        
 
         // Update user submission status to 'done'
         $userSubmission->status = 'done';
         $userSubmission->save();
         
-        
-
-       
-
         session()->flash('message', 'Survey responses have been saved.');
-        return redirect()->back();
+         // Send email
+         Mail::to($userSubmission->clientEmailAddress)->send(new ResponseEmail($surveyData));
+        return redirect()->route('email-sent', ['email' => $userSubmission->clientEmailAddress]);
     }
     public function render()
     {

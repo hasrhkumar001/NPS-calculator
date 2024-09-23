@@ -2,31 +2,38 @@
 
 namespace App\Livewire;
 
+use App\Models\Admin;
 use App\Models\Users;
 use Livewire\Component;
 
 class UserList extends Component
 {
-    public $all_users;
-    
-    public function mount(){
-        $this->all_users = Users::all();
+    public $selectedRole = 'users'; // Default to 'users'
+    public $list; // To store either users or admins
+
+    public function mount()
+    {
+        $this->updateList(); // Initialize the list
     }
-    public function delete($id){
-        try{
-            Users::where('id',$id)->delete(); 
-            return $this->redirect('/users',navigate:true);
-        }catch(\Exception $e){
-            dd($e);
+
+    // This method will be triggered when the select dropdown changes
+    public function updateListBasedOnRole()
+    {
+        $this->updateList();
+    }
+
+    // Update the list according to selectedRole value
+    public function updateList()
+    {
+        if ($this->selectedRole == 'users') {
+            $this->list = Users::all();
+        } elseif ($this->selectedRole == 'admins') {
+            $this->list = Admin::all();
         }
     }
 
-    
     public function render()
     {
-        return view('livewire.user-list',[
-            'users' => $this->all_users
-        ]);
+        return view('livewire.user-list');
     }
 }
-

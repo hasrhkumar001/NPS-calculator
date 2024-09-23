@@ -5,8 +5,9 @@ namespace App\Livewire;
 use App\Models\IdsGroup;
 use App\Models\Survey2Response;
 use App\Models\UserSubmission;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
-use Request;
+use Illuminate\Support\Facades\Response;
 
 class Dashboard extends Component
 {
@@ -24,11 +25,14 @@ class Dashboard extends Component
     public $dateFrom;
     public $dateTo;
     public $csat;
+    public $promoterPercentage;
+    public $detractorPercentage;
+   
 
     public function mount()
     {
         $this->responseCounts = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
-        ->whereIn('response', [1, 2, 3, 4, 5, 6, 9, 10])  // Filter responses between 1-6 and 9-10
+        ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  // Filter responses between 1-6 and 9-10
         ->groupBy('response')
         ->get()
         ->pluck('count', 'response')
@@ -51,7 +55,11 @@ class Dashboard extends Component
     private function calculateNPS()
     {
         $this->totalSurveys = $this->userSubmissions->where('status', 'done')->count();
-        $this->total = array_sum($this->responseCounts);
+        $filteredResponses = array_diff_key($this->responseCounts, array_flip([0,7, 8, 'Na']));
+        
+        // Sum the filtered responses
+        $this->total = array_sum($filteredResponses);
+        // Set total to 1 if no valid responses were found
         if ($this->total == 0) {
             $this->total = 1;
         }
@@ -60,10 +68,11 @@ class Dashboard extends Component
         $this->neutrals = ($this->responseCounts[7] ?? 0) + ($this->responseCounts[8] ?? 0);
         $this->detractors = array_sum(array_intersect_key($this->responseCounts, array_flip(range(0, 6))));
 
-        $promoterPercentage = ($this->promoters / $this->total) * 100;
-        $detractorPercentage = ($this->detractors / $this->total) * 100;
+        $this->promoterPercentage = round(($this->promoters / $this->total) * 100, 2);
+        $this->detractorPercentage = round((array_sum(array_intersect_key($this->responseCounts, array_flip(range(1, 6)))) / $this->total) * 100, 2);
 
-        $this->nps = round($promoterPercentage - $detractorPercentage, 2);
+
+        $this->nps = round($this->promoterPercentage - $this->detractorPercentage, 2);
     }
 
 
@@ -101,7 +110,7 @@ class Dashboard extends Component
             // Now filter Survey2Response by those user_submission_ids
             $responseQuery = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
                 ->whereIn('user_submission_id', $submissionIds)
-                ->whereIn('response', [1, 2, 3, 4, 5, 6, 9, 10]);  // Filter responses between 1-6 and 9-10
+                ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7,8,9, 10]);  // Filter responses between 1-6 and 9-10
             
           
 
@@ -135,7 +144,7 @@ class Dashboard extends Component
             // Get response counts for all user submissions
             $responseQuery = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
                 ->whereIn('user_submission_id', $submissionIds)
-                ->whereIn('response', [1, 2, 3, 4, 5, 6, 9, 10]);
+                ->whereIn('response', [0,1, 2, 3, 4, 5, 6,7,8, 9, 10]);
 
         
 
@@ -143,19 +152,75 @@ class Dashboard extends Component
                 ->get()
                 ->pluck('count', 'response')
                 ->toArray();
-        }
+                 }
 
         // Calculate NPS after filtering
-        $this->calculateNPS();
-}
+        return $this->calculateNPS();
+        }
 
 
+        public function downloadCSV()
+{
+    $filename = 'user_submissions.csv';
+    $columns = array_merge(['Client Name'], array_map(function ($i) {
+        return "Q$i";
+    }, range(1, 9)));
+
+    // Open a temporary file in memory
+    $file = fopen('php://temp', 'w');
+    
+    // Add the column headers to the file
+    fputcsv($file, $columns);
+    
+    // Add each row to the CSV file
+    foreach ($this->userSubmissions as $submission) {
+        // Check if there are any responses for this submission
+        $responses = DB::table('survey2_responses')
+            ->where('user_submission_id', $submission->id) // Use correct column name
+            ->orderBy('question_index')
+            ->get();
+
+        // Only proceed if responses exist
+        if ($responses->isNotEmpty()) {
+            $row = [];
+            $row[] = $submission->clientContactName;
+
+            // Initialize an array for responses
+            $responseRow = [];
+            foreach ($responses as $response) {
+                $responseRow[] = $response->response ?? 'NA';
+            }
+
+            // Merge client name with the responses
+            $row = array_merge($row, $responseRow);
+
+            // Add the complete row to the CSV
+            fputcsv($file, $row);
+        }
+    }
+
+    // Move the file pointer to the beginning of the file
+    rewind($file);
+
+    // Store the file in a temporary variable
+    $csvData = stream_get_contents($file);
+
+    // Close the file
+    fclose($file);
+
+    // Set the file for download using Laravel's response helper
+    return response($csvData)
+        ->header('Content-Type', 'text/csv')
+        ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
+} 
+        
     public function render()
     {
         return view('livewire.dashboard', [
             'userSubmissions' => $this->userSubmissions,
             'responses' => $this->responses,
             'totalNps' => $this->nps,
+            
         ]);
     }
 }
