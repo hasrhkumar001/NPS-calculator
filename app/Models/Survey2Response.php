@@ -9,11 +9,11 @@ class Survey2Response extends Model
 {
     use HasFactory;
     // Define the table if it doesn't follow Laravel's naming convention
-    protected $table = 'survey2_responses';
+    protected $table = 'survey_responses';
 
     // Allow mass-assignment for these fields
     protected $fillable = [
-        'user_submission_id', // Foreign key to link to the UserSubmission table
+        'client_id', // Foreign key to link to the UserSubmission table
         'question_index',     // Index of the question (0 for "Quality of Delivery", etc.)
         'response',           // The response value
     ];
@@ -24,6 +24,6 @@ class Survey2Response extends Model
      */
     public function userSubmission()
     {
-        return $this->belongsTo(UserSubmission::class, 'user_submission_id');
+        return $this->belongsTo(Client::class, 'client_id');
     }
 }

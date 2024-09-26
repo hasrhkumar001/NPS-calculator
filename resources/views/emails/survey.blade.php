@@ -17,7 +17,7 @@
     <p>
         We appreciate your time and inputs to help us serve you better.
         <br>
-        <strong><a href="{{ route('survey2') }}" target="_blank">Take Survey</a></strong>
+        <strong><a href="{{ route('survey2', ['token' => $token]) }}" target="_blank">Take Survey</a></strong>
     </p>
 
     <p>The survey parameters (How it works?):</p>

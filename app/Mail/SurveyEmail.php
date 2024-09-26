@@ -15,16 +15,20 @@ class SurveyEmail extends Mailable
 
     public $clientContactName;
     public $idsLeadManager;
+    public $client;
+    public $token;
 
     /**
      * Create a new message instance.
      *
      * @return void
      */
-    public function __construct($clientContactName, $idsLeadManager)
+    public function __construct($clientContactName, $idsLeadManager, $client,$token)
     {
         $this->clientContactName = $clientContactName;
         $this->idsLeadManager = $idsLeadManager;
+        $this->client = $client;
+        $this->token =$token;
     }
 
     /**
@@ -40,6 +44,8 @@ class SurveyEmail extends Mailable
                     ->with([
                         'clientContactName' => $this->clientContactName,
                         'idsLeadManager' => $this->idsLeadManager,
+                        'client' => $this->client,
+                        'token' => $this->token,
                     ]);
     }
     

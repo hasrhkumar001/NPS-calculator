@@ -6,11 +6,11 @@ use Livewire\Component;
 
 class EmailConfirmation extends Component
 {
-    public $email;
+    public $client;
 
-    public function mount($email)
+    public function mount($client)
     {
-        $this->email = $email;
+        $this->client = $client;
     }
     public function render()
     {

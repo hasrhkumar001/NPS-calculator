@@ -8,6 +8,7 @@ use App\Models\UserSubmission;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Illuminate\Support\Facades\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class Dashboard extends Component
 {
@@ -32,13 +33,13 @@ class Dashboard extends Component
     public function mount()
     {
         $this->responseCounts = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
-        ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  // Filter responses between 1-6 and 9-10
+        ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  
         ->groupBy('response')
         ->get()
         ->pluck('count', 'response')
         ->toArray();
 
-        $this->userSubmissions = UserSubmission::all();
+        $this->userSubmissions = UserSubmission::where('status', 'done')->get();
         
         $this->idsGroups = IdsGroup::all();
         $this->calculateNPS();
@@ -46,7 +47,7 @@ class Dashboard extends Component
 
         // Fetch the responses for each submission dynamically
         foreach ($this->userSubmissions as $submission) {
-            $this->responses[$submission->id] = Survey2Response::where('user_submission_id', $submission->id)
+            $this->responses[$submission->id] = Survey2Response::where('client_id', $submission->client_id)
                 ->orderBy('question_index')
                 ->get();
         }
@@ -55,10 +56,10 @@ class Dashboard extends Component
     private function calculateNPS()
     {
         $this->totalSurveys = $this->userSubmissions->where('status', 'done')->count();
-        $filteredResponses = array_diff_key($this->responseCounts, array_flip([0,7, 8, 'Na']));
+        
         
         // Sum the filtered responses
-        $this->total = array_sum($filteredResponses);
+        $this->total = array_sum($this->responseCounts);
         // Set total to 1 if no valid responses were found
         if ($this->total == 0) {
             $this->total = 1;
@@ -101,15 +102,15 @@ class Dashboard extends Component
                 // Filter for the current month
                 $query = $query->where('csatOccurrence', $csat);;
             }
-
+            $query = $query->where('status', 'done');
             $this->userSubmissions = $query->get();
             
             // Get all user_submission_ids for the filtered idsGroup and date range
-            $submissionIds = $this->userSubmissions->pluck('id')->toArray();
+            $submissionIds = $this->userSubmissions->pluck('client_id')->toArray();
 
             // Now filter Survey2Response by those user_submission_ids
             $responseQuery = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
-                ->whereIn('user_submission_id', $submissionIds)
+                ->whereIn('client_id', $submissionIds)
                 ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7,8,9, 10]);  // Filter responses between 1-6 and 9-10
             
           
@@ -136,14 +137,14 @@ class Dashboard extends Component
                 // Filter for the current month
                 $query = $query->where('csatOccurrence', $csat);;
             }
-
+            $query = $query->where('status', 'done');
             $this->userSubmissions = $query->get();
              // Get all user_submission_ids for the filtered idsGroup and date range
-             $submissionIds = $this->userSubmissions->pluck('id')->toArray();
+             $submissionIds = $this->userSubmissions->pluck('client_id')->toArray();
 
             // Get response counts for all user submissions
             $responseQuery = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
-                ->whereIn('user_submission_id', $submissionIds)
+                ->whereIn('client_id', $submissionIds)
                 ->whereIn('response', [0,1, 2, 3, 4, 5, 6,7,8, 9, 10]);
 
         
@@ -160,59 +161,44 @@ class Dashboard extends Component
 
 
         public function downloadCSV()
-{
-    $filename = 'user_submissions.csv';
-    $columns = array_merge(['Client Name'], array_map(function ($i) {
-        return "Q$i";
-    }, range(1, 9)));
-
-    // Open a temporary file in memory
-    $file = fopen('php://temp', 'w');
+        {
+            $userSubmissions = UserSubmission::with('responses')
+                                ->where('status','done')
+                                ->get();
+        
+            $headers = [
+                "Content-type" => "text/csv",
+                "Content-Disposition" => "attachment; filename=user_submissions.csv",
+                "Pragma" => "no-cache",
+                "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+                "Expires" => "0"
+            ];
     
-    // Add the column headers to the file
-    fputcsv($file, $columns);
-    
-    // Add each row to the CSV file
-    foreach ($this->userSubmissions as $submission) {
-        // Check if there are any responses for this submission
-        $responses = DB::table('survey2_responses')
-            ->where('user_submission_id', $submission->id) // Use correct column name
-            ->orderBy('question_index')
-            ->get();
-
-        // Only proceed if responses exist
-        if ($responses->isNotEmpty()) {
-            $row = [];
-            $row[] = $submission->clientContactName;
-
-            // Initialize an array for responses
-            $responseRow = [];
-            foreach ($responses as $response) {
-                $responseRow[] = $response->response ?? 'NA';
+            $columns = ['Question #'];
+            foreach ($userSubmissions as $submission) {
+                $columns[] = $submission->clientContactName . ' (' . $submission->updated_at->format('Y-m-d') . ')';
             }
-
-            // Merge client name with the responses
-            $row = array_merge($row, $responseRow);
-
-            // Add the complete row to the CSV
-            fputcsv($file, $row);
+    
+            $callback = function() use ($userSubmissions, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+    
+                for ($i = 1; $i <= 9; $i++) {
+                    $row = ['Q ' . $i];
+                    foreach ($userSubmissions as $submission) {
+                        $response = $submission->responses->where('question_index', $i)->first();
+                        
+                        $row[] = $response ? $response->response : 'NA';
+                    }
+                    fputcsv($file, $row);
+                }
+    
+                fclose($file);
+            };
+            return new StreamedResponse($callback, 200, $headers);
+            
         }
-    }
-
-    // Move the file pointer to the beginning of the file
-    rewind($file);
-
-    // Store the file in a temporary variable
-    $csvData = stream_get_contents($file);
-
-    // Close the file
-    fclose($file);
-
-    // Set the file for download using Laravel's response helper
-    return response($csvData)
-        ->header('Content-Type', 'text/csv')
-        ->header('Content-Disposition', 'attachment; filename="' . $filename . '"');
-} 
+        
         
     public function render()
     {

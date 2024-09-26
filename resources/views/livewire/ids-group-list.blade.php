@@ -16,7 +16,8 @@
                 <td>{{$loop->iteration}}</td>
                 <td>{{ $group->name }}</td>
                 
-                <td ><button class="btn btn-danger btn-sm shadow" wire:click="delete({{$group->id}})" wire:confirm="Are you sure you want to delete this? ">Delete</i></button></td>
+                <td ><a href="{{ route('ids-group.edit', $group->id) }}" wire:navigate class="btn btn-primary btn-sm shadow mr-2">EDIT</a>
+                    <button class="btn btn-danger btn-sm shadow" wire:click="delete({{$group->id}})" wire:confirm="Are you sure you want to delete this? ">Delete</i></button></td>
             </tr>
             @endforeach
         </tbody>

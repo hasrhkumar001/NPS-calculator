@@ -2,13 +2,16 @@
 
 namespace App\Livewire;
 
+use App\Models\Client;
 use App\Models\UserSubmission;
 use Livewire\Component;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SurveyEmail;
 use Illuminate\Support\Facades\Log;
 use App\Models\IdsGroup;
-
+use Firebase\JWT\JWT;
+use App\Models\SurveyToken;
+use Firebase\JWT\Key;
 
 class CustomerSatisfactionSurvey extends Component
 {
@@ -21,7 +24,7 @@ class CustomerSatisfactionSurvey extends Component
     public $clientContactName;
     public $clientEmailAddress;
     public $emailContent;
-
+    
     public $idsGroups; // Array to store all IDS groups
 
     public function mount()
@@ -45,19 +48,32 @@ class CustomerSatisfactionSurvey extends Component
         ]);
 
          // Check if the user has already submitted the form
-        $existingSubmission = UserSubmission::where('user_id', auth()->id())->first();
+        // $existingSubmission = UserSubmission::where('user_id', auth()->id())->first();
 
-        if ($existingSubmission) {
-            // If the user already submitted, show an error message
-            session()->flash('error', 'You have already submitted the form.');
-            return;
-        }
+        // if ($existingSubmission) {
+        //     // If the user already submitted, show an error message
+        //     session()->flash('error', 'You have already submitted the form.');
+        //     return;
+        // }
+        $client = Client::firstOrCreate(
+            ['email' => $this->clientEmailAddress],
+            [
+                'name' => $this->clientContactName,
+                'organization' => $this->clientOrganization,
+                'idsGroup' => $this->idsGroup,
+                'user_id' => auth()->id() // Nullable if not logged in
+            ]
+        );
+
+      
         
-        Mail::to($this->clientEmailAddress)->send(new SurveyEmail($this->clientContactName, $this->idsLeadManager));
+
+    
 
         // Store the form data in the database
-        UserSubmission::create([
+        $userSubmission =UserSubmission::create([
             'user_id' => auth()->id(),
+            'client_id' => $client->id,
             'idsGroup' => $this->idsGroup,
             'projectName' => $this->projectName,
             'csatOccurrence' => $this->csatOccurrence,
@@ -66,6 +82,26 @@ class CustomerSatisfactionSurvey extends Component
             'clientContactName' => $this->clientContactName,
             'clientEmailAddress' => $this->clientEmailAddress,
         ]);
+        // Generate JWT token
+        $token = JWT::encode([
+            'user_id' => auth()->id(),
+            'client_id' => $client->id,
+            'user_submission_id' => $userSubmission->id,
+            'exp' => time() + (60 * 60 * 24) // Token expires in 24 hours
+        ], env('JWT_SECRET'), 'HS256');
+
+        // $dcodeJWT = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
+
+        // dd($dcodeJWT);
+
+        // Save token to database
+        SurveyToken::create([
+            'token' => $token,
+            'user_submission_id' => $userSubmission->id,
+        ]);
+
+        // Include token in email
+        Mail::to($this->clientEmailAddress)->send(new SurveyEmail($this->clientContactName, $this->idsLeadManager, $client, $token));
        
 
         // You can add a success message or redirect

@@ -221,6 +221,14 @@
                     </div>
                     @error('responses.9') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
+                <div class="mb-3">
+                    <label class="form-label outer-label">Additional Comments</label>
+                    <div class="">
+                        <textarea wire:model="additionalComment" class="w-100"></textarea>
+                        
+                    </div>
+                    
+                </div>
 
               
 

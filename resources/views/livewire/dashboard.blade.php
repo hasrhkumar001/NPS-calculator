@@ -182,9 +182,9 @@
         </div>
     </div>
 
-    <!-- <div class="d-flex justify-content-end mb-3">
+    <div class="d-flex justify-content-end mb-3">
         <button wire:click="downloadCSV" class="btn btn-success">Download as CSV</button>
-    </div> -->
+    </div>
 
       <!-- Table Rendering the Responses -->
       <div class="table-responsive my-4">
@@ -201,6 +201,7 @@
                 @foreach(range(1, 9) as $index)
                     <tr>
                         <th>Q {{ $index }}</th>
+                        
                         @foreach($userSubmissions as $submission)
                             <td>
                                 @isset($responses[$submission->id][$index - 1])
@@ -211,7 +212,31 @@
                             </td>
                         @endforeach
                     </tr>
+                    
                 @endforeach
+                <tr>
+                    
+                    <th>NPS</th> 
+                    @foreach($userSubmissions as $submission)
+                    @php
+                        // Group responses by promoters, passives, and detractors
+                        $responsesForSubmission = $responses[$submission->id] ?? [];
+                        $promoters = collect($responsesForSubmission)->filter(fn($response) => $response->response >= 9)->count();
+                        $passives = collect($responsesForSubmission)->filter(fn($response) => $response->response >= 7 && $response->response < 9)->count();
+                        $detractors = collect($responsesForSubmission)->filter(fn($response) => $response->response < 7)->count();
+                        
+                        // Total responses for this submission
+                        $totalResponses = count($responsesForSubmission);
+
+                        // Calculate NPS
+                        $nps = round($totalResponses > 0
+                            ? (($promoters / $totalResponses) * 100) - (($detractors / $totalResponses) * 100)
+                            : 'NA',2);
+                            
+                    @endphp
+                        <td>{{ $nps }}</td>
+                    @endforeach
+                </tr>
             </tbody>
         </table>
     </div>

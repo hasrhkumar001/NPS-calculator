@@ -33,8 +33,10 @@
               <td>
                 <!-- Delete action -->
                 @if($selectedRole == 'users')
+                  <a href="{{ route('users.edit', $item->id) }}" wire:navigate class="btn btn-primary btn-sm shadow mr-2">EDIT</a>
                   <button class="btn btn-danger btn-sm shadow" wire:click="delete({{ $item->id }})">DELETE</button>
                 @elseif($selectedRole == 'admins')
+                  <a href="{{ route('admins.edit', $item->id) }}" wire:navigate class="btn btn-primary btn-sm shadow mr-2">EDIT</a>
                   <button class="btn btn-danger btn-sm shadow" wire:click="deleteAdmin({{ $item->id }})">DELETE</button>
                 @endif
               </td>

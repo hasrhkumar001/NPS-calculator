@@ -17,5 +17,10 @@ class UserSubmission extends Model
         'clientOrganization',
         'clientContactName',
         'clientEmailAddress',
+        'client_id'
     ];
+    public function responses()
+    {
+        return $this->hasMany(Survey2Response::class);
+    }
 }

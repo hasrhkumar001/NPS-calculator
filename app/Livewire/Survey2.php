@@ -2,33 +2,56 @@
 
 namespace App\Livewire;
 use App\Mail\ResponseEmail;
+use App\Models\Users;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
 use App\Models\UserSubmission; // Import your model
 use App\Models\Survey2Response; // Import your response model
+use App\Models\SurveyToken;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class Survey2 extends Component
 {
     public $responses = [];
-    public $submissionDetails; // Store submission details
+    public $additionalComments;
+    public $submissionDetails;
+    public $token;
 
-    public function mount()
+    public function mount($token)
     {
-        $userId = Auth::id();
-        // Fetch the user's submission details
-        $this->submissionDetails = UserSubmission::where('user_id', $userId)->first();
+        $this->token = $token;
 
-        // Check if the submission exists
-        if (!$this->submissionDetails) {
-            session()->flash('error', 'No submission found for this user.');
-            return redirect()->back();
+        try {
+            $decoded = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
+            $surveyToken = SurveyToken::where('token', $token)->first();
+            
+            if (!$surveyToken || $surveyToken->used) {
+                session()->flash('error', 'Invalid or expired token.');
+                return redirect()->route('survey.expired',['client' ,$decoded->client_id]);
+            }
+            
+
+            $this->submissionDetails = UserSubmission::find($decoded->user_submission_id);
+
+            if (!$this->submissionDetails) {
+                session()->flash('error', 'No submission found for this token.');
+                return redirect()->route('survey.expired',['client' ,$decoded->client_id]);
+            }
+            
+        } catch (\Exception $e) {
+            session()->flash('error', 'Invalid token.');
+            return redirect()->route('survey.expired',['client' ,$decoded->client_id]);
         }
     }
 
+
     public function submit()
     {
-        $userId = Auth::id();
+        $decoded = JWT::decode($this->token, new Key(env('JWT_SECRET'), 'HS256'));
+        // $user = Users::where('id', $decoded->user_id)->first();
+        // $userId = $user->id;
 
         // Validate responses to ensure each question has been answered
         $this->validate([
@@ -42,29 +65,46 @@ class Survey2 extends Component
             'responses.7' => 'required|in:0,1,2,3,4,5,6,7,8,9,10,Na',
             'responses.8' => 'required|in:0,1,2,3,4,5,6,7,8,9,10,Na',
             'responses.9' => 'required|in:0,1,2,3,4,5,6,7,8,9,10,Na',
-           
+            
            
 
         ]);
-
-        // Check if the user has already submitted the survey
-        $userSubmission = UserSubmission::where('user_id', $userId)->first();
         
-
+        // dd($decoded);
+        // Check if the user has already submitted the survey
+        $userSubmission = UserSubmission::where('client_id', $decoded->client_id)
+                            ->first();
+        
+       
         // Save each response
         foreach ($this->responses as $questionIndex => $response) {
             Survey2Response::updateOrCreate(
                 [
-                    'user_submission_id' => $userSubmission->id,
+                    'client_id' => $userSubmission->client_id,
                     'question_index' => $questionIndex, // Save the index as question ID
                 ],
                 ['response' => $response]
             );
         }
+        $promoters = collect($this->responses)->filter(function ($score) {
+            return $score >= 9;
+        })->count();
+        
+        $detractors = collect($this->responses)->filter(function ($score) {
+            return $score <= 6;
+        })->count();
+        
+        $totalRespondents = count($this->responses);
+        
+        if ($totalRespondents > 0) {
+            $nps = (($promoters / $totalRespondents) * 100) - (($detractors / $totalRespondents) * 100);
+        } else {
+            $nps = null; // Handle case where there are no responses
+        }
 
          // Prepare data for the email
          $surveyData = [
-            'nps' => 63, // You can calculate NPS based on responses
+            'nps' => $nps , // You can calculate NPS based on responses
             'project_name' => $userSubmission->projectName,
             'ids_lead' => $userSubmission->idsLeadManager,
             'client_organization' => $userSubmission->clientOrganization,
@@ -80,19 +120,25 @@ class Survey2 extends Component
             'value_for_money' => $this->responses[7],
             'overall_support' => $this->responses[8],
             'work_with_us_again' => $this->responses[9],
-            'additional_comments' => 'testing', // Replace this with actual comment if available
+            'additional_comments' => $this->additionalComments ?? 'No additional comments.', // Replace this with actual comment if available
         ];
 
+        // Mark the token as used after submission
+        $surveyToken = SurveyToken::where('token', $this->token)->first();
+        $surveyToken->used = true;
+        $surveyToken->save();
         
-
         // Update user submission status to 'done'
         $userSubmission->status = 'done';
         $userSubmission->save();
         
         session()->flash('message', 'Survey responses have been saved.');
+        $userEmail = Users::where('id', $userSubmission->user_id)->first();
+        
          // Send email
-         Mail::to($userSubmission->clientEmailAddress)->send(new ResponseEmail($surveyData));
-        return redirect()->route('email-sent', ['email' => $userSubmission->clientEmailAddress]);
+        Mail::to($userEmail->email)->send(new ResponseEmail($surveyData));
+        
+        return redirect()->route('email-sent',['client' ,$userSubmission->client_id]);
     }
     public function render()
     {

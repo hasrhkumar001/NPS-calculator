@@ -7,7 +7,7 @@
 </head>
 <body>
     <h2>Customer Satisfaction Survey</h2>
-    <!-- <p><strong>NPS:</strong> {{ $surveyData['nps'] }}%</p> -->
+    <p><strong>NPS:</strong> {{ $surveyData['nps'] }}%</p>
     <p><strong>Project Name:</strong> {{ $surveyData['project_name'] }}</p>
     <p><strong>IDS Lead/Manager:</strong> {{ $surveyData['ids_lead'] }}</p>
     <p><strong>Client Organization:</strong> {{ $surveyData['client_organization'] }}</p>

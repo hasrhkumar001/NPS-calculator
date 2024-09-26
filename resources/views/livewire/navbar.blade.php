@@ -1,12 +1,16 @@
+
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container">
         <!-- Brand -->
         @if($role === 'admin')
         <a class="navbar-brand" href="/admin/dashboard">IDS InfoTech</a>
         
-        @else
+        @elseif($role === 'user')
         <a class="navbar-brand" href="/dashboard">IDS InfoTech</a>
+        @else
+        <a class="navbar-brand" href="# ">IDS InfoTech</a>
         @endif
+        
 
         <!-- Toggle Button (for smaller screens) -->
         @if($role)

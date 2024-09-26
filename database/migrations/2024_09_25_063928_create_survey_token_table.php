@@ -9,16 +9,17 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up()
+    public function up(): void
     {
-        Schema::create('survey2_responses', function (Blueprint $table) {
+        Schema::create('survey_token', function (Blueprint $table) {
             $table->id();
+            $table->string('token')->unique();
             $table->unsignedBigInteger('user_submission_id');
-            $table->integer('question_index'); // Question index (0 for first question, 1 for second, etc.)
-            $table->string('response'); // Store the response (0-10 or NA)
+            $table->boolean('used')->default(false);
             $table->timestamps();
 
             $table->foreign('user_submission_id')->references('id')->on('user_submissions')->onDelete('cascade');
+        
         });
     }
 
@@ -27,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('survey2_responses');
+        Schema::dropIfExists('survey_token');
     }
 };
