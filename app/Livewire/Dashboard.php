@@ -163,9 +163,9 @@ class Dashboard extends Component
         public function downloadCSV()
         {
             $userSubmissions = UserSubmission::with('responses')
-                                ->where('status','done')
+                                ->where('status', 'done')
                                 ->get();
-        
+
             $headers = [
                 "Content-type" => "text/csv",
                 "Content-Disposition" => "attachment; filename=user_submissions.csv",
@@ -173,30 +173,41 @@ class Dashboard extends Component
                 "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
                 "Expires" => "0"
             ];
-    
+
+            // Prepare columns with NPS column
             $columns = ['Question #'];
             foreach ($userSubmissions as $submission) {
                 $columns[] = $submission->clientContactName . ' (' . $submission->updated_at->format('Y-m-d') . ')';
             }
-    
+              // Add NPS as the last column
+
             $callback = function() use ($userSubmissions, $columns) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $columns);
-    
+
                 for ($i = 1; $i <= 9; $i++) {
                     $row = ['Q ' . $i];
                     foreach ($userSubmissions as $submission) {
+                        // Fetch the response for each question
                         $response = $submission->responses->where('question_index', $i)->first();
-                        
                         $row[] = $response ? $response->response : 'NA';
                     }
                     fputcsv($file, $row);
                 }
-    
+
+                // Add the NPS row
+                $npsRow = ['NPS'];
+                foreach ($userSubmissions as $submission) {
+                    // Calculate NPS for each submission
+                    $nps = $this->calculateNPSForSubmission($submission);  // Helper method to calculate NPS
+                    $npsRow[] = $nps;
+                }
+                fputcsv($file, $npsRow);
+
                 fclose($file);
             };
+
             return new StreamedResponse($callback, 200, $headers);
-            
         }
         
         

@@ -30,12 +30,13 @@ Route::get('/survey/failed/{client}', SurveyExpired::class )->name('survey.expir
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', CustomerSatisfactionSurvey::class);
     Route::get('/clients', UserDashboard::class );
+    
 });
 
 
 Route::middleware('auth:admin')->group(function(){
     Route::get('/admin/dashboard', Dashboard::class );
-    Route::get('/users/{userId}/edit', EditUser::class)->name('users.edit');
+    Route::get('/user/{userId}/edit', EditUser::class)->name('users.edit');
     Route::get('/admin/{adminId}/edit', EditAdmin::class)->name('admins.edit');
     Route::get('/users',UserList::class);
     Route::get('/users-status',UserStatusList::class);

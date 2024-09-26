@@ -30,7 +30,7 @@
                         </div>
             </form>
             </div>
-            <table class="table table-hover">
+            <table class="table table-bordered">
                 <thead>
                     <tr class="text-center">
                     <th scope="col">Sr No.</th>
@@ -40,7 +40,7 @@
                     <th scope="col">Client Contact Name</th>
                     <th scope="col">Client Organization</th>
                     <th scope="col">Client Email</th>
-                    <th scope="col">Email Reply Status</th>
+                    <th scope="col">Survey Status</th>
                     <th scope="col">Date</th>
                     
                     

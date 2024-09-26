@@ -1,23 +1,30 @@
-<div>
-    <h2>Edit User</h2>
+<div class="container mt-4">
+    <h2 class="mb-4">Edit User</h2>
     <form wire:submit.prevent="updateAdmin">
-        <div>
-            <label for="name">Name</label>
-            <input type="text" id="name" wire:model="name">
-            @error('name') <span class="error">{{ $message }}</span> @enderror
+        <div class="form-group mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input type="text" id="name" class="form-control" wire:model="name">
+            @error('name') 
+                <small class="text-danger">{{ $message }}</small> 
+            @enderror
         </div>
-        <div>
-            <label for="email">Email</label>
-            <input type="email" id="email" wire:model="email">
-            @error('email') <span class="error">{{ $message }}</span> @enderror
+
+        <div class="form-group mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" class="form-control" wire:model="email">
+            @error('email') 
+                <small class="text-danger">{{ $message }}</small> 
+            @enderror
         </div>
-        <div>
-            <label for="password">New Password (leave blank to keep current)</label>
-            <input type="password" id="password" wire:model="password">
-            @error('password') <span class="error">{{ $message }}</span> @enderror
+
+        <div class="form-group mb-3">
+            <label for="password" class="form-label">New Password (leave blank to keep current)</label>
+            <input type="password" id="password" class="form-control" wire:model="password">
+            @error('password') 
+                <small class="text-danger">{{ $message }}</small> 
+            @enderror
         </div>
-        
-        
-        <button type="submit">Update Admin</button>
+
+        <button type="submit" class="btn btn-primary">Update Admin</button>
     </form>
 </div>

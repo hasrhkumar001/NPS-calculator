@@ -34,6 +34,10 @@
                         <li><a class="dropdown-item" wire:navigate href="/users">User List</a></li>
                         <li><a class="dropdown-item" wire:navigate href="/ids-groups/create">Add Group</a></li>
                         <li><a class="dropdown-item" wire:navigate href="/ids-groups">Group List</a></li>
+                        <li><a class="dropdown-item" wire:navigate href="/users-status">User Status List</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                    @elseif($role === 'user')
+                        <li><a class="dropdown-item" wire:navigate href="/clients">Clients Status List</a></li>
                         <li><hr class="dropdown-divider"></li>
                     @endif
                         <li><a class="dropdown-item" href="#" wire:click.prevent="logout">Logout</a></li>

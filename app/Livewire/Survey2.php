@@ -97,7 +97,7 @@ class Survey2 extends Component
         $totalRespondents = count($this->responses);
         
         if ($totalRespondents > 0) {
-            $nps = (($promoters / $totalRespondents) * 100) - (($detractors / $totalRespondents) * 100);
+            $nps = round((($promoters / $totalRespondents) * 100) - (($detractors / $totalRespondents) * 100),2);
         } else {
             $nps = null; // Handle case where there are no responses
         }

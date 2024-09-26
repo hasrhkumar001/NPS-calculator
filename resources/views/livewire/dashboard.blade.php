@@ -187,23 +187,24 @@
     </div>
 
       <!-- Table Rendering the Responses -->
+      @if(count($userSubmissions) > 0)
       <div class="table-responsive my-4">
         <table class="table table-bordered">
             <thead>
                 <tr>
-                    <th>Question #</th>
+                    <th style="white-space: nowrap;">Question #</th>
                     @foreach($userSubmissions as $submission)
-                        <th><strong data-group="{{$submission->idsGroup}}">{{ $submission->clientContactName }} ({{  $submission->updated_at->format('Y-m-d') }})</th>
+                        <th style="white-space: nowrap;"><strong data-group="{{$submission->idsGroup}}">{{ $submission->clientContactName }} ({{  $submission->updated_at->format('Y-m-d') }})</th>
                     @endforeach
                 </tr>
             </thead>
             <tbody>
                 @foreach(range(1, 9) as $index)
                     <tr>
-                        <th>Q {{ $index }}</th>
+                        <th style="white-space: nowrap;">Q {{ $index }}</th>
                         
                         @foreach($userSubmissions as $submission)
-                            <td>
+                            <td style="white-space: nowrap;">
                                 @isset($responses[$submission->id][$index - 1])
                                     {{ $responses[$submission->id][$index - 1]->response ?? 'NA' }}
                                 @else
@@ -216,7 +217,7 @@
                 @endforeach
                 <tr>
                     
-                    <th>NPS</th> 
+                    <th style="white-space: nowrap;">NPS</th> 
                     @foreach($userSubmissions as $submission)
                     @php
                         // Group responses by promoters, passives, and detractors
@@ -234,13 +235,15 @@
                             : 'NA',2);
                             
                     @endphp
-                        <td>{{ $nps }}</td>
+                        <td style="white-space: nowrap;">{{ $nps }}</td>
                     @endforeach
                 </tr>
             </tbody>
         </table>
     </div>
-
+    @else
+    <p class="text-center">No submissions available.</p>
+    @endif
     
 </div>
 
