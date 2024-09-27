@@ -15,17 +15,18 @@
     <p><strong>Email Sent Date:</strong> {{ $surveyData['email_sent_date'] }}</p>
     <p><strong>Survey Date:</strong> {{ $surveyData['survey_date'] }}</p>
     <p><strong>CSAT:</strong> Quarterly</p>
+    <table  border="1" style="border-collapse:collapse">
+    <tr><th>Quality of Delivery</th> <td>{{ $surveyData['quality_of_delivery'] }}</td></tr>
+    <tr><th>Quality of Responses</th> <td> {{ $surveyData['quality_of_responses'] }}</td></tr>
+    <tr><th>Timeliness of Responses</th> <td> {{ $surveyData['timeliness_of_responses'] }}</td></tr>
+    <tr><th>IT Support</th> <td> {{ $surveyData['it_support'] }}</td></tr>
+    <tr><th>Project Management</th> <td> {{ $surveyData['project_management'] }}</td></tr>
+    <tr><th>Use of Latest Tools/Technology</th> <td> {{ $surveyData['latest_tools'] }}</td></tr>
+    <tr><th>Value for Money</th> <td> {{ $surveyData['value_for_money'] }}</td></tr>
+    <tr><th>Overall Support</th> <td> {{ $surveyData['overall_support'] }}</td></tr>
+    <tr><th>How likely are you to work with us again on other projects?</th> <td> {{ $surveyData['work_with_us_again'] }}</td></tr>
 
-    <p><strong>Quality of Delivery:</strong> {{ $surveyData['quality_of_delivery'] }}</p>
-    <p><strong>Quality of Responses:</strong> {{ $surveyData['quality_of_responses'] }}</p>
-    <p><strong>Timeliness of Responses:</strong> {{ $surveyData['timeliness_of_responses'] }}</p>
-    <p><strong>IT Support:</strong> {{ $surveyData['it_support'] }}</p>
-    <p><strong>Project Management:</strong> {{ $surveyData['project_management'] }}</p>
-    <p><strong>Use of Latest Tools/Technology:</strong> {{ $surveyData['latest_tools'] }}</p>
-    <p><strong>Value for Money:</strong> {{ $surveyData['value_for_money'] }}</p>
-    <p><strong>Overall Support:</strong> {{ $surveyData['overall_support'] }}</p>
-    <p><strong>How likely are you to work with us again on other projects?</strong> {{ $surveyData['work_with_us_again'] }}</p>
-
-    <p><strong>Additional Comments:</strong> {{ $surveyData['additional_comments'] }}</p>
+    <tr><th>Additional Comments </th> <td> {{ $surveyData['additional_comments'] }}</td></tr>
+    </table>
 </body>
 </html>

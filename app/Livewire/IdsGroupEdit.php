@@ -9,11 +9,11 @@ class IdsGroupEdit extends Component
 {
     public $group;
     public $name;
-    public $description;
+    
 
     protected $rules = [
         'name' => 'required|string|max:255',
-        'description' => 'nullable|string',
+        
     ];
 
     public function mount(IdsGroup $group)

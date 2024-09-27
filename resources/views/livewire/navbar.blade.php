@@ -38,6 +38,7 @@
                         <li><hr class="dropdown-divider"></li>
                     @elseif($role === 'user')
                         <li><a class="dropdown-item" wire:navigate href="/clients">Clients Status List</a></li>
+                        <li><a class="dropdown-item" href="{{ route('users.edit.user', auth()->user()->id) }}" wire:navigate >Edit Profile</a></li>
                         <li><hr class="dropdown-divider"></li>
                     @endif
                         <li><a class="dropdown-item" href="#" wire:click.prevent="logout">Logout</a></li>

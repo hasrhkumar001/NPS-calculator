@@ -21,6 +21,6 @@ class UserSubmission extends Model
     ];
     public function responses()
     {
-        return $this->hasMany(Survey2Response::class);
+        return $this->hasMany(Survey2Response::class, 'client_id', 'id');
     }
 }

@@ -44,7 +44,7 @@
                     <th scope="col">Date</th>
                     
                     
-                    <th scope="col" colspan="2">Actions</th>
+                    <!-- <th scope="col" colspan="2">Actions</th> -->
                     </tr>
                 </thead>
                 <tbody>
@@ -63,7 +63,7 @@
                     
                     
                     
-                    <td ><button class="btn btn-danger btn-sm shadow" wire:click="delete({{$users->id}})" wire:confirm="Are you sure you want to delete this? ">DELETE</button></td>
+                    <!-- <td ><button class="btn btn-danger btn-sm shadow" wire:click="delete({{$users->id}})" wire:confirm="Are you sure you want to delete this? ">DELETE</button></td> -->
                     </tr>
                     @endforeach
                     

@@ -196,13 +196,13 @@ class Dashboard extends Component
                 }
 
                 // Add the NPS row
-                $npsRow = ['NPS'];
-                foreach ($userSubmissions as $submission) {
-                    // Calculate NPS for each submission
-                    $nps = $this->calculateNPSForSubmission($submission);  // Helper method to calculate NPS
-                    $npsRow[] = $nps;
-                }
-                fputcsv($file, $npsRow);
+                // $npsRow = ['NPS'];
+                // foreach ($userSubmissions as $submission) {
+                //     // Calculate NPS for each submission
+                //     $nps = $this->calculateNPSForSubmission($submission);  // Helper method to calculate NPS
+                //     $npsRow[] = $nps;
+                // }
+                // fputcsv($file, $npsRow);
 
                 fclose($file);
             };

@@ -1,4 +1,14 @@
 <div class="container mt-4">
+                @if (session()->has('message'))
+                    <div class="alert alert-success">
+                        {{ session('message') }}
+                    </div>
+                @endif
+                @if (session()->has('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
     <h2 class="mb-4">Edit User</h2>
     <form wire:submit.prevent="updateAdmin">
         <div class="form-group mb-3">

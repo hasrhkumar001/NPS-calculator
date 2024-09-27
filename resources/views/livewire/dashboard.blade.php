@@ -47,7 +47,7 @@
 
         <!-- NPS and Total Survey Info -->
         <div style="padding:0px 100px;margin:150px 0px ">
-            <div class="row mb-4 d-flex " style="">
+            <div class="row mb-4 d-flex align-items-center" style="">
                 <div class="col-md-4">
                     <div class="">
                         <div class="text-center">
@@ -68,19 +68,19 @@
                 @if($nps > 60)
                     <div class="">
                         <div class="">
-                            <h1 class="text-white">😃</h1>
+                            <h1 class="text-white" style="font-size:70px">😃</h1>
                         </div>
                     </div>
                 @elseif($nps > 30 && $nps <= 60)
                     <div class="">
                         <div class="text-center">
-                            <h1 class="text-white">😐</h1>
+                            <h1 class="text-white" style="font-size:70px">😐</h1>
                         </div>
                     </div>
                 @else
                     <div class="">
-                        <div class="text-center d-flex align-items-center justify-content-center ">
-                            <h1 class="text-white fs-1">🙁</h1>
+                        <div class=" d-flex align-items-center justify-content-center ">
+                            <h1 class="text-white " style="font-size:70px">🙁</h1>
                         </div>
                     </div>
                 @endif
@@ -235,7 +235,7 @@
                             : 'NA',2);
                             
                     @endphp
-                        <td style="white-space: nowrap;">{{ $nps }}</td>
+                        <td style="white-space: nowrap;">{{ $nps }}%</td>
                     @endforeach
                 </tr>
             </tbody>

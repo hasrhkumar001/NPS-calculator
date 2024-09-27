@@ -9,67 +9,91 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
     <style>
-        /* Hide the radio inputs */
-        input[type=radio] {
-            position: absolute;
-            visibility: hidden;
-        }
+            /* Hide the radio inputs */
+            input[type=radio] {
+                position: absolute;
+                visibility: hidden;
+            }
 
+            /* Style the labels */
+            .radio-label {
+                display: inline-block;
+                cursor: pointer;
+                padding: 10px 20px;
+                color: white;
+                font-weight: bold;
+                text-align: center;
+                transition: background-color 0.3s, color 0.3s;
+            }
 
-        /* Style the labels */
+            /* Style for outer labels (if used for wrapping radio buttons) */
+            .outer-label {
+                cursor: default;
+                padding: 0;
+                background-color: transparent;
+                border: none;
+            }
 
-        label {
-            display: inline-block;
-            cursor: pointer;
-            padding: 10px 20px;
-            background-color: #ddd;
-            border: 1px solid #ccc;
-            color: #333;
-            font-weight: bold;
-            text-align: center;
-            transition: background-color 0.3s, color 0.3s;
-        }
-        .outer-label{
-            cursor: default;
-            padding: 0px 0px;
-            background-color: transparent;
-            border: none;
-        }
+            /* Colors for the radio labels based on index */
+            .radio-label:nth-of-type(1),
+            .radio-label:nth-of-type(2),
+            .radio-label:nth-of-type(3) {
+                background-color: #e40000; /* Red for 0, 1, 2 */
+            }
 
-        /* Add a class for the checked label */
-        .checked {
-            background-color: #28a745; /* Green for selected */
-            color: white;
-        }
+            .radio-label:nth-of-type(4),
+            .radio-label:nth-of-type(5),
+            .radio-label:nth-of-type(6),
+            .radio-label:nth-of-type(7) {
+                background-color: #ff7a00; /* Orange for 3, 4, 5 */
+            }
 
-        /* Add a little border between the labels */
-        label + label {
-            border-left: 1px solid #fff;
-        }
+            
+            .radio-label:nth-of-type(8),
+            .radio-label:nth-of-type(9) {
+                background-color: #ffd400; /* Yellow for 6, 7, 8 */
+            }
 
-        /* Wrap radio buttons in a responsive container */
-        .radio-group {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
+            .radio-label:nth-of-type(10),
+            .radio-label:nth-of-type(11) {
+                background-color: #80b918; /* Green for 9, 10 */
+            }
 
-        .radio-group label {
-            flex: 1; /* Distribute equally */
-            text-align: center;
-        }
+            .radio-label:nth-of-type(12) {
+                background-color: #6c757d; /* Gray for NA */
+            }
 
-        /* Override Bootstrap's form-check class to fit our design */
-        .form-check {
-            display: block;
-        }
+            /* Add a class for the checked label */
+            input[type=radio]:checked + label {
+                background-color: rgba(3, 2, 0, 0.6);
+                color: black;
+            }
 
-        /* Customize card header */
-        .card-header {
-            background-color: #007bff;
-            color: white;
-        }
-    </style>
+            /* Add a little border between the labels */
+            .radio-label + .radio-label {
+                border-left: 1px solid #fff;
+            }
+
+            /* Responsive container for radio buttons */
+            .radio-group {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 20px;
+            }
+
+            /* Labels inside the radio group should be equally distributed */
+            .radio-group .radio-label {
+                flex: 1;
+                text-align: center;
+            }
+
+            /* Customize card header */
+            .card-header {
+                background-color: #007bff;
+                color: white;
+            }
+        </style>
+                                                                
 </head>
 <body>
 <div class="card">
@@ -98,15 +122,15 @@
                 <h4 >Please rate us on our services/offerings/products such as:</h4>
 
                 <!-- Quality of Delivery -->
-                <div class="mb-3">
+                <div class="mb-3 mt-5">
                     <label class="form-label outer-label">Quality of Delivery</label>
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="quality{{ $i }}" wire:model="responses.1" value="{{ $i }}">
-                            <label for="quality{{ $i }}">{{ $i }}</label>
+                            <label class="radio-label" for="quality{{ $i }}">{{ $i }}</label>
                         @endfor
                         <input type="radio" id="qualityNa" wire:model="responses.1" value="Na">
-                        <label for="qualityNa">N/A</label>
+                        <label class="radio-label" for="qualityNa">N/A</label>
                     </div>
                     @error('responses.1') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -117,10 +141,10 @@
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="responses{{ $i }}" wire:model="responses.2" value="{{ $i }}">
-                            <label for="responses{{ $i }}">{{ $i }}</label>
+                            <label class="radio-label" for="responses{{ $i }}">{{ $i }}</label>
                         @endfor
                         <input type="radio" id="responsesNa" wire:model="responses.2" value="Na">
-                        <label for="responsesNa">N/A</label>
+                        <label class="radio-label" for="responsesNa">N/A</label>
                     </div>
                     @error('responses.2') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -131,10 +155,10 @@
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="timeliness{{ $i }}" wire:model="responses.3" value="{{ $i }}">
-                            <label for="timeliness{{ $i }}">{{ $i }}</label>
+                            <label class="radio-label" for="timeliness{{ $i }}">{{ $i }}</label>
                         @endfor
                         <input type="radio" id="timelinessNa" wire:model="responses.3" value="Na">
-                        <label for="timelinessNa">N/A</label>
+                        <label class="radio-label" for="timelinessNa">N/A</label>
                     </div>
                     @error('responses.3') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -145,10 +169,10 @@
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="support{{ $i }}" wire:model="responses.4" value="{{ $i }}">
-                            <label for="support{{ $i }}">{{ $i }}</label>
+                            <label class="radio-label" for="support{{ $i }}">{{ $i }}</label>
                         @endfor
                         <input type="radio" id="supportNa" wire:model="responses.4" value="Na">
-                        <label for="supportNa">N/A</label>
+                        <label class="radio-label" for="supportNa">N/A</label>
                     </div>
                     @error('responses.4') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -159,10 +183,10 @@
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="management{{ $i }}" wire:model="responses.5" value="{{ $i }}">
-                            <label for="management{{ $i }}">{{ $i }}</label>
+                            <label class="radio-label" for="management{{ $i }}">{{ $i }}</label>
                         @endfor
                         <input type="radio" id="managementNa" wire:model="responses.5" value="Na">
-                        <label for="managementNa">N/A</label>
+                        <label class="radio-label" for="managementNa">N/A</label>
                     </div>
                     @error('responses.5') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -172,10 +196,10 @@
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="deadlines{{ $i }}" wire:model="responses.6" value="{{ $i }}">
-                            <label for="deadlines{{ $i }}">{{ $i }}</label>
+                            <label class="radio-label" for="deadlines{{ $i }}">{{ $i }}</label>
                         @endfor
                         <input type="radio" id="deadlinesNa" wire:model="responses.6" value="Na">
-                        <label for="deadlinesNa">N/A</label>
+                        <label class="radio-label" for="deadlinesNa">N/A</label>
                     </div>
                     @error('responses.6') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -186,10 +210,10 @@
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="communication{{ $i }}" wire:model="responses.7" value="{{ $i }}">
-                            <label for="communication{{ $i }}">{{ $i }}</label>
+                            <label class="radio-label" for="communication{{ $i }}">{{ $i }}</label>
                         @endfor
                         <input type="radio" id="communicationNa" wire:model="responses.7" value="Na">
-                        <label for="communicationNa">N/A</label>
+                        <label class="radio-label" for="communicationNa">N/A</label>
                     </div>
                     @error('responses.7') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -200,10 +224,10 @@
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="problemsolving{{ $i }}" wire:model="responses.8" value="{{ $i }}">
-                            <label for="problemsolving{{ $i }}">{{ $i }}</label>
+                            <label class="radio-label" for="problemsolving{{ $i }}">{{ $i }}</label>
                         @endfor
                         <input type="radio" id="problemsolvingNa" wire:model="responses.8" value="Na">
-                        <label for="problemsolvingNa">N/A</label>
+                        <label class="radio-label" for="problemsolvingNa">N/A</label>
                     </div>
                     @error('responses.8') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>
@@ -214,10 +238,10 @@
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="innovation{{ $i }}" wire:model="responses.9" value="{{ $i }}">
-                            <label for="innovation{{ $i }}">{{ $i }}</label>
+                            <label class="radio-label" for="innovation{{ $i }}">{{ $i }}</label>
                         @endfor
                         <input type="radio" id="innovationNa" wire:model="responses.9" value="Na">
-                        <label for="innovationNa">N/A</label>
+                        <label class="radio-label" for="innovationNa">N/A</label>
                     </div>
                     @error('responses.9') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>

@@ -33,6 +33,7 @@ class EditUser extends Component
         $this->idsGroup = $user->idsGroup; // Fetch the current IDS group of the user
         $this->idsGroups = IdsGroup::all(); // Fetch all available IDS groups
     }
+    
 
     public function updateUser()
     {
@@ -58,7 +59,7 @@ class EditUser extends Component
 
         session()->flash('message', 'User updated successfully.');
         
-        $this->reset(['password', 'password_confirmation']);
+        $this->reset(['password']);
     }
 
     public function render()

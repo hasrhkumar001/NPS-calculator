@@ -1,4 +1,14 @@
 <div class="container">
+@if (session()->has('message'))
+                    <div class="alert alert-success">
+                        {{ session('message') }}
+                    </div>
+                @endif
+                @if (session()->has('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
     <form wire:submit.prevent="submit">
         <div class="form-group mb-3  mt-5">
             <label for="name"  class="form-label">Group Name</label>
