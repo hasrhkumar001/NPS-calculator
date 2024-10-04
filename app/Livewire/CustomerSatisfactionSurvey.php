@@ -46,29 +46,17 @@ class CustomerSatisfactionSurvey extends Component
             'clientContactName' => 'required',
             'clientEmailAddress' => 'required|email',
         ]);
-
-         // Check if the user has already submitted the form
-        // $existingSubmission = UserSubmission::where('user_id', auth()->id())->first();
-
-        // if ($existingSubmission) {
-        //     // If the user already submitted, show an error message
-        //     session()->flash('error', 'You have already submitted the form.');
-        //     return;
-        // }
-        $client = Client::firstOrCreate(
-            ['email' => $this->clientEmailAddress],
+        
+        
+        $client = Client::Create(
             [
                 'name' => $this->clientContactName,
+                'email' => $this->clientEmailAddress,
                 'organization' => $this->clientOrganization,
                 'idsGroup' => $this->idsGroup,
                 'user_id' => auth()->id() // Nullable if not logged in
             ]
         );
-
-      
-        
-
-    
 
         // Store the form data in the database
         $userSubmission =UserSubmission::create([
@@ -105,7 +93,8 @@ class CustomerSatisfactionSurvey extends Component
        
 
         // You can add a success message or redirect
-        session()->flash('message', 'Survey email has been sent to the client.');
+        // session()->flash('message', 'Survey email has been sent to the client.');
+        return $this->redirect('/sent/'.$this->clientEmailAddress,navigate:true);
     }
     public function render()
     {

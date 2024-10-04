@@ -14,6 +14,6 @@ class EmailConfirmation extends Component
     }
     public function render()
     {
-        return view('livewire.email-confirmation');
+        return view('livewire.email-confirmation')->layout('components.layouts.app-default');
     }
 }

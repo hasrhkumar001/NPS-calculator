@@ -1,7 +1,7 @@
 <div class="container w-50 mt-5">
 <div class="card shadow">
         <div class="card-header text-center fs-3 fw-bold" style="background-color: #2d4575; color: white">
-            Login 
+            User Login 
         </div>
         <div class="card-body">
 

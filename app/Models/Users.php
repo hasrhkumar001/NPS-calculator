@@ -20,4 +20,7 @@ class Users extends Model
         
         
     ];
+    // public function idsGroups() {
+    //     return $this->belongsToMany(IdsGroup::class,'users_groups' , 'group_id' ,'user_id')->withTimestamps();
+    // }
 }

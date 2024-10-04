@@ -2,7 +2,7 @@
    
 <div class="card">
         <div class="card-header  bg-primary text-white">
-            <h2 class="mb-0 container p-5 display-3 text-center">Customer Satisfaction Survey</h2>
+            <h2 class="mb-0 container p-5 display-3 text-center" style="height:200px">Customer Satisfaction Survey</h2>
         </div>
         <div class="container mt-4">
     
@@ -30,6 +30,9 @@
                             <option value="{{ $group->name }}">{{ $group->name }}</option>
                         @endforeach
                     </select>
+                    @error('idsGroup') 
+                                <span class="text-danger">{{ $message }}</span>
+                    @enderror
                 </div>
                     <div class="col-md-6">
                         <label for="date" class="form-label">Date</label>
@@ -41,6 +44,9 @@
                     <div class="col-md-6">
                         <label for="projectName" class="form-label">Project Name</label>
                         <input type="text" wire:model="projectName" id="projectName" class="form-control">
+                        @error('projectName') 
+                                <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
                     <div class="col-md-6">
                         <label for="csatOccurrence" class="form-label">CSAT Occurrence</label>
@@ -50,6 +56,9 @@
                             <option value="Quaterly">Quaterly</option>
                             <option value="Yearly">Yearly</option>
                         </select>
+                        @error('csatOccurrence') 
+                                <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
 
@@ -57,10 +66,16 @@
                     <div class="col-md-6">
                         <label for="idsLeadManager" class="form-label">IDS Lead/Manager</label>
                         <input type="text" wire:model="idsLeadManager" id="idsLeadManager" class="form-control">
+                        @error('idsLeadManager') 
+                                <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
                     <div class="col-md-6">
                         <label for="clientOrganization" class="form-label">Client Organization</label>
                         <input type="text" wire:model="clientOrganization" id="clientOrganization" class="form-control">
+                        @error('clientOrganization') 
+                                <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
 
@@ -68,10 +83,16 @@
                     <div class="col-md-6">
                         <label for="clientContactName" class="form-label">Client Contact Name</label>
                         <input type="text" wire:model="clientContactName" id="clientContactName" class="form-control">
+                        @error('clientContactName') 
+                                <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
                     <div class="col-md-6">
                         <label for="clientEmailAddress" class="form-label">Client Email Address</label>
                         <input type="email" wire:model="clientEmailAddress" id="clientEmailAddress" class="form-control">
+                        @error('clientEmailAddress') 
+                                <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
                 </div>
 

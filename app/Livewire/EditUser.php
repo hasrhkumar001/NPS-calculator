@@ -21,7 +21,7 @@ class EditUser extends Component
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'password' => 'sometimes|nullable|min:6',
-        'idsGroup' => 'required|string', // Ensure this field is validated
+        'idsGroup' => 'required', // Ensure this field is validated
     ];
 
     public function mount($userId)

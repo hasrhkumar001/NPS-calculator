@@ -129,8 +129,8 @@
                             <input type="radio" id="quality{{ $i }}" wire:model="responses.1" value="{{ $i }}">
                             <label class="radio-label" for="quality{{ $i }}">{{ $i }}</label>
                         @endfor
-                        <input type="radio" id="qualityNa" wire:model="responses.1" value="Na">
-                        <label class="radio-label" for="qualityNa">N/A</label>
+                        <input type="radio" id="qualityNa"  wire:model="responses.1" value="Na">
+                        <label class="radio-label"  for="qualityNa">N/A</label>
                     </div>
                     @error('responses.1') <span class="text-danger">{{ $message }}</span> @enderror
                 </div>

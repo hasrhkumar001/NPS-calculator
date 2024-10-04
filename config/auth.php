@@ -44,7 +44,10 @@ return [
             'driver' => 'session',
             'provider' => 'admins',
         ],
-        
+        'subadmin' => [
+            'driver' => 'session',
+            'provider' => 'subadmins',
+        ],
     ],
 
     /*
@@ -72,6 +75,11 @@ return [
         'admins' => [
             'driver' => 'eloquent',
             'model' => App\Models\Admin::class,
+        ],
+        
+        'subadmins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\SubAdmin::class, 
         ],
 
         
@@ -114,6 +122,7 @@ return [
             'expire' => 60,
             'throttle' => 60,
         ],
+        
     ],
 
     /*

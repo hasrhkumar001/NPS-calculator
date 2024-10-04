@@ -10,7 +10,7 @@
                         {{ session('error') }}
                     </div>
                 @endif
-    <h2>Groups List</h2>
+    <h2 class="mb-3">Groups List</h2>
     <table class="table table-bordered">
         <thead>
             <tr class="text-center">

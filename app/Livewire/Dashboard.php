@@ -27,8 +27,10 @@ class Dashboard extends Component
     public $dateTo;
     public $csat;
     public $promoterPercentage;
+    public $neutralPercentage;
     public $detractorPercentage;
    
+    
 
     public function mount()
     {
@@ -55,33 +57,53 @@ class Dashboard extends Component
 
     private function calculateNPS()
     {
-        $this->totalSurveys = $this->userSubmissions->where('status', 'done')->count();
+        // Recalculate total number of valid surveys
+        $this->totalSurveys = $this->userSubmissions->count();
+
+      
+
+        // Aggregate responses from responseCounts, skipping 'NA'
+        $filteredResponses = array_diff_key($this->responseCounts, array_flip(['Na']));
         
+        // Calculate total valid responses
+        $this->total = array_sum($filteredResponses);
         
-        // Sum the filtered responses
-        $this->total = array_sum($this->responseCounts);
-        // Set total to 1 if no valid responses were found
+        // Default total to 1 to avoid division errors (if no responses)
         if ($this->total == 0) {
             $this->total = 1;
         }
-
         $this->promoters = ($this->responseCounts[9] ?? 0) + ($this->responseCounts[10] ?? 0);
         $this->neutrals = ($this->responseCounts[7] ?? 0) + ($this->responseCounts[8] ?? 0);
         $this->detractors = array_sum(array_intersect_key($this->responseCounts, array_flip(range(0, 6))));
-
+        // dd( $this->responseCounts);
+    
+        // Calculate promoter and detractor percentages
         $this->promoterPercentage = round(($this->promoters / $this->total) * 100, 2);
-        $this->detractorPercentage = round((array_sum(array_intersect_key($this->responseCounts, array_flip(range(1, 6)))) / $this->total) * 100, 2);
-
-
+        $this->neutralPercentage = round(($this->neutrals / $this->total) * 100, 2);
+        $this->detractorPercentage = round(($this->detractors / $this->total) * 100, 2);
+    
+        // Calculate the final NPS score
         $this->nps = round($this->promoterPercentage - $this->detractorPercentage, 2);
+
+        // Dispatch the event with updated data
+        $this->dispatch('updateCharts', [
+            'promoters' => $this->promoters,
+            'neutrals' => $this->neutrals,
+            'detractors' => $this->detractors,
+            'promoterPercentage' => $this->promoterPercentage,
+            'neutralPercentage' => $this->neutralPercentage,
+            'detractorPercentage' => $this->detractorPercentage,
+            'responseCounts' => $filteredResponses,
+        ]);
+        
     }
 
 
     public function filter()
     {
         $idsGroup = $this->idsGroup;
-        $dateFrom = $this->dateFrom;  // Assuming this is passed as a filter input
-        $dateTo = $this->dateTo;      // Assuming this is passed as a filter input
+        $dateFrom = $this->dateFrom;  
+        $dateTo = $this->dateTo;      
         $csat = $this->csat;
         
 
@@ -111,7 +133,7 @@ class Dashboard extends Component
             // Now filter Survey2Response by those user_submission_ids
             $responseQuery = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
                 ->whereIn('client_id', $submissionIds)
-                ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7,8,9, 10]);  // Filter responses between 1-6 and 9-10
+                ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7,8,9, 10]);  
             
           
 
@@ -155,8 +177,8 @@ class Dashboard extends Component
                 ->toArray();
                  }
 
-        // Calculate NPS after filtering
-        return $this->calculateNPS();
+            // Calculate NPS after filtering
+            return $this->calculateNPS();
         }
 
 
@@ -190,19 +212,20 @@ class Dashboard extends Component
                     foreach ($userSubmissions as $submission) {
                         // Fetch the response for each question
                         $response = $submission->responses->where('question_index', $i)->first();
+                        
                         $row[] = $response ? $response->response : 'NA';
                     }
                     fputcsv($file, $row);
                 }
 
                 // Add the NPS row
-                // $npsRow = ['NPS'];
-                // foreach ($userSubmissions as $submission) {
-                //     // Calculate NPS for each submission
-                //     $nps = $this->calculateNPSForSubmission($submission);  // Helper method to calculate NPS
-                //     $npsRow[] = $nps;
-                // }
-                // fputcsv($file, $npsRow);
+                $npsRow = ['NPS'];
+                foreach ($userSubmissions as $submission) {
+                    // Calculate NPS for each submission
+                    $nps = $this->calculateNPSForSubmission($submission);  // Use the new helper method
+                    $npsRow[] = $nps . '%';
+                }
+                fputcsv($file, $npsRow);
 
                 fclose($file);
             };
@@ -210,6 +233,43 @@ class Dashboard extends Component
             return new StreamedResponse($callback, 200, $headers);
         }
         
+        private function calculateNPSForSubmission($submission)
+        {
+            // Get the responses for the submission
+            $responses = Survey2Response::where('client_id', $submission->client_id)
+                ->get();
+
+            $responseCounts = [
+                'promoters' => 0,
+                'detractors' => 0,
+                'neutrals' => 0,
+            ];
+
+            // Count responses based on NPS categories
+            foreach ($responses as $response) {
+                if ($response->response >= 9 && $response->response <= 10) {
+                    $responseCounts['promoters']++;
+                } elseif ($response->response <= 6 && $response->response >= 0) {
+                    $responseCounts['detractors']++;
+                } elseif(($response->response <= 8) &&($response->response >= 7)) {
+                    $responseCounts['neutrals']++;
+                }
+            }
+
+            // Calculate total responses
+            $totalResponses = $responseCounts['promoters'] + $responseCounts['detractors'] + $responseCounts['neutrals'];
+            
+
+            // Calculate NPS
+            if ($totalResponses > 0) {
+                $promoterPercentage = ($responseCounts['promoters'] / $totalResponses) * 100;
+                $detractorPercentage = ($responseCounts['detractors'] / $totalResponses) * 100;
+                return round($promoterPercentage - $detractorPercentage, 2);
+            }
+
+            return 0; // Return 0 if no responses found
+        }
+
         
     public function render()
     {

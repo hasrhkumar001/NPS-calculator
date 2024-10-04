@@ -14,19 +14,29 @@
                                     @endforeach
                                 </select>
                             </div>
-                            
+                            <!-- CSAT Selection -->
                             <div class="col-md-6 mb-3">
-                                <label for="csat" class="form-label">Status</label>
-                                <select id="csat" class="form-select" wire:model="status">
+                                <label for="csat" class="form-label">CSAT</label>
+                                <select id="csat" class="form-select" wire:model="csat">
                                     <option  value="">All</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="done">Done</option>
-                                    
+                                    <option value="Monthly">Monthly</option>
+                                    <option value="Quaterly">Quaterly</option>
+                                    <option value="Yearly">Yearly</option>
                                 </select>
                             </div>
                         </div>
 
-                        
+                        <!-- Date Range Inputs -->
+                        <div class="row px-5 py-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="dateFrom" class="form-label">Date From</label>
+                                <input type="date" id="dateFrom" wire:model="dateFrom" class="form-control" placeholder="Select Date" >
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="dateTo" class="form-label">Date To</label>
+                                <input type="date" id="dateTo" wire:model="dateTo" class="form-control" placeholder="Select Date" >
+                            </div>
+                        </div>
                         <div class=" px-5 py-3 text-end">
                             <button type="submit" class="btn px-5 py-2 btn-primary fs-5">Filter</button>
                         </div>      
@@ -35,52 +45,235 @@
                     
             </form>
 
-       
+        <!-- NPS and Total Survey Info -->
+        <div class="container shadow p-3" style="margin: 150px auto; padding: 0 20px;">
+        
+            <!-- Summary Row for Total Surveys and Overall NPS -->
+            <div class="row mb-4 d-flex align-items-center p-2">
+                <div class="col-md-6 ">
+                    <div class="text-center border">
+                        <h2 class="mb-0" id="totalSurveys" style="font-size: 2.5rem;">{{ $totalSurveys }}</h2>
+                        <p class="text-muted">Total Surveys</p>
+                    </div>
+                </div>
+                <div class="col-md-6 ">
+                    <div class="text-center border">
+                        <h2 class="mb-0" id="overallNPS" class="overallpercentage" style="font-size: 2.5rem;">{{ $nps }}%</h2>
+                        <p class="text-muted">Overall NPS</p>
+                    </div>
+                </div>
+                
+            </div>
 
-      <!-- Table Rendering the Responses -->
-      <div class="table-responsive my-4">
-      <table class="table table-bordered">
-                <thead>
-                    <tr class="text-center">
-                    <th scope="col">Sr No.</th>
-                    <th scope="col">Group Name</th>
-                    <th scope="col">Project Name</th>
-                    <th scope="col">IDS Lead/Manager</th>
-                    <th scope="col">Client Contact Name</th>
-                    <th scope="col">Client Organization</th>
-                    <th scope="col">Client Email</th>
-                    <th scope="col">Survey Status</th>
-                    <th scope="col">Date</th>
-                    
-                    
-                    <!-- <th scope="col" colspan="2">Actions</th> -->
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($usersubmissions as $users)
-                    <tr class="text-center">
-                    <th scope="row">{{$loop->iteration}}</th>
-                    
-                    <td >{{$users->idsGroup}}</td>
-                    <td >{{$users->projectName}}</td>
-                    <td >{{$users->idsLeadManager}}</td>
-                    <td >{{$users->clientContactName}}</td>
-                    <td >{{$users->clientOrganization}}</td>
-                    <td >{{$users->clientEmailAddress}}</td>
-                    <td >{{$users->status}}</td>
-                    <td >{{$users->updated_at}}</td>
-                    
-                    
-                    
-                    <!-- <td ><button class="btn btn-danger btn-sm shadow" wire:click="delete({{$users->id}})" wire:confirm="Are you sure you want to delete this? ">DELETE</button></td> -->
-                    </tr>
-                    @endforeach
-                    
-                </tbody>
-            </table>
-    </div>
+            <!-- Pie Chart for Promoters, Neutrals, Detractors -->
+            <div class="row mt-4">
+                <!-- Bar Chart for Ratings and Votes -->
+            
+                <div class="col-6 d-flex align-items-center justify-content-center">
+                    <div class="card p-3 w-100  ">
+                        
+                        <div class=" text-center">
+                            <canvas id="ratingsBarChart" style=" max-height:524px; width:100%  "></canvas>
+                            
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 ">
+                    <div class="">
+                        
+                        <div class="  ">
+                            <canvas id="npsPieChart" style=" max-height:524px; "></canvas>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
 
     
+   
 </div>
 
 
+    <div class="d-flex justify-content-end mb-3">
+        <button wire:click="downloadCSV" class="btn btn-success">Download as CSV</button>
+    </div>
+
+      <!-- Table Rendering the Responses -->
+      @if(count($userSubmissions) > 0)
+      <div class="table-responsive my-4">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th style="white-space: nowrap;">Question #</th>
+                    @foreach($userSubmissions as $submission)
+                        <th style="white-space: nowrap;"><strong data-group="{{$submission->idsGroup}}">{{ $submission->clientContactName }} ({{  $submission->updated_at->format('Y-m-d') }})</th>
+                    @endforeach
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(range(1, 9) as $index)
+                    <tr>
+                        <th style="white-space: nowrap;">Q {{ $index }}</th>
+                        
+                        @foreach($userSubmissions as $submission)
+                            <td style="white-space: nowrap;">
+                                @isset($responses[$submission->id][$index - 1])
+                                    {{ $responses[$submission->id][$index - 1]->response ?? 'NA' }}
+                                @else
+                                    NA
+                                @endisset
+                            </td>
+                        @endforeach
+                    </tr>
+                    
+                @endforeach
+                <tr>
+                    
+                    <th style="white-space: nowrap;">NPS</th> 
+                    @foreach($userSubmissions as $submission)
+                    @php
+                        // Group responses by promoters, passives, and detractors
+                        $responsesForSubmission = collect($responses[$submission->id] ?? [])->filter(fn($response) => $response->response !== 'Na');
+                        $promoters = collect($responsesForSubmission)->filter(fn($response) => $response->response >= 9)->count();
+                        $passives = collect($responsesForSubmission)->filter(fn($response) => $response->response >= 7 && $response->response < 9)->count();
+                        $detractors = collect($responsesForSubmission)->filter(fn($response) =>$response->response >= 0 && $response->response < 7)->count();
+                        
+                        // Total responses for this submission
+                        $totalResponses = count($responsesForSubmission);
+
+                        // Calculate NPS
+                        $nps = round($totalResponses > 0
+                            ? (($promoters / $totalResponses) * 100) - (($detractors / $totalResponses) * 100)
+                            : 'NA',2);
+                            
+                    @endphp
+                        <td style="white-space: nowrap;">{{ $nps }}%</td>
+                    @endforeach
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    @else
+    <p class="text-center">No submissions available.</p>
+    @endif
+    
+</div>
+
+<script>
+
+let npsPieChart, ratingsBarChart;
+
+document.addEventListener('updateCharts', initCharts);
+document.addEventListener('livewire:navigated', initCharts);
+
+function initCharts() {
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded');
+        return;
+    }
+
+    createNPSPieChart();
+    createRatingsBarChart();
+}
+
+function createNPSPieChart() {
+    const ctxPie = document.getElementById('npsPieChart');
+    if (!ctxPie) return;
+
+    npsPieChart = new Chart(ctxPie, {
+        type: 'pie',
+        data: {
+            labels: ['Promoters', 'Neutrals', 'Detractors'],
+            datasets: [{
+                label: 'NPS',
+                data: [1, 1, 1], // Initial placeholder data
+                backgroundColor: ['#4CAF50', '#FFC107', '#F44336'],
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
+}
+
+function createRatingsBarChart() {
+    const ctxBar = document.getElementById('ratingsBarChart');
+    if (!ctxBar) return;
+
+    const ratingLabels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+    const barColors = ratingLabels.map(rating => {
+        const value = parseInt(rating);
+        if (value >= 0 && value <= 6) return '#dc3545';
+        if (value >= 7 && value <= 8) return '#ffc107';
+        if (value >= 9 && value <= 10) return '#28a745';
+        return '#007bff';
+    });
+
+    ratingsBarChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: ratingLabels,
+            datasets: [{
+                label: 'Responses',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Initial placeholder data
+                backgroundColor: barColors,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                    },
+                    title: {
+                        display: true,
+                        text: 'Votes'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Ratings'
+                    }
+                }
+            }
+        }
+    });
+}
+
+window.addEventListener('updateCharts', function (event) {
+    const data = event.detail[0];
+    console.log('Updating charts with data:', data);
+
+    if (npsPieChart) {
+        if (data.promoters === 0 && data.neutrals === 0 && data.detractors === 0) {
+            npsPieChart.data.datasets[0].data = [1, 1, 1]; // Default to non-zero values
+        } else {
+            npsPieChart.data.datasets[0].data = [
+                data.promoterPercentage || 0,
+                data.neutralPercentage || 0,
+                data.detractorPercentage || 0
+            ];
+        }
+        npsPieChart.update();
+    }
+
+    if (ratingsBarChart && data.responseCounts) {
+        const ratingLabels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+        const votesData = ratingLabels.map(rating => data.responseCounts[rating] || 0);
+        ratingsBarChart.data.datasets[0].data = votesData;
+        ratingsBarChart.update();
+    }
+
+    
+});
+</script>

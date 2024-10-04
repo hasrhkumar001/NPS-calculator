@@ -8,6 +8,6 @@ class SurveyExpired extends Component
 {
     public function render()
     {
-        return view('livewire.survey-expired');
+        return view('livewire.survey-expired')->layout('components.layouts.app-default');
     }
 }

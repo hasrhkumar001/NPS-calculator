@@ -24,16 +24,12 @@ class LoginForm extends Component
         'password' => 'required'
     ]);
 
-    // Attempt to login as admin
-    if (Auth::guard('admin')->attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
-        $request->session()->regenerate();
-        return redirect('/admin/dashboard'); // Redirect to admin dashboard
-    }
+   
 
     // Attempt to login as a regular user
     if (Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
         $request->session()->regenerate();
-        return redirect('/dashboard'); // Redirect to the regular user dashboard
+        return redirect('/user/dashboard'); // Redirect to the regular user dashboard
     }
 
     // If login fails, flash an error message
@@ -43,6 +39,6 @@ class LoginForm extends Component
 
     public function render()
     {
-        return view('livewire.login-form');
+        return view('livewire.login-form')->layout('components.layouts.app-default');
     }
 }

@@ -17,7 +17,7 @@
     <p>
         We appreciate your time and inputs to help us serve you better.
         <br>
-        <strong><a href="{{ route('survey2', ['token' => $token]) }}" target="_blank">Take Survey</a></strong>
+        <strong><a href="http://127.0.0.1:8000/survey/{{$token}}" target="_blank" style="border:1px solid blue; background-color:blue;border-radius:5px;padding:5px;margin-top:10px;color:white;text-decoration:none;">Take Survey</a></strong>
     </p>
 
     <p>The survey parameters (How it works?):</p>

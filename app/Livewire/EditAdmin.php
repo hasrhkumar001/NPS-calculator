@@ -13,7 +13,7 @@ class EditAdmin extends Component
     public $name;
     public $email;
     public $password;
-    public $password_confirmation;
+    
     public $role; // Assuming admins have roles
 
     protected $rules = [
@@ -46,17 +46,15 @@ class EditAdmin extends Component
         $admin = Admin::findOrFail($this->adminId);
         $admin->name = $this->name;
         $admin->email = $this->email;
-        $admin->role = $this->role;
-        
-        if ($this->password) {
-            $admin->password = Hash::make($this->password);
-        }
+    
+        $admin->password = Hash::make($this->password);
+       
 
         $admin->save();
 
         session()->flash('message', 'Admin updated successfully.');
         
-        $this->reset(['password', 'password_confirmation']);
+        $this->reset(['password']);
     }
     public function render()
     {

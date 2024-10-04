@@ -34,16 +34,28 @@
                 <small class="text-danger">{{ $message }}</small> 
             @enderror
         </div>
-        <div class="form-group mb-3">
-                <label for="idsGroup" class="form-label">IDS Group</label>
-                <select wire:model="idsGroup" id="idsGroup" class="form-select">
-                    <option value="">All Groups</option>
-                    @foreach($idsGroups as $group)
-                        <option value="{{ $group->name }}">{{ $group->name }}</option>
-                    @endforeach
-                </select>
+        <div class=" form-group mb-3 ">
+                        <label for="idsGroup" class="form-label fw-bold">IDS Group</label>
+                        <select id="idsGroup" class="form-control selectpicker border" data-actions-box="true" required wire:model="idsGroup" multiple data-live-search="true" >
+                            @foreach ($idsGroups as $group)
+                                <option value="{{ $group->name }}">{{ $group->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('idsGroup')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
             </div>
 
         <button type="submit" class="btn btn-primary">Update User</button>
     </form>
 </div>
+
+
+<script>
+
+  
+    $(document).ready(function() {
+        $('.selectpicker').selectpicker();
+    });
+
+</script>

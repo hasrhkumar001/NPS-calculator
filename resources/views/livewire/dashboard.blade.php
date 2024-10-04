@@ -46,141 +46,53 @@
             </form>
 
         <!-- NPS and Total Survey Info -->
-        <div style="padding:0px 100px;margin:150px 0px ">
-            <div class="row mb-4 d-flex align-items-center" style="">
-                <div class="col-md-4">
-                    <div class="">
-                        <div class="text-center">
-                            <h2 class="mb-0" id="totalSurveys" >{{ $totalSurveys }}</h2>
-                            <p class="text-muted">Total Survey</p>
-                        </div>
+        <div class="container shadow p-3" style="margin: 150px auto; padding: 0 20px;">
+        
+            <!-- Summary Row for Total Surveys and Overall NPS -->
+            <div class="row mb-4 d-flex align-items-center p-2">
+                <div class="col-md-6 ">
+                    <div class="text-center border">
+                        <h2 class="mb-0" id="totalSurveys" style="font-size: 2.5rem;">{{ $totalSurveys }}</h2>
+                        <p class="text-muted">Total Surveys</p>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="">
+                <div class="col-md-6 ">
+                    <div class="text-center border">
+                        <h2 class="mb-0" id="overallNPS" class="overallpercentage" style="font-size: 2.5rem;">{{ $nps }}%</h2>
+                        <p class="text-muted">Overall NPS</p>
+                    </div>
+                </div>
+                
+            </div>
+
+            <!-- Pie Chart for Promoters, Neutrals, Detractors -->
+            <div class="row mt-4">
+                <!-- Bar Chart for Ratings and Votes -->
+            
+                <div class="col-6 d-flex align-items-center justify-content-center">
+                    <div class="card p-3 w-100  ">
+                        
                         <div class=" text-center">
-                            <h2 class="mb-0" id="overallNPS" class="overallpercentage">{{ $nps }}%</h2>
-                            <p class="text-muted">Overall NPS</p>
+                            <canvas id="ratingsBarChart" style=" max-height:524px; width:100%  "></canvas>
+                            
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                @if($nps > 60)
+                <div class="col-6 ">
                     <div class="">
-                        <div class="">
-                            <h1 class="text-white" style="font-size:70px">😃</h1>
+                        
+                        <div class="  ">
+                            <canvas id="npsPieChart" style=" max-height:524px; "></canvas>
+                            
                         </div>
-                    </div>
-                @elseif($nps > 30 && $nps <= 60)
-                    <div class="">
-                        <div class="text-center">
-                            <h1 class="text-white" style="font-size:70px">😐</h1>
-                        </div>
-                    </div>
-                @else
-                    <div class="">
-                        <div class=" d-flex align-items-center justify-content-center ">
-                            <h1 class="text-white " style="font-size:70px">🙁</h1>
-                        </div>
-                    </div>
-                @endif
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-md-4">
-                        <div class="card border-success">
-                            <div class="card-header bg-success text-white text-center">
-                                <h5 class="mb-0">😃</h5>
-                            </div>
-                            <div class="card-body">
-                            <div class="d-flex justify-content-around">
-                                <p class="px-2 border"><strong>10:</strong> {{ $responseCounts[10] ?? 0 }}</p>
-                                <p class="px-2 border"><strong>9:</strong> {{ $responseCounts[9] ?? 0 }}</p>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-light">
-                            <h5 class="text-center mb-0">Promoter: {{ $promoters }}</h5>
-                        </div>
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="card border-warning">
-                    <div class="card-header bg-warning text-white text-center">
-                        <h5 class="mb-0">😐</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-around">
-                            <p  class="px-2 border"><strong>8:</strong> {{ $responseCounts[8] ?? 0 }}</p>
-                            <p class="px-2 border"><strong>7:</strong> {{ $responseCounts[7] ?? 0 }}</p>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-light">
-                        <h5 class="text-center mb-0">Neutral: {{ $neutrals }}</h5>
                     </div>
                 </div>
             </div>
 
-            <div class="col-md-4">
-                <div class="card border-danger">
-                    <div class="card-header bg-danger text-white text-center">
-                        <h5 class="mb-0">😞</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-around flex-wrap">
-                            @for ($i = 6; $i >= 0; $i--)
-                                <p class="px-2 border">
-                                    <strong>{{ $i }}:</strong> {{ $responseCounts[$i] ?? 0 }}</p>
-                            @endfor
-                        </div>
-                    </div>
-                    <div class="card-footer bg-light">
-                        <h5 class="text-center mb-0">Detractor: {{ $detractors }}</h5>
-                    </div>
-                </div>
-            </div>
-        </div>
+    
+   
+</div>
 
-        <div class="row mt-4">
-            <div class="col-md-4">
-                <div class="card border-success">
-                    <div class="card-body text-center">
-                        <h5 class="text-success mb-0">{{  $promoterPercentage }}%</h5>
-                        <p class="text-muted">of total responses</p>
-                    </div>
-                    <div class="card-footer bg-light">
-                        <h5 class="text-center mb-0">Promoters Percentage</h5>
-                </div>
-                </div>
-                
-            </div>
-            <div class="col-md-4">
-                <div class="card border-danger">
-                    <div class="card-body text-center">
-                        <h5 class="text-danger mb-0">{{ $detractorPercentage }}%</h5>
-                        <p class="text-muted">of total responses</p>
-                    </div>
-                    <div class="card-footer bg-light">
-                        <h5 class="text-center mb-0">Detractors Percentage</h5>
-                </div>
-                </div>
-               
-            </div>
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-body text-center">
-                        <h5 class="mb-0" class="overallpercentage">{{ $nps }}%</h5>
-                        <p class="text-muted">This is your NPS</p>
-                    </div>
-                    <div class="card-footer bg-light">
-                        <h5 class="text-center mb-0">Overall NPS Percentage</h5>
-                </div>
-                </div>
-                
-            </div>
-        </div>
-    </div>
 
     <div class="d-flex justify-content-end mb-3">
         <button wire:click="downloadCSV" class="btn btn-success">Download as CSV</button>
@@ -221,10 +133,10 @@
                     @foreach($userSubmissions as $submission)
                     @php
                         // Group responses by promoters, passives, and detractors
-                        $responsesForSubmission = $responses[$submission->id] ?? [];
+                        $responsesForSubmission = collect($responses[$submission->id] ?? [])->filter(fn($response) => $response->response !== 'Na');
                         $promoters = collect($responsesForSubmission)->filter(fn($response) => $response->response >= 9)->count();
                         $passives = collect($responsesForSubmission)->filter(fn($response) => $response->response >= 7 && $response->response < 9)->count();
-                        $detractors = collect($responsesForSubmission)->filter(fn($response) => $response->response < 7)->count();
+                        $detractors = collect($responsesForSubmission)->filter(fn($response) =>$response->response >= 0 && $response->response < 7)->count();
                         
                         // Total responses for this submission
                         $totalResponses = count($responsesForSubmission);
@@ -247,4 +159,121 @@
     
 </div>
 
+<script>
 
+let npsPieChart, ratingsBarChart;
+
+document.addEventListener('updateCharts', initCharts);
+document.addEventListener('livewire:navigated', initCharts);
+
+function initCharts() {
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js is not loaded');
+        return;
+    }
+
+    createNPSPieChart();
+    createRatingsBarChart();
+}
+
+function createNPSPieChart() {
+    const ctxPie = document.getElementById('npsPieChart');
+    if (!ctxPie) return;
+
+    npsPieChart = new Chart(ctxPie, {
+        type: 'pie',
+        data: {
+            labels: ['Promoters', 'Neutrals', 'Detractors'],
+            datasets: [{
+                label: 'NPS',
+                data: [1, 1, 1], // Initial placeholder data
+                backgroundColor: ['#4CAF50', '#FFC107', '#F44336'],
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+        }
+    });
+}
+
+function createRatingsBarChart() {
+    const ctxBar = document.getElementById('ratingsBarChart');
+    if (!ctxBar) return;
+
+    const ratingLabels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+    const barColors = ratingLabels.map(rating => {
+        const value = parseInt(rating);
+        if (value >= 0 && value <= 6) return '#dc3545';
+        if (value >= 7 && value <= 8) return '#ffc107';
+        if (value >= 9 && value <= 10) return '#28a745';
+        return '#007bff';
+    });
+
+    ratingsBarChart = new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+            labels: ratingLabels,
+            datasets: [{
+                label: 'Responses',
+                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Initial placeholder data
+                backgroundColor: barColors,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false,
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        stepSize: 1,
+                    },
+                    title: {
+                        display: true,
+                        text: 'Votes'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Ratings'
+                    }
+                }
+            }
+        }
+    });
+}
+
+window.addEventListener('updateCharts', function (event) {
+    const data = event.detail[0];
+    console.log('Updating charts with data:', data);
+
+    if (npsPieChart) {
+        if (data.promoters === 0 && data.neutrals === 0 && data.detractors === 0) {
+            npsPieChart.data.datasets[0].data = [1, 1, 1]; // Default to non-zero values
+        } else {
+            npsPieChart.data.datasets[0].data = [
+                data.promoterPercentage || 0,
+                data.neutralPercentage || 0,
+                data.detractorPercentage || 0
+            ];
+        }
+        npsPieChart.update();
+    }
+
+    if (ratingsBarChart && data.responseCounts) {
+        const ratingLabels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+        const votesData = ratingLabels.map(rating => data.responseCounts[rating] || 0);
+        ratingsBarChart.data.datasets[0].data = votesData;
+        ratingsBarChart.update();
+    }
+
+    
+});
+</script>

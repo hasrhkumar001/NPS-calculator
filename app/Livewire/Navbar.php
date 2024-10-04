@@ -18,7 +18,9 @@ class Navbar extends Component
             
         } elseif (Auth::guard('web')->check()) {
             $this->role = 'user';
-        } else {
+        }elseif (Auth::guard('subadmin')->check()) {
+            $this->role = 'subadmin';
+        }else {
             $this->role = null; // Not authenticated
         }
     }

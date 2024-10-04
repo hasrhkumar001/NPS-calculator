@@ -22,6 +22,7 @@ class Survey2 extends Component
     public function mount($token)
     {
         $this->token = $token;
+        $this->responses = array_fill(1, 9,'Na'); 
 
         try {
             $decoded = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));
@@ -29,7 +30,7 @@ class Survey2 extends Component
             
             if (!$surveyToken || $surveyToken->used) {
                 session()->flash('error', 'Invalid or expired token.');
-                return redirect()->route('survey.expired',['client' ,$decoded->client_id]);
+                return redirect('/survey/failed/'.$decoded->client_id);
             }
             
 
@@ -37,40 +38,25 @@ class Survey2 extends Component
 
             if (!$this->submissionDetails) {
                 session()->flash('error', 'No submission found for this token.');
-                return redirect()->route('survey.expired',['client' ,$decoded->client_id]);
+                return redirect('/survey/failed/'.$decoded->client_id);
             }
             
         } catch (\Exception $e) {
             session()->flash('error', 'Invalid token.');
-            return redirect()->route('survey.expired',['client' ,$decoded->client_id]);
+            return redirect('/survey/failed/'.$decoded->client_id);
         }
     }
 
 
     public function submit()
     {
-        $decoded = JWT::decode($this->token, new Key(env('JWT_SECRET'), 'HS256'));
-        // $user = Users::where('id', $decoded->user_id)->first();
-        // $userId = $user->id;
+       
 
         // Validate responses to ensure each question has been answered
-        $this->validate([
-            
-            'responses.1' => 'required|in:0,1,2,3,4,5,6,7,8,9,10,Na',
-            'responses.2' => 'required|in:0,1,2,3,4,5,6,7,8,9,10,Na',
-            'responses.3' => 'required|in:0,1,2,3,4,5,6,7,8,9,10,Na',
-            'responses.4' => 'required|in:0,1,2,3,4,5,6,7,8,9,10,Na',
-            'responses.5' => 'required|in:0,1,2,3,4,5,6,7,8,9,10,Na',
-            'responses.6' => 'required|in:0,1,2,3,4,5,6,7,8,9,10,Na',
-            'responses.7' => 'required|in:0,1,2,3,4,5,6,7,8,9,10,Na',
-            'responses.8' => 'required|in:0,1,2,3,4,5,6,7,8,9,10,Na',
-            'responses.9' => 'required|in:0,1,2,3,4,5,6,7,8,9,10,Na',
-            
-           
-
-        ]);
         
-        // dd($decoded);
+       
+        $decoded = JWT::decode($this->token, new Key(env('JWT_SECRET'), 'HS256'));
+        
         // Check if the user has already submitted the survey
         $userSubmission = UserSubmission::where('client_id', $decoded->client_id)
                             ->first();
@@ -87,14 +73,19 @@ class Survey2 extends Component
             );
         }
         $promoters = collect($this->responses)->filter(function ($score) {
-            return $score >= 9;
+            return $score >= 9 && $score <=10;
         })->count();
         
         $detractors = collect($this->responses)->filter(function ($score) {
-            return $score <= 6;
+            return $score >= 0 && $score <= 6;
+        })->count();
+
+        $neutrals = collect($this->responses)->filter(function ($score) {
+            return $score >= 7 && $score <= 8;
         })->count();
         
-        $totalRespondents = count($this->responses);
+        
+        $totalRespondents = $promoters + $neutrals + $detractors;
         
         if ($totalRespondents > 0) {
             $nps = round((($promoters / $totalRespondents) * 100) - (($detractors / $totalRespondents) * 100),2);
@@ -138,10 +129,11 @@ class Survey2 extends Component
          // Send email
         Mail::to($userEmail->email)->send(new ResponseEmail($surveyData));
         
-        return redirect()->route('email-sent',['client' ,$userSubmission->client_id]);
+        return redirect('/survey/success/'.$userSubmission->client_id);
+        
     }
     public function render()
     {
-        return view('livewire.survey2');
+        return view('livewire.survey2')->layout('components.layouts.app-default');
     }
 }

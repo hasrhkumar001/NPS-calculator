@@ -35,6 +35,6 @@ class SignupForm extends Component
 
     public function render()
     {
-        return view('livewire.sign-up-form');
+        return view('livewire.sign-up-form')->layout('components.layouts.app-default');
     }
 }
