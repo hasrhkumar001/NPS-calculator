@@ -30,7 +30,7 @@ class EditUser extends Component
         $user = Users::findOrFail($userId);
         $this->name = $user->name;
         $this->email = $user->email;
-        $this->idsGroup = $user->idsGroup; // Fetch the current IDS group of the user
+        $this->idsGroup = json_decode($user->idsGroup); // Fetch the current IDS group of the user
         $this->idsGroups = IdsGroup::all(); // Fetch all available IDS groups
     }
     

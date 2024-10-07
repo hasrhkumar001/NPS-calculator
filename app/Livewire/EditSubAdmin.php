@@ -33,11 +33,12 @@ class EditSubAdmin extends Component
     public function mount($subAdminId)
     {
         $this->subAdminId = $subAdminId;
-        $admin = SubAdmin::findOrFail($subAdminId);
-        $this->name = $admin->name;
-        $this->email = $admin->email;
-        $this->idsGroup = $admin->idsGroup; // Fetch the current IDS group of the user
+        $subadmin = SubAdmin::findOrFail($subAdminId);
+        $this->name = $subadmin->name;
+        $this->email = $subadmin->email;
+        $this->idsGroup = json_decode($subadmin->idsGroup); // Fetch the current IDS group of the user
         $this->idsGroups = IdsGroup::all();
+        
     }
 
     public function updateAdmin()
@@ -63,9 +64,9 @@ class EditSubAdmin extends Component
 
         $admin->save();
 
-        session()->flash('message', 'Admin updated successfully.');
+        session()->flash('message', 'Sub Admin updated successfully.');
+        return back();
         
-        $this->reset(['password']);
     }
     public function render()
     {

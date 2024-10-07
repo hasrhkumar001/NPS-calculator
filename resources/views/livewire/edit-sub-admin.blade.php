@@ -9,7 +9,7 @@
                         {{ session('error') }}
                     </div>
                 @endif
-    <h2 class="mb-4">Edit Admin</h2>
+    <h2 class="mb-4">Edit Sub Admin</h2>
     <form wire:submit.prevent="updateAdmin">
         <div class="form-group mb-3">
             <label for="name" class="form-label">Name</label>
@@ -53,7 +53,7 @@
 
 
 <script>
-    ;
+ 
   
     $(document).ready(function() {
         $('.selectpicker').selectpicker();
