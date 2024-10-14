@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Admin;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -20,6 +21,15 @@ class AdminSeeder extends Seeder
             [
                 'name' => 'Admin User',
                 'password' => Hash::make('123456'), // Replace with a strong password
+                 
+            ]
+        );
+        User::updateOrCreate(
+            ['email' => 'admin@idsil.com'], // Check for existing user
+            [
+                'name' => 'Admin User',
+                'password' => Hash::make('123456'), // Replace with a strong password
+                'idsGroup'=> 'All',
                  
             ]
         );

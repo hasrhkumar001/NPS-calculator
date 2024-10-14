@@ -14,7 +14,7 @@ class UserStatusList extends Component
     public $userSubmissions;
     public function mount (){
         $this->idsGroups = IdsGroup::all();
-        $this->userSubmissions = UserSubmission::all();
+        $this->userSubmissions = UserSubmission::orderByRaw('updated_at DESC')->get();
     }
 
     public function filter()
@@ -36,14 +36,14 @@ class UserStatusList extends Component
             }
         }
 
-        $this->userSubmissions = $query->get();
+        $this->userSubmissions = $query->orderByRaw('updated_at DESC') ->get();
             
 
     }
     public function delete($id){
         try{
             UserSubmission::where('id',$id)->delete(); 
-            return $this->redirect('/users-status',navigate:true);
+            return $this->redirect('/all-surveys-status',navigate:true);
         }catch(\Exception $e){
             dd($e);
         }

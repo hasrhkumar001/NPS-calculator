@@ -93,7 +93,7 @@ class UserList extends Component
     public function deleteSubAdmin($id)
     {
         $admin = SubAdmin::findOrFail($id);
-        if (Auth::guard('subadmin')->user()->id != $admin->id) {
+        if (Auth::guard('admin')->user()->id != $admin->id) {
             $admin->delete();
             session()->flash('message', 'Sub Admin deleted successfully.');
         } else {

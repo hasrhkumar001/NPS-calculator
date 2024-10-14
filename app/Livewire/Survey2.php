@@ -19,8 +19,9 @@ class Survey2 extends Component
     public $submissionDetails;
     public $token;
 
-    public function mount($token)
+    public function mount($token = null)
     {
+        
         $this->token = $token;
         $this->responses = array_fill(1, 9,'Na'); 
 
@@ -30,7 +31,7 @@ class Survey2 extends Component
             
             if (!$surveyToken || $surveyToken->used) {
                 session()->flash('error', 'Invalid or expired token.');
-                return redirect('/survey/failed/'.$decoded->client_id);
+                return redirect('/survey/failed');
             }
             
 
@@ -38,12 +39,13 @@ class Survey2 extends Component
 
             if (!$this->submissionDetails) {
                 session()->flash('error', 'No submission found for this token.');
-                return redirect('/survey/failed/'.$decoded->client_id);
+                return redirect('/survey/failed');
             }
             
         } catch (\Exception $e) {
             session()->flash('error', 'Invalid token.');
-            return redirect('/survey/failed/'.$decoded->client_id);
+            
+            return redirect('/survey/failed');
         }
     }
 
@@ -120,7 +122,7 @@ class Survey2 extends Component
         $surveyToken->save();
         
         // Update user submission status to 'done'
-        $userSubmission->status = 'done';
+        $userSubmission->status = 'Done';
         $userSubmission->save();
         
         session()->flash('message', 'Survey responses have been saved.');
@@ -129,7 +131,7 @@ class Survey2 extends Component
          // Send email
         Mail::to($userEmail->email)->send(new ResponseEmail($surveyData));
         
-        return redirect('/survey/success/'.$userSubmission->client_id);
+        return redirect('/survey/success');
         
     }
     public function render()

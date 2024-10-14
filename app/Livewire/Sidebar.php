@@ -24,6 +24,17 @@ class Sidebar extends Component
             $this->role = null; // Not authenticated
         }
     }
+    public function logout()
+    {
+        if ($this->role === 'admin') {
+            Auth::guard('admin')->logout(); // Admin logout
+        }elseif ($this->role === 'subadmin') {
+            Auth::guard('subadmin')->logout(); // SubAdmin logout
+        }else {
+            Auth::guard('web')->logout(); // User logout
+        }
+        return redirect('/login'); // Redirect to the login page after logout
+    }
     public function render()
     {
         return view('livewire.sidebar');

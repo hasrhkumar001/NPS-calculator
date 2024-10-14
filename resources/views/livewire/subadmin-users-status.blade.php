@@ -5,7 +5,7 @@
             <form  wire:submit.prevent="filter">
                         <div class="row px-5 py-3">
                             <!-- Group Selection -->
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="idsGroup" class="form-label">IDS Group</label>
                                 <select wire:model="idsGroup" id="idsGroup" class="form-select" >
                                     <option value="">All Groups</option>
@@ -15,12 +15,22 @@
                                 </select>
                             </div>
                             
-                            <div class="col-md-6 mb-3">
-                                <label for="csat" class="form-label">Status</label>
-                                <select id="csat" class="form-select" wire:model="status">
+                            <div class="col-md-4 mb-3">
+                                <label for="status" class="form-label">Status</label>
+                                <select id="status" class="form-select" wire:model="status">
                                     <option  value="">All</option>
                                     <option value="Pending">Pending</option>
                                     <option value="Done">Done</option>
+                                    
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="users" class="form-label">Users</label>
+                                <select id="users" class="form-select" wire:model="user">
+                                    <option  value="">All</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user }}">{{ $user }}</option>
+                                    @endforeach
                                     
                                 </select>
                             </div>
@@ -66,7 +76,7 @@
                     @endphp
                     <td >{{$users->idsGroup}}</td>
                     <td >{{$users->projectName}}</td>
-                    <td >{{$users->idsLeadManager}} ({{ $leadManager ? $leadManager->email : 'Deleted User' }})</td>
+                    <td>{{ $users->idsLeadManager }} ({{ $leadManager ? $leadManager->email : 'Deleted User' }})</td>
                     <td >{{$users->clientContactName}}</td>
                     <td >{{$users->clientOrganization}}</td>
                     <td >{{$users->clientEmailAddress}}</td>

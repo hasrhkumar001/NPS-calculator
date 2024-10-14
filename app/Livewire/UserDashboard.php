@@ -32,22 +32,37 @@ class UserDashboard extends Component
 
     public function mount()
     {
+    
+        // Fetch the idsGroup array from the authenticated user
+        $authIdsGroupArray = json_decode(auth()->user()->idsGroup, true);
+        
+        // Fetch all users whose idsGroup matches any of the values in the authenticated user's idsGroup
+        $matchingUsers = UserSubmission::where(function ($query) use ($authIdsGroupArray) {
+            foreach ($authIdsGroupArray as $group) {
+               $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
+            }
+            
+        })->pluck('id')->toArray(); // Get the IDs of matching users
+        
+
+        // Fetch user submissions where user_id matches the matching users
+        $this->userSubmissions = UserSubmission::whereIn('id', $matchingUsers)
+                ->where('status', 'Done')
+                ->where('user_id', auth()->id())
+                ->get();
+                
+        //  dd($this->userSubmissions);
         $this->responseCounts = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
         ->join('user_submissions', 'survey_responses.client_id', '=', 'user_submissions.client_id')
-        ->where('user_submissions.user_id', auth()->id()) // Filter by the authenticated user's ID
-
+        ->where('user_submissions.id', $matchingUsers) // Filter by the authenticated user's ID
+        ->where('user_submissions.user_id', auth()->id())
         ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  
         ->groupBy('response')
         ->get()
         ->pluck('count', 'response')
         ->toArray();
-
-        $this->userSubmissions = UserSubmission::where('status', 'done')
-                                ->where('user_id', auth()->id())->get();
-                                
         
-        
-        $this->idsGroups = IdsGroup::all();
+        $this->idsGroups = json_decode(auth()->user()->idsGroup, true);
         $this->calculateNPS();
         
 
@@ -63,7 +78,7 @@ class UserDashboard extends Component
     {
         // Recalculate total number of valid surveys
         $this->totalSurveys = $this->userSubmissions->count();
-
+        
 
         // Aggregate responses from responseCounts, skipping 'NA'
         $filteredResponses = array_diff_key($this->responseCounts, array_flip(['Na']));
@@ -186,10 +201,7 @@ class UserDashboard extends Component
 
         public function downloadCSV()
         {
-            $userSubmissions = UserSubmission::with('responses')
-                                ->where('status', 'done')
-                                ->where('user_id', auth()->id())
-                                ->get();
+            $userSubmissions = $this->userSubmissions;
 
             $headers = [
                 "Content-type" => "text/csv",
@@ -232,6 +244,18 @@ class UserDashboard extends Component
 
                 fclose($file);
             };
+
+            $filteredResponses = array_diff_key($this->responseCounts, array_flip(['Na']));
+        
+            $this->dispatch('updateCharts', [
+                'promoters' => $this->promoters,
+                'neutrals' => $this->neutrals,
+                'detractors' => $this->detractors,
+                'promoterPercentage' => $this->promoterPercentage,
+                'neutralPercentage' => $this->neutralPercentage,
+                'detractorPercentage' => $this->detractorPercentage,
+                'responseCounts' => $filteredResponses,
+            ]);
 
             return new StreamedResponse($callback, 200, $headers);
         }

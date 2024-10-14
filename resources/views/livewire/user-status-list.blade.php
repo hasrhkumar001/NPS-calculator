@@ -18,8 +18,8 @@
                                 <label for="status" class="form-label">Pending Email</label>
                                 <select id="status" class="form-select" wire:model="status">
                                     <option  value="">All</option>
-                                    <option value="pending">Pending</option>
-                                    <option value="done">Done</option>
+                                    <option value="Pending">Pending</option>
+                                    <option value="Done">Done</option>
                                 </select>
                             </div>
 
@@ -43,18 +43,19 @@
                     <th scope="col">Survey Status</th>
                     <th scope="col">Date</th>
                     
-                    
-                    <th scope="col" colspan="2">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach($usersubmissions as $users)
-                    <tr class="text-center">
+                    <tr class="text-center {{ $users->status === 'Pending' ? 'table-danger' : '' }} ">
                     <th scope="row">{{$loop->iteration}}</th>
-                    
+                    @php
+                        // Fetch the user from the database based on the ID from the $users object
+                        $leadManager = \App\Models\Users::find($users->user_id);
+                    @endphp
                     <td >{{$users->idsGroup}}</td>
                     <td >{{$users->projectName}}</td>
-                    <td >{{$users->idsLeadManager}}</td>
+                    <td>{{ $users->idsLeadManager }} ({{ $leadManager ? $leadManager->email : 'Deleted User' }})</td>
                     <td >{{$users->clientContactName}}</td>
                     <td >{{$users->clientOrganization}}</td>
                     <td >{{$users->clientEmailAddress}}</td>
@@ -63,8 +64,7 @@
                     
                     
                     
-                    <td ><button class="btn btn-danger btn-sm shadow" wire:click="delete({{$users->id}})" wire:confirm="Are you sure you want to delete this? ">DELETE</button></td>
-                    </tr>
+                </tr>
                     @endforeach
                     
                 </tbody>

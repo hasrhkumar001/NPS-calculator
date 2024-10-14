@@ -1,7 +1,7 @@
 <div>
    
 <div class="card">
-        <div class="card-header  bg-primary text-white">
+        <div class="card-header   text-white" style="background-color:#007DBD">
             <h2 class="mb-0 container p-5 display-3 text-center" style="height:200px">Customer Satisfaction Survey</h2>
         </div>
         <div class="container mt-4">
@@ -17,7 +17,7 @@
                         {{ session('error') }}
                     </div>
                 @endif
-            <p class="text-center">Welcome {{ auth()->user()->name }}</p>
+            
 
             <form wire:submit.prevent="submit">
                 @csrf
@@ -27,7 +27,7 @@
                     <select wire:model="idsGroup" id="idsGroup" class="form-select">
                         <option value="">Select IDS Group</option>
                         @foreach($idsGroups as $group)
-                            <option value="{{ $group->name }}">{{ $group->name }}</option>
+                            <option value="{{ $group }}">{{ $group }}</option>
                         @endforeach
                     </select>
                     @error('idsGroup') 

@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Models\IdsGroup;
 use App\Models\Survey2Response;
 use App\Models\User;
+use App\Models\Users;
 use App\Models\UserSubmission;
 use Illuminate\Support\Facades\DB;
 use Livewire\Component;
@@ -27,6 +28,8 @@ class SubAdminDashboard extends Component
     public $dateFrom;
     public $dateTo;
     public $csat;
+    public $users;
+    public $user;
     public $promoterPercentage;
     public $detractorPercentage;
     public $neutralPercentage;
@@ -36,32 +39,35 @@ class SubAdminDashboard extends Component
     {
          // Fetch the idsGroup array from the authenticated user
          $authIdsGroupArray = json_decode(auth()->user()->idsGroup, true);
-
+        
          // Fetch all users whose idsGroup matches any of the values in the authenticated user's idsGroup
          $matchingUsers = UserSubmission::where(function ($query) use ($authIdsGroupArray) {
              foreach ($authIdsGroupArray as $group) {
                 $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
              }
              
-         })->pluck('user_id')->toArray(); // Get the IDs of matching users
+         })->pluck('id')->toArray(); // Get the IDs of matching users
          
 
          // Fetch user submissions where user_id matches the matching users
-         $this->userSubmissions = UserSubmission::whereIn('user_id', $matchingUsers)
+         $this->userSubmissions = UserSubmission::whereIn('id', $matchingUsers)
              ->where('status', 'done')
              ->get();
  
          // Fetch the response counts from survey_responses table
          $this->responseCounts = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
              ->join('user_submissions', 'survey_responses.client_id', '=', 'user_submissions.client_id')
-             ->whereIn('user_submissions.user_id', $matchingUsers)
+             ->whereIn('user_submissions.id', $matchingUsers)
              ->whereIn('response', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
              ->groupBy('response')
              ->get()
              ->pluck('count', 'response')
              ->toArray();
        
-
+        $this->users = Users::where(function ($query) use ($authIdsGroupArray) {
+                foreach ($authIdsGroupArray as $group) {
+                   $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
+                }})->pluck('name')->toArray();
        
        
         
@@ -125,6 +131,20 @@ class SubAdminDashboard extends Component
         $dateFrom = $this->dateFrom;  
         $dateTo = $this->dateTo;      
         $csat = $this->csat;
+        $selectedUser =$this->user;
+        
+        // Fetch the idsGroup array from the authenticated user
+        $authIdsGroupArray = json_decode(auth()->user()->idsGroup, true);
+
+        // Fetch all users whose idsGroup matches any of the values in the authenticated user's idsGroup
+        $matchingUsers = UserSubmission::where(function ($query) use ($authIdsGroupArray) {
+            foreach ($authIdsGroupArray as $group) {
+               $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
+            }
+            
+        })->pluck('id')->toArray(); // Get the IDs of matching users
+
+        $query = UserSubmission::query();
         
 
         if (!empty($idsGroup)) {
@@ -134,6 +154,10 @@ class SubAdminDashboard extends Component
             // If dateFrom is provided, filter user submissions updated after or on dateFrom
             if (!empty($dateFrom)) {
                 $query = $query->where('updated_at', '>=', $dateFrom);
+            }
+            if (!empty($selectedUser)) {
+                $user = Users::where('name', $selectedUser)->pluck('id'); 
+                $query = $query->where('user_id', $user); 
             }
 
             // If dateTo is provided, filter user submissions updated before or on dateTo
@@ -163,12 +187,18 @@ class SubAdminDashboard extends Component
                 ->toArray();
 
         } else {
-            // If no idsGroup is selected, show all user submissions
-            $query = UserSubmission::query();
+
+            if (!empty($matchingUsers)) {
+                $query->whereIn('id', $matchingUsers);
+            }
             
             // If dateFrom is provided, filter by updated_at after or on dateFrom
             if (!empty($dateFrom)) {
                 $query = $query->where('updated_at', '>=', $dateFrom);
+            }
+            if (!empty($selectedUser)) {
+                $user = Users::where('name', $selectedUser)->pluck('id'); 
+                $query = $query->where('user_id', $user); 
             }
 
             // If dateTo is provided, filter by updated_at before or on dateTo
@@ -204,9 +234,7 @@ class SubAdminDashboard extends Component
 
         public function downloadCSV()
         {
-            $userSubmissions = UserSubmission::with('responses')
-                                ->where('status', 'done')
-                                ->get();
+            $userSubmissions = $this->userSubmissions;
 
             $headers = [
                 "Content-type" => "text/csv",
@@ -249,6 +277,18 @@ class SubAdminDashboard extends Component
 
                 fclose($file);
             };
+
+            $filteredResponses = array_diff_key($this->responseCounts, array_flip(['Na']));
+        
+            $this->dispatch('updateCharts', [
+                'promoters' => $this->promoters,
+                'neutrals' => $this->neutrals,
+                'detractors' => $this->detractors,
+                'promoterPercentage' => $this->promoterPercentage,
+                'neutralPercentage' => $this->neutralPercentage,
+                'detractorPercentage' => $this->detractorPercentage,
+                'responseCounts' => $filteredResponses,
+            ]);
 
             return new StreamedResponse($callback, 200, $headers);
         }

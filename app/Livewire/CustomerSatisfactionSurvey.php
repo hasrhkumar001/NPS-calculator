@@ -30,7 +30,7 @@ class CustomerSatisfactionSurvey extends Component
     public function mount()
     {
         $this->date = now()->format('Y-m-d');
-        $this->idsGroups = IdsGroup::all();
+        $this->idsGroups = json_decode(auth()->user()->idsGroup, true);
         $this->emailContent = "Improvement is an ongoing process. In the wake of improving our services to our customers, IDS InfoTech shares Customer Satisfaction Survey on a periodic basis to be filled out by its esteemed Customers.\n\nWe appreciate your time and inputs to help us serve you better.";
     }
 

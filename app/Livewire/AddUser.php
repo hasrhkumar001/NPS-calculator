@@ -29,15 +29,41 @@ class AddUser extends Component
         $this->idsGroups = IdsGroup::all();
     }
     
+    protected $rules = [
+        'name' => 'required|string',
+        'email' => 'required|email',
+        'role' => 'required',
+        
+    ];
+    protected $listeners = ['updateSelectedGroups'];
+
+    public function updateSelectedGroups($selected)
+    {
+        $this->idsGroup = $selected; // Update Livewire property
+        
+    }
+
+    
     public function saveUser(){
         $this->validate([
-            'name'=>'required',
-            'email'=>'required',
-            'role'=>'required',
+            'name' => 'required|string',
+            'email' => 'required|email',
+            'role' => 'required',
             'idsGroup' =>  $this->role === '2' ? 'nullable' : 'required', 
-            
+    
         ]);
+         // Event listener to update idsGroup from custom dropdown
         
+       
+        $userExists = Users::where('email', $this->email)->exists() ||
+                  SubAdminSignup::where('email', $this->email)->exists() ||
+                  AdminSignup::where('email', $this->email)->exists();
+
+        if ($userExists) {
+            session()->flash('error', 'A user with this email already exists!');
+            return;
+        }
+            
        // Generate a random password of length 10
        $this->password = Str::random(10);
       
@@ -46,8 +72,7 @@ class AddUser extends Component
             $new_user =new Users;
             $new_user->name =$this->name;
             $new_user->email=$this->email;
-            $new_user->idsGroup = "['" . implode("','", $this->idsGroup) . "']";
-            
+            $new_user->idsGroup = json_encode($this->idsGroup);
             $new_user->password =bcrypt($this->password);
             $new_user->save();
             session()->flash('message', 'User added successfully!');
@@ -58,15 +83,10 @@ class AddUser extends Component
         $new_subadmin->name =$this->name;
         $new_subadmin->email =$this->email;
         $new_subadmin->password =bcrypt($this->password);
-        $new_subadmin->idsGroup = implode(',', $this->idsGroup);
+        $new_subadmin->idsGroup = json_encode($this->idsGroup);
         $new_subadmin->save();
 
-        $new_user =new Users;
-        $new_user->name =$this->name;
-        $new_user->email=$this->email;
-        $new_user->idsGroup = "['" . implode("','", $this->idsGroup) . "']";
-        $new_user->password =bcrypt($this->password);
-        $new_user->save();
+        
         session()->flash('message', 'Sub Admin added successfully!');
         }
         elseif($this->role =="2"){
@@ -75,19 +95,9 @@ class AddUser extends Component
             $new_admin->name =$this->name;
             $new_admin->email =$this->email;
             $new_admin->password =bcrypt($this->password);
-         
             $new_admin->save();
     
-            $new_user =new Users;
-            $new_user->name =$this->name;
-            $new_user->email=$this->email;
-            if ($this->idsGroup === null || empty($this->idsGroup)) {
-                $new_user->idsGroup = json_encode(['All']);
-            } else {
-                $new_user->idsGroup = json_encode($this->idsGroup);
-            }
-            $new_user->password =bcrypt($this->password);
-            $new_user->save();
+
             session()->flash('message', 'Admin added successfully!');
             }
         

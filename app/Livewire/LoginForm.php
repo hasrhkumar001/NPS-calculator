@@ -15,6 +15,7 @@ class LoginForm extends Component
         'email' => 'required|email',
         'password' => 'required',
     ];
+  
 
     public function login(Request $request)
     {
@@ -29,7 +30,19 @@ class LoginForm extends Component
     // Attempt to login as a regular user
     if (Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
         $request->session()->regenerate();
-        return redirect('/user/dashboard'); // Redirect to the regular user dashboard
+        return redirect('/user'); // Redirect to the regular user dashboard
+    }
+
+    // Attempt to login as admin
+    if (Auth::guard('admin')->attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
+        $request->session()->regenerate();
+        return redirect('/admin'); // Redirect to admin dashboard
+    }
+
+    if (Auth::guard('subadmin')->attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
+        // Redirect to the admin dashboard if logged in
+        $request->session()->regenerate();
+        return redirect('/subadmin');  // Change this to the appropriate admin dashboard route
     }
 
     // If login fails, flash an error message

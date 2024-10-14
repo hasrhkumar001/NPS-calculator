@@ -45,7 +45,7 @@
                         <td>{{ ucfirst($item->role) }}</td>
                         <td>
                             @if($item->role == 'user')
-                                <a href="{{ url('subadmin/user/' . $item->id . '/edit') }}" wire:navigate class="btn btn-primary btn-sm shadow mr-2">EDIT</a>
+                                <a href="{{ route('users.edit', $item->id) }}" wire:navigate class="btn btn-primary btn-sm shadow mr-2">EDIT</a>
                                 <button class="btn btn-danger btn-sm shadow" wire:click="delete({{ $item->id }})">DELETE</button>
                             @elseif($item->role == 'subadmin')
                                 <a href="{{ route('subadmin.edit', $item->id) }}" wire:navigate class="btn btn-primary btn-sm shadow mr-2">EDIT</a>

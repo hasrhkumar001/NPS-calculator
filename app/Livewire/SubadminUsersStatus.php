@@ -2,21 +2,20 @@
 
 namespace App\Livewire;
 
+use App\Models\Users;
 use Livewire\Component;
 use App\Models\IdsGroup;
-use App\Models\Survey2Response;
 use App\Models\UserSubmission;
-use Illuminate\Support\Facades\DB;
+use App\Models\Survey2Response;
 
-use Illuminate\Support\Facades\Response;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class UserClientsStatusList extends Component
+class SubadminUsersStatus extends Component
 {
     public $responseCounts = [];
     public $totalSurveys = 0;
     public $total = 0;
-    
+    public $users;
+    public $user;
     public $nps = 0;
     public $status;
     public $idsGroups;
@@ -40,13 +39,18 @@ class UserClientsStatusList extends Component
             
         })->pluck('id')->toArray(); // Get the IDs of matching users
         
-        // dd($matchingUsers);
+        $this->users = Users::where(function ($query) use ($authIdsGroupArray) {
+            foreach ($authIdsGroupArray as $group) {
+               $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
+            }
+            
+        })->pluck('name')->toArray();        
+        // dd($users);
         // Fetch user submissions where user_id matches the matching users
         $this->userSubmissions = UserSubmission::whereIn('id', $matchingUsers)
-                ->where('user_id',auth()->user()->id)
-                ->orderByRaw('updated_at DESC') 
-                ->get();
-        
+                                ->orderByRaw('updated_at  DESC') 
+                                ->get();
+                        
         // dd($this->userSubmissions);
 
         $this->responseCounts = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
@@ -73,8 +77,10 @@ class UserClientsStatusList extends Component
     public function filter()
     {
         $idsGroup = $this->idsGroup;
-        $status = $this->status;
+        $status = $this->status;  
+        $selectedUser = $this->user;
         
+        // Fetch the idsGroup array from the authenticated user
         $authIdsGroupArray = json_decode(auth()->user()->idsGroup, true);
 
         // Fetch all users whose idsGroup matches any of the values in the authenticated user's idsGroup
@@ -88,7 +94,6 @@ class UserClientsStatusList extends Component
         
         
         if (!empty($idsGroup)) {
-            
             // Filter user submissions based on idsGroup
             $query = UserSubmission::where('idsGroup', $idsGroup);
             
@@ -97,7 +102,14 @@ class UserClientsStatusList extends Component
                 $query = $query->where('status',  $status);
             }
 
-            $this->userSubmissions = $query->where('user_id',  auth()->user()->id)->orderByRaw('updated_at DESC')->get();
+            if (!empty($selectedUser)) {
+                $user = Users::where('name', $selectedUser)->pluck('id'); 
+                $query = $query->where('user_id', $user); 
+            }
+
+            
+            
+            $this->userSubmissions = $query->orderByRaw('updated_at  DESC')->get();
             
             // Get all user_submission_ids for the filtered idsGroup and date range
             $submissionIds = $this->userSubmissions->pluck('client_id')->toArray();
@@ -116,18 +128,24 @@ class UserClientsStatusList extends Component
 
         } else {
             // If no idsGroup is selected, show all user submissions
-            $query = UserSubmission::where('user_id', auth()->id());;
+            $query = UserSubmission::where(function ($query) use ($authIdsGroupArray) {
+                foreach ($authIdsGroupArray as $group) {
+                   $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
+                };});
             
             if (!empty($status)) {
                 $query = $query->where('status',  $status);
             }
 
+            if (!empty($selectedUser)) {
+                $user = Users::where('name', $selectedUser)->pluck('id'); 
+                $query = $query->where('user_id', $user); 
+            }
             
           
            
             $this->userSubmissions = $query
-                                    ->where('user_id',  auth()->user()->id)
-                                    ->orderByRaw('updated_at DESC')  
+                                    ->orderByRaw('updated_at  DESC')  
                                     ->get();
             
              // Get all user_submission_ids for the filtered idsGroup and date range
@@ -159,8 +177,9 @@ class UserClientsStatusList extends Component
         }
     public function render()
     {
-        return view('livewire.user-clients-status-list',[
+        return view('livewire.subadmin-users-status',[
             'usersubmissions' => $this->userSubmissions
         ]);
     }
 }
+ 

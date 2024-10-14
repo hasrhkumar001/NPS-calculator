@@ -1,6 +1,6 @@
 
 <nav class="navbar navbar-expand-lg shadow navbar-light bg-light" style="position:sticky; top:0;z-index:5;">
-    <div class="container-fluid">
+    <div class="container-fluid d-flex align-items-baseline justify-content-between">
         <!-- Brand -->
         @if($role === 'admin')
         <a class="navbar-brand" href="/admin/dashboard"><svg width="65" height="50" viewBox="0 0 65 32" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -75,18 +75,21 @@
         <!-- Toggle Button (for smaller screens) -->
         @if($role)
         
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+        <div class="d-flex align-items-baseline" style="color: #fff; padding: 10px;">
+                <div class="avatar-circle  d-flex justify-content-center align-items-center" style="width: 30px; height: 30px; border-radius: 50%; font-size: 18px; color: white;background-color:#007DBD;">
+                    <strong>{{ substr(auth()->user()->name, 0, 1) }}</strong> <!-- First letter of user name -->
+                </div>
+                <div><p class=" text-dark fw-bold ms-2">{{ auth()->user()->name }}</p></div>
+        </div>
         
         <!-- Collapsible Content -->
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+        <!-- <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
             <ul class="navbar-nav">
-                <!-- Settings Dropdown -->
+                
                
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-gear"></i> <!-- Settings Icon -->
+                        <i class="bi bi-gear"></i> 
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
                     
@@ -95,7 +98,7 @@
                 </li>
             </ul>
             
-        </div>
+        </div> -->
         @endif
     </div>
 </nav>

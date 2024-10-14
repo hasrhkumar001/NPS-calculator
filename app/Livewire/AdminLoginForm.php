@@ -15,6 +15,14 @@ class AdminLoginForm extends Component
         'email' => 'required|email',
         'password' => 'required',
     ];
+    public function mount()
+    {
+        // Check if the admin is already authenticated
+        if (Auth::guard('admin')->check()) {
+            // Redirect to the admin dashboard if logged in
+            return redirect('/admin/dashboard');  // Change this to the appropriate admin dashboard route
+        }
+    }
 
     public function login(Request $request)
     {

@@ -10,7 +10,7 @@
                                 <select wire:model="idsGroup" id="idsGroup" class="form-select" >
                                     <option value="">All Groups</option>
                                     @foreach($idsGroups as $group)
-                                        <option value="{{ $group->name }}">{{ $group->name }}</option>
+                                        <option value="{{ $group }}">{{ $group }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -134,6 +134,7 @@
                     @php
                         // Group responses by promoters, passives, and detractors
                         $responsesForSubmission = collect($responses[$submission->id] ?? [])->filter(fn($response) => $response->response !== 'Na');
+                    
                         $promoters = collect($responsesForSubmission)->filter(fn($response) => $response->response >= 9)->count();
                         $passives = collect($responsesForSubmission)->filter(fn($response) => $response->response >= 7 && $response->response < 9)->count();
                         $detractors = collect($responsesForSubmission)->filter(fn($response) =>$response->response >= 0 && $response->response < 7)->count();
@@ -144,7 +145,7 @@
                         // Calculate NPS
                         $nps = round($totalResponses > 0
                             ? (($promoters / $totalResponses) * 100) - (($detractors / $totalResponses) * 100)
-                            : 'NA',2);
+                            : '0',2);
                             
                     @endphp
                         <td style="white-space: nowrap;">{{ $nps }}%</td>
@@ -172,14 +173,41 @@ function initCharts() {
         return;
     }
 
-    createNPSPieChart();
-    createRatingsBarChart();
+    // createCharts();
+    
 }
+function destroyCharts() {
+    if (npsPieChart) {
+        npsPieChart.destroy();
+        npsPieChart = null;
+    }
+    if (ratingsBarChart) {
+        ratingsBarChart.destroy();
+        ratingsBarChart = null;
+    }
+}
+
+function createCharts(data = null) {
+    createNPSPieChart(data);
+    createRatingsBarChart(data);
+}
+
+window.addEventListener('updateCharts', function handleUpdate(event) {
+    
+    const data = event.detail[0];
+  
+    if (data && typeof data === 'object') {
+        destroyCharts();
+        createCharts(data);
+    } else {
+        console.error('Invalid data received for chart update');
+    }
+});
 
 function createNPSPieChart() {
     const ctxPie = document.getElementById('npsPieChart');
     if (!ctxPie) return;
-
+    
     npsPieChart = new Chart(ctxPie, {
         type: 'pie',
         data: {
@@ -192,15 +220,57 @@ function createNPSPieChart() {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
+            aspectRatio: 1,
+            hover: {
+                mode: null,  // Disable hover effects entirely
+            },
+            animation: {
+                duration: 0,  // Disable animation effects, or set it to a lower value like 200 for subtle animations
+            }
         }
     });
 }
 
-function createRatingsBarChart() {
+function createNPSPieChart(data = null) {
+    const ctxPie = document.getElementById('npsPieChart');
+    if (!ctxPie) return;
+
+    const chartData = data ? [
+        data.detractorPercentage== 0 ? 1 : data.promoterPercentage,
+        data.neutralPercentage== 0 ? 1 : data.neutralPercentage,
+        data.detractorPercentage == 0 ? 1 : data.detractorPercentage
+    ] : [1, 1, 1]; // Default data if no data is provided
+
+    console.log(chartData);
+    npsPieChart = new Chart(ctxPie, {
+        type: 'pie',
+        data: {
+            labels: ['Promoters', 'Neutrals', 'Detractors'],
+            datasets: [{
+                label: 'NPS',
+                data: chartData,
+                backgroundColor: ['#4CAF50', '#FFC107', '#F44336'],
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1,
+            hover: {
+                mode: null,  // Disable hover effects entirely
+            },
+            animation: {
+                duration: 0,  // Disable animation effects, or set it to a lower value like 200 for subtle animations
+            }
+        }
+    });
+}
+
+function createRatingsBarChart(data) {
     const ctxBar = document.getElementById('ratingsBarChart');
     if (!ctxBar) return;
-
+    // console.log(data.detractorPercentage== 0 ? 1 : data.promoterPercentage);
     const ratingLabels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
     const barColors = ratingLabels.map(rating => {
         const value = parseInt(rating);
@@ -210,19 +280,30 @@ function createRatingsBarChart() {
         return '#007bff';
     });
 
+    const chartData = data && data.responseCounts
+        ? ratingLabels.map(rating => data.responseCounts[rating] || 0)
+        : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // Default data if no data is provided
+
     ratingsBarChart = new Chart(ctxBar, {
         type: 'bar',
         data: {
             labels: ratingLabels,
             datasets: [{
                 label: 'Responses',
-                data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Initial placeholder data
+                data: chartData,
                 backgroundColor: barColors,
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false,
+            maintainAspectRatio: true,
+            aspectRatio: 1,
+            hover: {
+                mode: null,  // Disable hover effects entirely
+            },
+            animation: {
+                duration: 0,  // Disable animation effects, or set it to a lower value like 200 for subtle animations
+            },
             plugins: {
                 legend: {
                     display: false,
@@ -249,31 +330,5 @@ function createRatingsBarChart() {
         }
     });
 }
-
-window.addEventListener('updateCharts', function (event) {
-    const data = event.detail[0];
-    console.log('Updating charts with data:', data);
-
-    if (npsPieChart) {
-        if (data.promoters === 0 && data.neutrals === 0 && data.detractors === 0) {
-            npsPieChart.data.datasets[0].data = [1, 1, 1]; // Default to non-zero values
-        } else {
-            npsPieChart.data.datasets[0].data = [
-                data.promoterPercentage || 0,
-                data.neutralPercentage || 0,
-                data.detractorPercentage || 0
-            ];
-        }
-        npsPieChart.update();
-    }
-
-    if (ratingsBarChart && data.responseCounts) {
-        const ratingLabels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
-        const votesData = ratingLabels.map(rating => data.responseCounts[rating] || 0);
-        ratingsBarChart.data.datasets[0].data = votesData;
-        ratingsBarChart.update();
-    }
-
-    
-});
 </script>
+

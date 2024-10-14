@@ -103,7 +103,7 @@
 <div class="container mt-4">
     
         <div class="card-body">
-            <form wire:submit.prevent="submit">
+            <form wire:submit.prevent="submit" wire:confirm="Are you sure you want to submit this? ">
 
                 <div class="mb-4">
                     <div class="row">
@@ -257,7 +257,7 @@
               
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary px-3 py-2 ">Submit</button>
+                <button type="submit"  class="btn btn-primary px-3 py-2 ">Submit</button>
             </form>
         </div>
     </div>

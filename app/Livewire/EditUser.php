@@ -30,7 +30,8 @@ class EditUser extends Component
         $user = Users::findOrFail($userId);
         $this->name = $user->name;
         $this->email = $user->email;
-        $this->idsGroup = json_decode($user->idsGroup); // Fetch the current IDS group of the user
+        $this->idsGroup = json_decode($user->idsGroup);
+        // Fetch the current IDS group of the user
         $this->idsGroups = IdsGroup::all(); // Fetch all available IDS groups
     }
     
@@ -49,12 +50,15 @@ class EditUser extends Component
         $user = Users::findOrFail($this->userId);
         $user->name = $this->name;
         $user->email = $this->email;
-        $user->idsGroup = $this->idsGroup; // Save the selected IDS group
+        
 
         if ($this->password) {
             $user->password = Hash::make($this->password);
         }
 
+        if ($this->idsGroup) {
+            $user->idsGroup = $this->idsGroup;
+        }
         $user->save();
 
         session()->flash('message', 'User updated successfully.');

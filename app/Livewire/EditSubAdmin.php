@@ -36,7 +36,7 @@ class EditSubAdmin extends Component
         $subadmin = SubAdmin::findOrFail($subAdminId);
         $this->name = $subadmin->name;
         $this->email = $subadmin->email;
-        $this->idsGroup = json_decode($subadmin->idsGroup); // Fetch the current IDS group of the user
+        $this->idsGroup = json_decode($subadmin->idsGroup, true); // Fetch the current IDS group of the user
         $this->idsGroups = IdsGroup::all();
         
     }

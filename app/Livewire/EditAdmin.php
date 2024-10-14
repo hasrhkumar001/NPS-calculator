@@ -14,13 +14,13 @@ class EditAdmin extends Component
     public $email;
     public $password;
     
-    public $role; // Assuming admins have roles
+    
 
     protected $rules = [
         'name' => 'required|string|max:255',
         'email' => 'required|email|max:255',
         'password' => 'sometimes|nullable|min:6',
-        'role' => 'required|string',
+        
     ];
 
     public function mount($adminId)
@@ -46,9 +46,8 @@ class EditAdmin extends Component
         $admin = Admin::findOrFail($this->adminId);
         $admin->name = $this->name;
         $admin->email = $this->email;
-    
         $admin->password = Hash::make($this->password);
-       
+      
 
         $admin->save();
 

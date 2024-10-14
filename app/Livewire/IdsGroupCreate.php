@@ -19,6 +19,15 @@ class IdsGroupCreate extends Component
     {
         $this->validate();
 
+        // Check if a group with the same name already exists
+        $existingGroup = IdsGroup::where('name', $this->name)->first();
+
+        if ($existingGroup) {
+            // If a group with the same name exists, show an error message
+            session()->flash('error', 'A group with this name already exists!');
+            return;
+        }
+        
         IdsGroup::create([
             'name' => $this->name,
             

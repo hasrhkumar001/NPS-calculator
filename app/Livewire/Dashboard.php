@@ -184,9 +184,7 @@ class Dashboard extends Component
 
         public function downloadCSV()
         {
-            $userSubmissions = UserSubmission::with('responses')
-                                ->where('status', 'done')
-                                ->get();
+            $userSubmissions = $this->userSubmissions;
 
             $headers = [
                 "Content-type" => "text/csv",
@@ -229,6 +227,17 @@ class Dashboard extends Component
 
                 fclose($file);
             };
+            $filteredResponses = array_diff_key($this->responseCounts, array_flip(['Na']));
+        
+            $this->dispatch('updateCharts', [
+                'promoters' => $this->promoters,
+                'neutrals' => $this->neutrals,
+                'detractors' => $this->detractors,
+                'promoterPercentage' => $this->promoterPercentage,
+                'neutralPercentage' => $this->neutralPercentage,
+                'detractorPercentage' => $this->detractorPercentage,
+                'responseCounts' => $filteredResponses,
+            ]);
 
             return new StreamedResponse($callback, 200, $headers);
         }

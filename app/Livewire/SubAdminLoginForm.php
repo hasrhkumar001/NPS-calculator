@@ -17,6 +17,17 @@ class SubAdminLoginForm extends Component
         'password' => 'required',
     ];
 
+    public function mount()
+    {
+        // Check if the admin is already authenticated
+        
+
+        if (Auth::guard('subadmin')->check()) {
+            // Redirect to the admin dashboard if logged in
+            return redirect('/subadmin/dashboard');  // Change this to the appropriate admin dashboard route
+        }
+    }
+
     public function login(Request $request)
     {
        // Validate the request data
