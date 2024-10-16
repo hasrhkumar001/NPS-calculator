@@ -54,7 +54,7 @@ class UserDashboard extends Component
         //  dd($this->userSubmissions);
         $this->responseCounts = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
         ->join('user_submissions', 'survey_responses.client_id', '=', 'user_submissions.client_id')
-        ->where('user_submissions.id', $matchingUsers) // Filter by the authenticated user's ID
+         // Filter by the authenticated user's ID
         ->where('user_submissions.user_id', auth()->id())
         ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  
         ->groupBy('response')
