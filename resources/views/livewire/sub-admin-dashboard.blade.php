@@ -29,7 +29,7 @@
                                 <select id="users" class="form-select" wire:model="user">
                                     <option  value="">All</option>
                                     @foreach($users as $user)
-                                        <option value="{{ $user }}">{{ $user }}</option>
+                                        <option value="{{ $user['email'] }}">{{ $user['name'] }}</option>
                                     @endforeach
                                     
                                 </select>
@@ -48,7 +48,7 @@
                             </div>
                         </div>
                         <div class=" px-5 py-3 text-end">
-                            <button type="submit" class="btn px-5 py-2 btn-primary fs-5">Filter</button>
+                            <button type="submit" class="btn px-5 py-2 btn-primary fs-5"><i class="fas fa-filter mx-2"></i>Apply Filter</button>
                         </div>      
                     </div>
 
@@ -116,7 +116,7 @@
                 <tr>
                     <th style="white-space: nowrap;">Question #</th>
                     @foreach($userSubmissions as $submission)
-                        <th style="white-space: nowrap;"><strong data-group="{{$submission->idsGroup}}">{{ $submission->clientContactName }} ({{  $submission->updated_at->format('Y-m-d') }})</th>
+                        <th style="white-space: nowrap;"><strong data-group="{{$submission->idsGroup}}">{{ $submission->clientContactName }} ({{  $submission->updated_at->format('Y-m-d') }})</strong></th>
                     @endforeach
                 </tr>
             </thead>
@@ -127,37 +127,21 @@
                         
                         @foreach($userSubmissions as $submission)
                             <td style="white-space: nowrap;">
-                                @isset($responses[$submission->id][$index - 1])
-                                    {{ $responses[$submission->id][$index - 1]->response ?? 'NA' }}
+                                @isset($responses[$submission->id])
+                                    {{ $responses[$submission->id]->{"Q{$index}"} ?? 'NA' }}
                                 @else
-                                    NA
+                                    Nope
                                 @endisset
                             </td>
                         @endforeach
                     </tr>
-                    
                 @endforeach
                 <tr>
-                    
                     <th style="white-space: nowrap;">NPS</th> 
                     @foreach($userSubmissions as $submission)
-                    @php
-                        // Group responses by promoters, passives, and detractors
-                        $responsesForSubmission = collect($responses[$submission->id] ?? [])->filter(fn($response) => $response->response !== 'Na');
-                        $promoters = collect($responsesForSubmission)->filter(fn($response) => $response->response >= 9)->count();
-                        $passives = collect($responsesForSubmission)->filter(fn($response) => $response->response >= 7 && $response->response < 9)->count();
-                        $detractors = collect($responsesForSubmission)->filter(fn($response) =>$response->response >= 0 && $response->response < 7)->count();
-                        
-                        // Total responses for this submission
-                        $totalResponses = count($responsesForSubmission);
-
-                        // Calculate NPS
-                        $nps = round($totalResponses > 0
-                            ? (($promoters / $totalResponses) * 100) - (($detractors / $totalResponses) * 100)
-                            : 'NA',2);
-                            
-                    @endphp
-                        <td style="white-space: nowrap;">{{ $nps }}%</td>
+                        <td style="white-space: nowrap;">
+                            {{ $responses[$submission->id]->Nps_percentage?? 'NA' }}%
+                        </td>
                     @endforeach
                 </tr>
             </tbody>

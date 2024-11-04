@@ -49,15 +49,13 @@ class AddUser extends Component
             'name' => 'required|string',
             'email' => 'required|email',
             'role' => 'required',
-            'idsGroup' =>  $this->role === '2' ? 'nullable' : 'required', 
+            'idsGroup' =>  $this->role === '3' ? 'nullable' : 'required', 
     
         ]);
          // Event listener to update idsGroup from custom dropdown
         
        
-        $userExists = Users::where('email', $this->email)->exists() ||
-                  SubAdminSignup::where('email', $this->email)->exists() ||
-                  AdminSignup::where('email', $this->email)->exists();
+        $userExists = Users::where('email', $this->email)->exists() ;
 
         if ($userExists) {
             session()->flash('error', 'A user with this email already exists!');
@@ -67,40 +65,29 @@ class AddUser extends Component
        // Generate a random password of length 10
        $this->password = Str::random(10);
       
+       $new_user =new Users;
+       $new_user->name =$this->name;
+       $new_user->email=$this->email;
+       $new_user->password =bcrypt($this->password);
+       $new_user->role = $this->role;
+      
 
-        if($this->role =="0"){
-            $new_user =new Users;
-            $new_user->name =$this->name;
-            $new_user->email=$this->email;
+        if($this->role =="1"){
             $new_user->idsGroup = json_encode($this->idsGroup);
-            $new_user->password =bcrypt($this->password);
-            $new_user->save();
             session()->flash('message', 'User added successfully!');
-        }
-        elseif($this->role =="1"){
-
-        $new_subadmin =new SubAdminSignup;
-        $new_subadmin->name =$this->name;
-        $new_subadmin->email =$this->email;
-        $new_subadmin->password =bcrypt($this->password);
-        $new_subadmin->idsGroup = json_encode($this->idsGroup);
-        $new_subadmin->save();
-
-        
-        session()->flash('message', 'Sub Admin added successfully!');
         }
         elseif($this->role =="2"){
 
-            $new_admin =new AdminSignup;
-            $new_admin->name =$this->name;
-            $new_admin->email =$this->email;
-            $new_admin->password =bcrypt($this->password);
-            $new_admin->save();
-    
+            $new_user->idsGroup = json_encode($this->idsGroup);
+            session()->flash('message', 'Sub Admin added successfully!');
+        }
+        elseif($this->role =="3"){
 
+            $new_user->idsGroup= 'All';
             session()->flash('message', 'Admin added successfully!');
             }
         
+        $new_user->save();
 
          // Send email with the credentials
         Mail::to($this->email)->send(new WelcomeMail($this->name, $this->email, $this->password));

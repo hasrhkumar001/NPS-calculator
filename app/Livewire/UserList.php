@@ -14,6 +14,7 @@ class UserList extends Component
 {
     public $selectedRole = 'all'; // Default to 'users'
     public $list; // To store either users, admins, or both
+    public $search = ''; 
 
     public function mount()
     {
@@ -25,49 +26,42 @@ class UserList extends Component
     {
         $this->updateList();
     }
+    public function updatedSearch()
+    {
+        // Update the search term when input changes
+        $this->updateList(); // Update the list with the new search term
+    }
 
+    public function searchUsers()
+    {
+        // Call the updateList method to refresh the list based on the current search value
+        $this->updateList();
+    }
+   
     // Update the list according to selectedRole value
     public function updateList()
-{
-    $this->list = []; // Initialize as an empty array
+    {
+        $query = Users::query();
 
-    if ($this->selectedRole == 'users') {
-        $this->list = Users::all()->map(function ($user) {
-            $user->role = 'user'; // Add role information
-            return $user;
-        });
-    } elseif ($this->selectedRole == 'subadmins') {
-        $this->list = SubAdmin::all()->map(function ($subadmin) {
-            $subadmin->role = 'subadmin'; // Add role information
-            return $subadmin;
-        });
-    }elseif ($this->selectedRole == 'admins') {
-        $this->list = Admin::all()->map(function ($admin) {
-            $admin->role = 'admin'; // Add role information
-            return $admin;
-        });
-    } 
-    elseif ($this->selectedRole == 'all') {
-        // Fetch and add admins individually
-        foreach (Admin::all() as $admin) {
-            $admin->role = 'admin'; // Add role information
-            $this->list[] = $admin; // Add admin to the list
-        }
-        foreach (SubAdmin::all() as $admin) {
-            $admin->role = 'subadmin'; // Add role information
-            $this->list[] = $admin; // Add admin to the list
-        }
-        // Fetch and add users individually
-        foreach (Users::all() as $user) {
-            $user->role = 'user'; // Add role information
-            $this->list[] = $user; // Add user to the list
+        if ($this->selectedRole === 'users') {
+            $query->where('role', 1);
+        } elseif ($this->selectedRole === 'subadmins') {
+            $query->where('role', 2);
+        } elseif ($this->selectedRole === 'admins') {
+            $query->where('role', 3);
         }
 
-        
+        // Apply search filter if there is input
+        if (!empty($this->search)) {
+            $query->where(function ($q) {
+                $q->where('name', 'like', '%' . $this->search . '%')
+                  ->orWhere('email', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        // Set the filtered list
+        $this->list = $query->orderByRaw("FIELD(role, '3', '2', '1')")->get();
     }
-    
-    // No need for return statement here, as $this->list is updated directly
-}
 
     
 
@@ -81,8 +75,8 @@ class UserList extends Component
 
     public function deleteAdmin($id)
     {
-        $admin = Admin::findOrFail($id);
-        if (Auth::guard('admin')->user()->id != $admin->id) {
+        $admin = Users::findOrFail($id);
+        if (Auth::user()->id != $admin->id) {
             $admin->delete();
             session()->flash('message', 'Admin deleted successfully.');
         } else {

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('idsGroup');
+            $table->tinyInteger('role')->default(1)->comment('1: user, 2: sub-admin, 3: admin');
             $table->softDeletes();
             $table->timestamps();
         });

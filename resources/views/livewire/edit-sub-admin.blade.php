@@ -35,7 +35,7 @@
             @enderror
         </div>
 
-        @if(auth()->guard('admin')->check()) 
+        @if(auth()->user()->role == 3) 
         <div class="mb-3 col-12">
                     <label for="idsGroup" class="form-label fw-bold">IDS Group</label>
                     <div class="custom-multiselect">

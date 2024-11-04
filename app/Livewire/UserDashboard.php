@@ -52,15 +52,39 @@ class UserDashboard extends Component
                 ->get();
                 
         //  dd($this->userSubmissions);
-        $this->responseCounts = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
-        ->join('user_submissions', 'survey_responses.client_id', '=', 'user_submissions.client_id')
-         // Filter by the authenticated user's ID
-        ->where('user_submissions.user_id', auth()->id())
-        ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  
-        ->groupBy('response')
-        ->get()
-        ->pluck('count', 'response')
-        ->toArray();
+        $validResponses = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+         $columns = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15'];
+     
+             // Initialize an array to store counts for each response
+             $counts = array_fill_keys($validResponses, 0);
+     
+             foreach ($validResponses as $response) {
+                 $this->responseCounts = Survey2Response::selectRaw(
+                     // Dynamically create the SUM(CASE WHEN) for each column
+                     implode(' + ', array_map(function ($column) use ($response) {
+                         return "SUM(CASE WHEN {$column} = '{$response}' THEN 1 ELSE 0 END)";
+                     }, $columns)) . ' as total_count'
+                 )->join('user_submissions', 'survey_responses.client_id', '=', 'user_submissions.client_id')
+                 ->where('user_submissions.user_id', auth()->id())->value('total_count');
+     
+                 // Store the count for the current response
+                 $counts[$response] = $this->responseCounts;
+             }
+     
+             // Only keep counts where the value is greater than zero
+             $this->responseCounts = array_filter($counts, function ($count) {
+                 return $count > 0;
+             });
+ 
+        // $this->responseCounts = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
+        // ->join('user_submissions', 'survey_responses.client_id', '=', 'user_submissions.client_id')
+        //  // Filter by the authenticated user's ID
+        // ->where('user_submissions.user_id', auth()->id())
+        // ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  
+        // ->groupBy('response')
+        // ->get()
+        // ->pluck('count', 'response')
+        // ->toArray();
         
         $this->idsGroups = json_decode(auth()->user()->idsGroup, true);
         $this->calculateNPS();
@@ -69,8 +93,7 @@ class UserDashboard extends Component
         // Fetch the responses for each submission dynamically
         foreach ($this->userSubmissions as $submission) {
             $this->responses[$submission->id] = Survey2Response::where('client_id', $submission->client_id)
-                ->orderBy('question_index')
-                ->get();
+                ->first();
         }
     }
 
@@ -117,148 +140,148 @@ class UserDashboard extends Component
 
 
     public function filter()
-    {
-        $idsGroup = $this->idsGroup;
-        $dateFrom = $this->dateFrom;  
-        $dateTo = $this->dateTo;      
-        $csat = $this->csat;
-        
+{
+    $idsGroup = $this->idsGroup;
+    $dateFrom = $this->dateFrom;  
+    $dateTo = $this->dateTo;      
+    $csat = $this->csat;
 
-        if (!empty($idsGroup)) {
-            // Filter user submissions based on idsGroup
-            $query = UserSubmission::where('idsGroup', $idsGroup);
-            
-            // If dateFrom is provided, filter user submissions updated after or on dateFrom
-            if (!empty($dateFrom)) {
-                $query = $query->where('updated_at', '>=', $dateFrom);
-            }
+    // Define the valid responses
+    $validResponses = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    $columns = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15']; // Replace with actual response columns if needed
+    $counts = [];
 
-            // If dateTo is provided, filter user submissions updated before or on dateTo
-            if (!empty($dateTo)) {
-                $query = $query->where('updated_at', '<=', $dateTo);
-            }
-            if (!empty($csat)) {
-                // Filter for the current month
-                $query = $query->where('csatOccurrence', $csat);;
-            }
-            $query = $query->where('status', 'done')->where('user_id', auth()->id());
-            $this->userSubmissions = $query->get();
-            
-            // Get all user_submission_ids for the filtered idsGroup and date range
-            $submissionIds = $this->userSubmissions->pluck('client_id')->toArray();
+    // Filter when idsGroup is provided
+    if (!empty($idsGroup)) {
+        // Filter user submissions based on idsGroup
+        $query = UserSubmission::where('idsGroup', $idsGroup);
 
-            // Now filter Survey2Response by those user_submission_ids
-            $responseQuery = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
-                ->whereIn('client_id', $submissionIds)
-                ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7,8,9, 10]);  
-            
-          
-
-            $this->responseCounts = $responseQuery->groupBy('response')
-                ->get()
-                ->pluck('count', 'response')
-                ->toArray();
-
-        } else {
-            // If no idsGroup is selected, show all user submissions
-            $query = UserSubmission::query();
-            
-            // If dateFrom is provided, filter by updated_at after or on dateFrom
-            if (!empty($dateFrom)) {
-                $query = $query->where('updated_at', '>=', $dateFrom);
-            }
-
-            // If dateTo is provided, filter by updated_at before or on dateTo
-            if (!empty($dateTo)) {
-                $query = $query->where('updated_at', '<=', $dateTo);
-            }
-            if (!empty($csat)) {
-                // Filter for the current month
-                $query = $query->where('csatOccurrence', $csat);;
-            }
-            $query = $query->where('status', 'done')->where('user_id', auth()->id());
-            $this->userSubmissions = $query->get();
-             // Get all user_submission_ids for the filtered idsGroup and date range
-             $submissionIds = $this->userSubmissions->pluck('client_id')->toArray();
-
-            // Get response counts for all user submissions
-            $responseQuery = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
-                ->whereIn('client_id', $submissionIds)
-                ->whereIn('response', [0,1, 2, 3, 4, 5, 6,7,8, 9, 10]);
-
-        
-
-            $this->responseCounts = $responseQuery->groupBy('response')
-                ->get()
-                ->pluck('count', 'response')
-                ->toArray();
-                 }
-
-        // Calculate NPS after filtering
-        return $this->calculateNPS();
+        // If dateFrom is provided, filter user submissions updated after or on dateFrom
+        if (!empty($dateFrom)) {
+            $query = $query->where('updated_at', '>=', $dateFrom);
         }
 
+        // If dateTo is provided, filter user submissions updated before or on dateTo
+        if (!empty($dateTo)) {
+            $query = $query->where('updated_at', '<=', $dateTo);
+        }
 
-        public function downloadCSV()
-        {
-            $userSubmissions = $this->userSubmissions;
+        // If CSAT is provided, filter for the specific month
+        if (!empty($csat)) {
+            $query = $query->where('csatOccurrence', $csat);
+        }
 
-            $headers = [
-                "Content-type" => "text/csv",
-                "Content-Disposition" => "attachment; filename=user_submissions.csv",
-                "Pragma" => "no-cache",
-                "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
-                "Expires" => "0"
-            ];
+        $query = $query->where('status', 'done')->where('user_id', auth()->id());
+        $this->userSubmissions = $query->get();
 
-            // Prepare columns with NPS column
-            $columns = ['Question #'];
+        // Get all user_submission_ids for the filtered idsGroup and date range
+        $submissionIds = $this->userSubmissions->pluck('client_id')->toArray();
+
+    } else {
+        // If no idsGroup is selected, show all user submissions
+        $query = UserSubmission::query();
+
+        // If dateFrom is provided, filter by updated_at after or on dateFrom
+        if (!empty($dateFrom)) {
+            $query = $query->where('updated_at', '>=', $dateFrom);
+        }
+
+        // If dateTo is provided, filter by updated_at before or on dateTo
+        if (!empty($dateTo)) {
+            $query = $query->where('updated_at', '<=', $dateTo);
+        }
+
+        // If CSAT is provided, filter for the specific month
+        if (!empty($csat)) {
+            $query = $query->where('csatOccurrence', $csat);
+        }
+
+        $query = $query->where('status', 'done')->where('user_id', auth()->id());
+        $this->userSubmissions = $query->get();
+
+        // Get all user_submission_ids for the filtered idsGroup and date range
+        $submissionIds = $this->userSubmissions->pluck('client_id')->toArray();
+    }
+
+    // Perform dynamic SUM(CASE WHEN) for each response across the defined columns
+    foreach ($validResponses as $response) {
+        $this->responseCounts = Survey2Response::selectRaw(
+            implode(' + ', array_map(function ($column) use ($response) {
+                return "SUM(CASE WHEN {$column} = '{$response}' THEN 1 ELSE 0 END)";
+            }, $columns)) . ' as total_count'
+        )->whereIn('client_id', $submissionIds)->value('total_count');
+
+        // Store the count for the current response
+        $counts[$response] = $this->responseCounts;
+    }
+
+    $this->responseCounts = $counts;
+
+    // Calculate NPS after filtering
+    return $this->calculateNPS();
+}
+
+
+
+public function downloadCSV()
+{
+   
+    $userSubmissions = $this->userSubmissions;
+
+    $headers = [
+        "Content-type" => "text/csv",
+        "Content-Disposition" => "attachment; filename=user_submissions.csv",
+        "Pragma" => "no-cache",
+        "Cache-Control" => "must-revalidate, post-check=0, pre-check=0",
+        "Expires" => "0"
+    ];
+
+    // Prepare columns with NPS column
+    $columns = ['Question #'];
+    foreach ($userSubmissions as $submission) {
+        $columns[] = $submission->clientContactName . ' (' . $submission->updated_at->format('Y-m-d') . ')';
+    }
+    // Add NPS as the last column
+
+    $callback = function () use ($userSubmissions, $columns) {
+        $file = fopen('php://output', 'w');
+        fputcsv($file, $columns);
+
+        for ($i = 1; $i <= 9; $i++) {
+            $row = ['Q ' . $i];
             foreach ($userSubmissions as $submission) {
-                $columns[] = $submission->clientContactName . ' (' . $submission->updated_at->format('Y-m-d') . ')';
+                // Fetch the response for each question
+                $response = $this->responses[$submission->id]->{"Q{$i}"} ?? 'NA';
+                $row[] = $response;
             }
-              // Add NPS as the last column
-
-            $callback = function() use ($userSubmissions, $columns) {
-                $file = fopen('php://output', 'w');
-                fputcsv($file, $columns);
-
-                for ($i = 1; $i <= 9; $i++) {
-                    $row = ['Q ' . $i];
-                    foreach ($userSubmissions as $submission) {
-                        // Fetch the response for each question
-                        $response = $submission->responses->where('question_index', $i)->first();
-                        
-                        $row[] = $response ? $response->response : 'NA';
-                    }
-                    fputcsv($file, $row);
-                }
-
-                // Add the NPS row
-                $npsRow = ['NPS'];
-                foreach ($userSubmissions as $submission) {
-                    // Calculate NPS for each submission
-                    $nps = $this->calculateNPSForSubmission($submission);  // Use the new helper method
-                    $npsRow[] = $nps . '%';
-                }
-                fputcsv($file, $npsRow);
-
-                fclose($file);
-            };
-
-            $filteredResponses = array_diff_key($this->responseCounts, array_flip(['Na']));
-        
-            $this->dispatch('updateCharts', [
-                'promoters' => $this->promoters,
-                'neutrals' => $this->neutrals,
-                'detractors' => $this->detractors,
-                'promoterPercentage' => $this->promoterPercentage,
-                'neutralPercentage' => $this->neutralPercentage,
-                'detractorPercentage' => $this->detractorPercentage,
-                'responseCounts' => $filteredResponses,
-            ]);
-
-            return new StreamedResponse($callback, 200, $headers);
+            fputcsv($file, $row);
         }
+
+        // Add the NPS row
+        $npsRow = ['NPS'];
+        foreach ($userSubmissions as $submission) {
+            // Calculate NPS for each submission
+            $nps = $this->responses[$submission->id]->Nps_percentage; // Use the new helper method
+            $npsRow[] = $nps . '%';
+        }
+        fputcsv($file, $npsRow);
+
+        fclose($file);
+    };
+    $filteredResponses = array_diff_key($this->responseCounts, array_flip(['Na']));
+
+    $this->dispatch('updateCharts', [
+        'promoters' => $this->promoters,
+        'neutrals' => $this->neutrals,
+        'detractors' => $this->detractors,
+        'promoterPercentage' => $this->promoterPercentage,
+        'neutralPercentage' => $this->neutralPercentage,
+        'detractorPercentage' => $this->detractorPercentage,
+        'responseCounts' => $filteredResponses,
+    ]);
+
+    return new StreamedResponse($callback, 200, $headers);
+}
         
         private function calculateNPSForSubmission($submission)
         {

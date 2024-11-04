@@ -5,6 +5,7 @@ namespace App\Livewire;
 
 use App\Models\IdsGroup;
 use App\Models\SubAdmin;
+use App\Models\Users;
 use Livewire\Component;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
@@ -33,7 +34,7 @@ class EditSubAdmin extends Component
     public function mount($subAdminId)
     {
         $this->subAdminId = $subAdminId;
-        $subadmin = SubAdmin::findOrFail($subAdminId);
+        $subadmin = Users::findOrFail($subAdminId);
         $this->name = $subadmin->name;
         $this->email = $subadmin->email;
         $this->idsGroup = json_decode($subadmin->idsGroup, true); // Fetch the current IDS group of the user
@@ -52,7 +53,7 @@ class EditSubAdmin extends Component
 
         $this->validate();
 
-        $admin = SubAdmin::findOrFail($this->subAdminId);
+        $admin = Users::findOrFail($this->subAdminId);
         $admin->name = $this->name;
         $admin->email = $this->email;
         $admin->idsGroup = $this->idsGroup;

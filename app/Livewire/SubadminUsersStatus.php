@@ -44,7 +44,7 @@ class SubadminUsersStatus extends Component
                $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
             }
             
-        })->pluck('name')->toArray();        
+        })->get()->toArray();        
         // dd($users);
         // Fetch user submissions where user_id matches the matching users
         $this->userSubmissions = UserSubmission::whereIn('id', $matchingUsers)
@@ -52,23 +52,45 @@ class SubadminUsersStatus extends Component
                                 ->get();
                         
         // dd($this->userSubmissions);
+        $validResponses = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+         $columns = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15'];
+     
+             // Initialize an array to store counts for each response
+             $counts = array_fill_keys($validResponses, 0);
+     
+             foreach ($validResponses as $response) {
+                 $this->responseCounts = Survey2Response::selectRaw(
+                     // Dynamically create the SUM(CASE WHEN) for each column
+                     implode(' + ', array_map(function ($column) use ($response) {
+                         return "SUM(CASE WHEN {$column} = '{$response}' THEN 1 ELSE 0 END)";
+                     }, $columns)) . ' as total_count'
+                 )->join('user_submissions', 'survey_responses.client_id', '=', 'user_submissions.client_id')
+                 ->where('user_submissions.id', $matchingUsers)->value('total_count');
+     
+                 // Store the count for the current response
+                 $counts[$response] = $this->responseCounts;
+             }
+     
+             // Only keep counts where the value is greater than zero
+             $this->responseCounts = array_filter($counts, function ($count) {
+                 return $count > 0;
+             });
 
-        $this->responseCounts = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
-            ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  
-            ->join('user_submissions', 'survey_responses.client_id', '=', 'user_submissions.client_id')
-            ->where('user_submissions.id', $matchingUsers) // Filter by the authenticated user's ID
-            ->groupBy('response')
-            ->get()
-            ->pluck('count', 'response')
-            ->toArray();
+        // $this->responseCounts = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
+        //     ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  
+        //     ->join('user_submissions', 'survey_responses.client_id', '=', 'user_submissions.client_id')
+        //     ->where('user_submissions.id', $matchingUsers) // Filter by the authenticated user's ID
+        //     ->groupBy('response')
+        //     ->get()
+        //     ->pluck('count', 'response')
+        //     ->toArray();
             
         $this->idsGroups = json_decode(auth()->user()->idsGroup, true);
 
         // Fetch the responses for each submission dynamically
         foreach ($this->userSubmissions as $submission) {
             $this->responses[$submission->id] = Survey2Response::where('client_id', $submission->client_id)
-                ->orderBy('question_index')
-                ->get();
+                ->first();
         }
     }
 
@@ -103,7 +125,7 @@ class SubadminUsersStatus extends Component
             }
 
             if (!empty($selectedUser)) {
-                $user = Users::where('name', $selectedUser)->pluck('id'); 
+                $user = Users::where('email', $selectedUser)->pluck('id'); 
                 $query = $query->where('user_id', $user); 
             }
 
@@ -114,17 +136,17 @@ class SubadminUsersStatus extends Component
             // Get all user_submission_ids for the filtered idsGroup and date range
             $submissionIds = $this->userSubmissions->pluck('client_id')->toArray();
 
-            // Now filter Survey2Response by those user_submission_ids
-            $responseQuery = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
-                ->whereIn('client_id', $submissionIds)
-                ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7,8,9, 10]);  // Filter responses between 1-6 and 9-10
+            // // Now filter Survey2Response by those user_submission_ids
+            // $responseQuery = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
+            //     ->whereIn('client_id', $submissionIds)
+            //     ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7,8,9, 10]);  // Filter responses between 1-6 and 9-10
             
           
 
-            $this->responseCounts = $responseQuery->groupBy('response')
-                ->get()
-                ->pluck('count', 'response')
-                ->toArray();
+            // $this->responseCounts = $responseQuery->groupBy('response')
+            //     ->get()
+            //     ->pluck('count', 'response')
+            //     ->toArray();
 
         } else {
             // If no idsGroup is selected, show all user submissions
@@ -138,7 +160,7 @@ class SubadminUsersStatus extends Component
             }
 
             if (!empty($selectedUser)) {
-                $user = Users::where('name', $selectedUser)->pluck('id'); 
+                $user = Users::where('email', $selectedUser)->pluck('id'); 
                 $query = $query->where('user_id', $user); 
             }
             
@@ -151,20 +173,36 @@ class SubadminUsersStatus extends Component
              // Get all user_submission_ids for the filtered idsGroup and date range
              $submissionIds = $this->userSubmissions->pluck('client_id')->toArray();
 
-            // Get response counts for all user submissions
-            $responseQuery = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
-                ->whereIn('client_id', $submissionIds)
-                ->whereIn('response', [0,1, 2, 3, 4, 5, 6,7,8, 9, 10]);
+            // // Get response counts for all user submissions
+            // $responseQuery = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
+            //     ->whereIn('client_id', $submissionIds)
+            //     ->whereIn('response', [0,1, 2, 3, 4, 5, 6,7,8, 9, 10]);
 
         
 
-            $this->responseCounts = $responseQuery->groupBy('response')
-                ->get()
-                ->pluck('count', 'response')
-                ->toArray();
+            // $this->responseCounts = $responseQuery->groupBy('response')
+            //     ->get()
+            //     ->pluck('count', 'response')
+            //     ->toArray();
                  }
-
-        // Calculate NPS after filtering
+            
+            $validResponses = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+            $columns = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15']; // Replace with actual response columns if needed
+            $counts = [];
+            foreach ($validResponses as $response) {
+                $this->responseCounts = Survey2Response::selectRaw(
+                    implode(' + ', array_map(function ($column) use ($response) {
+                        return "SUM(CASE WHEN {$column} = '{$response}' THEN 1 ELSE 0 END)";
+                    }, $columns)) . ' as total_count'
+                )->whereIn('client_id', $submissionIds)->value('total_count');
+        
+                // Store the count for the current response
+                $counts[$response] = $this->responseCounts;
+            }
+        
+            $this->responseCounts = $counts;
+     
+        
         
         }
         public function delete($id){

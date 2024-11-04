@@ -28,7 +28,7 @@
 
                         
                         <div class=" px-5 py-3 text-end">
-                            <button type="submit" class="btn px-5 py-2 btn-primary fs-5">Filter</button>
+                            <button type="submit" class="btn px-5 py-2 btn-primary fs-5"><i class="fas fa-filter mx-2"></i>Apply Filter</button>
                         </div>      
                     </div>
 

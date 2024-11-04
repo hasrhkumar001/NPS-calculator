@@ -15,7 +15,7 @@ use Firebase\JWT\Key;
 class Survey2 extends Component
 {
     public $responses = [];
-    public $additionalComments;
+    public $additionalComment;
     public $submissionDetails;
     public $token;
 
@@ -62,22 +62,12 @@ class Survey2 extends Component
         // Check if the user has already submitted the survey
         $userSubmission = UserSubmission::where('client_id', $decoded->client_id)
                             ->first();
-        
-       
-        // Save each response
-        foreach ($this->responses as $questionIndex => $response) {
-            Survey2Response::updateOrCreate(
-                [
-                    'client_id' => $userSubmission->client_id,
-                    'question_index' => $questionIndex, // Save the index as question ID
-                ],
-                ['response' => $response]
-            );
-        }
+
+         // Calculate Promoters, Detractors, and Neutrals
         $promoters = collect($this->responses)->filter(function ($score) {
-            return $score >= 9 && $score <=10;
+            return $score >= 9 && $score <= 10;
         })->count();
-        
+
         $detractors = collect($this->responses)->filter(function ($score) {
             return $score >= 0 && $score <= 6;
         })->count();
@@ -85,15 +75,46 @@ class Survey2 extends Component
         $neutrals = collect($this->responses)->filter(function ($score) {
             return $score >= 7 && $score <= 8;
         })->count();
-        
-        
+
         $totalRespondents = $promoters + $neutrals + $detractors;
-        
+
         if ($totalRespondents > 0) {
-            $nps = round((($promoters / $totalRespondents) * 100) - (($detractors / $totalRespondents) * 100),2);
+            $promoterPercentage = round(($promoters / $totalRespondents) * 100, 2);
+            $detractorPercentage = round(($detractors / $totalRespondents) * 100, 2);
+            $neutralPercentage = round(($neutrals / $totalRespondents) * 100, 2);
+            $nps = $promoterPercentage - $detractorPercentage;
         } else {
-            $nps = null; // Handle case where there are no responses
+            $promoterPercentage = 0;
+            $detractorPercentage = 0;
+            $neutralPercentage = 0;
+            $nps = null; // No responses, NPS cannot be calculated
         }
+        
+        Survey2Response::updateOrCreate(
+            ['client_id' => $userSubmission->client_id],
+            [
+                'Q1' => $this->responses[1] ?? null,
+                'Q2' => $this->responses[2] ?? null,
+                'Q3' => $this->responses[3] ?? null,
+                'Q4' => $this->responses[4] ?? null,
+                'Q5' => $this->responses[5] ?? null,
+                'Q6' => $this->responses[6] ?? null,
+                'Q7' => $this->responses[7] ?? null,
+                'Q8' => $this->responses[8] ?? null,
+                'Q9' => $this->responses[9] ?? null,
+                'additional_comments' => $this->additionalComment ?? 'No additional comments.',
+                'Promoter' => $promoters,
+                'Detractor' => $detractors,
+                'Neutral' => $neutrals,
+                'Promoter_percentage' => $promoterPercentage,
+                'Detractor_percentage' => $detractorPercentage,
+                'Neutral_percentage' => $neutralPercentage,
+                'Nps_percentage' => $nps,
+            ]
+        );
+        
+       
+        
 
          // Prepare data for the email
          $surveyData = [
@@ -113,7 +134,7 @@ class Survey2 extends Component
             'value_for_money' => $this->responses[7],
             'overall_support' => $this->responses[8],
             'work_with_us_again' => $this->responses[9],
-            'additional_comments' => $this->additionalComments ?? 'No additional comments.', // Replace this with actual comment if available
+            'additional_comments' => $this->additionalComment ?? 'No additional comments.', // Replace this with actual comment if available
         ];
 
         // Mark the token as used after submission

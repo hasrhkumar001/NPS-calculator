@@ -29,7 +29,7 @@
                                 <select id="users" class="form-select" wire:model="user">
                                     <option  value="">All</option>
                                     @foreach($users as $user)
-                                        <option value="{{ $user }}">{{ $user }}</option>
+                                        <option value="{{ $user['email'] }}">{{ $user['name'] }}</option>
                                     @endforeach
                                     
                                 </select>
@@ -38,7 +38,7 @@
 
                         
                         <div class=" px-5 py-3 text-end">
-                            <button type="submit" class="btn px-5 py-2 btn-primary fs-5">Filter</button>
+                            <button type="submit" class="btn px-5 py-2 btn-primary fs-5"><i class="fas fa-filter mx-2"></i>Apply Filter</button>
                         </div>      
                     </div>
 

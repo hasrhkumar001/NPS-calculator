@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Models\Users;
 use Livewire\Component;
 use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
@@ -26,7 +27,7 @@ class EditAdmin extends Component
     public function mount($adminId)
     {
         $this->adminId = $adminId;
-        $admin = Admin::findOrFail($adminId);
+        $admin = Users::findOrFail($adminId);
         $this->name = $admin->name;
         $this->email = $admin->email;
       
@@ -34,23 +35,28 @@ class EditAdmin extends Component
 
     public function updateAdmin()
     {
-        $this->rules['email'] = [
-            'required',
-            'email',
-            'max:255',
-            Rule::unique('admins')->ignore($this->adminId),
-        ];
+        $this->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($this->adminId), // Validate unique email in 'users' table
+            ],
+            'password' => 'sometimes|nullable|min:6', // Password is optional and validated only if provided
+        ]);
 
-        $this->validate();
-
-        $admin = Admin::findOrFail($this->adminId);
+        $admin = Users::findOrFail($this->adminId);
         $admin->name = $this->name;
         $admin->email = $this->email;
-        $admin->password = Hash::make($this->password);
-      
+
+        // Only update the password if one is provided
+        if (!empty($this->password)) {
+            $admin->password = Hash::make($this->password);
+        }
 
         $admin->save();
-
+        
         session()->flash('message', 'Admin updated successfully.');
         
         $this->reset(['password']);

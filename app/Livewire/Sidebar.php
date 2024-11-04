@@ -12,27 +12,32 @@ class Sidebar extends Component
     public function mount()
     {
         
-        if (Auth::guard('admin')->check()) {
-            $this->role = 'admin';
-            
-        } elseif (AutH::guard('web')->check()) {
-            $this->role = 'user';
-        }
-        elseif (Auth::guard('subadmin')->check()) {
-            $this->role = 'subadmin';
+        if (Auth::check()) {
+            // Set the role based on the user's role field
+            $user = Auth::user();
+            if ($user->role == 3) {
+                $this->role = 'admin';
+            } elseif ($user->role == 2) {
+                $this->role = 'subadmin';
+            } elseif ($user->role == 1) {
+                $this->role = 'user';
+            } else {
+                $this->role = null; // Unknown role or not authenticated
+            }
         } else {
             $this->role = null; // Not authenticated
         }
     }
     public function logout()
     {
-        if ($this->role === 'admin') {
-            Auth::guard('admin')->logout(); // Admin logout
-        }elseif ($this->role === 'subadmin') {
-            Auth::guard('subadmin')->logout(); // SubAdmin logout
-        }else {
-            Auth::guard('web')->logout(); // User logout
-        }
+        
+        // Logout the authenticated user, regardless of their role
+        Auth::logout();
+
+        // Regenerate the session to avoid session fixation attacks
+        session()->invalidate();
+        session()->regenerateToken();
+
         return redirect('/login'); // Redirect to the login page after logout
     }
     public function render()

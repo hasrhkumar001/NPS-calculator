@@ -15,6 +15,7 @@
             <h2>{{ ucfirst($selectedRole) }} List</h2>
         </div>
         <div class="col d-flex justify-content-end">
+            <input type="text" class="form-control me-2" placeholder="Search by Name or Email" wire:model.live.debounce.300ms="search" wire:keydown.enter="searchUsers"  style="width: 250px;">
             <select wire:change="updateListBasedOnRole" wire:model="selectedRole" class="form-select me-2" style="width: 200px;">
                 <option value="all">All</option>
                 <option value="users">Users</option>
@@ -42,15 +43,20 @@
                         <th scope="row">{{ $loop->iteration }}</th>
                         <td>{{ $item->name }}</td>
                         <td>{{ $item->email }}</td>
-                        <td>{{ ucfirst($item->role) }}</td>
+                        <td>@if($item->role == 1)
+                                User
+                            @elseif($item->role == 2)
+                                Subadmin
+                            @elseif($item->role == 3)
+                                Admin
+                            @endif
+                        </td>
                         <td>
-                            @if($item->role == 'user')
+                            @if($item->role == '1' || $item->role == '2')
                                 <a href="{{ route('users.edit', $item->id) }}" wire:navigate class="btn btn-primary btn-sm shadow mr-2">EDIT</a>
                                 <button class="btn btn-danger btn-sm shadow" wire:click="delete({{ $item->id }})">DELETE</button>
-                            @elseif($item->role == 'subadmin')
-                                <a href="{{ route('subadmin.edit', $item->id) }}" wire:navigate class="btn btn-primary btn-sm shadow mr-2">EDIT</a>
-                                <button class="btn btn-danger btn-sm shadow" wire:click="deleteSubAdmin({{ $item->id }})">DELETE</button>
-                            @elseif($item->role == 'admin')
+                            
+                            @elseif($item->role == '3')
                                 <a href="{{ route('admins.edit', $item->id) }}" wire:navigate class="btn btn-primary btn-sm shadow mr-2">EDIT</a>
                                 <button class="btn btn-danger btn-sm shadow" wire:click="deleteAdmin({{ $item->id }})">DELETE</button>
                             @endif

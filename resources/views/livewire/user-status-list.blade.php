@@ -4,7 +4,7 @@
             <form  wire:submit.prevent="filter">
                         <div class="row px-5 py-3">
                             <!-- Group Selection -->
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="idsGroup" class="form-label">IDS Group</label>
                                 <select wire:model="idsGroup" id="idsGroup" class="form-select" >
                                     <option value="">All Groups</option>
@@ -14,7 +14,7 @@
                                 </select>
                             </div>
                             <!-- CSAT Selection -->
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="status" class="form-label">Pending Email</label>
                                 <select id="status" class="form-select" wire:model="status">
                                     <option  value="">All</option>
@@ -22,11 +22,21 @@
                                     <option value="Done">Done</option>
                                 </select>
                             </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="users" class="form-label">Users</label>
+                                <select id="users" class="form-select" wire:model="user">
+                                    <option  value="">All</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user['email'] }}">{{ $user['name'] }}</option>
+                                    @endforeach
+                                    
+                                </select>
+                            </div>
 
                             
                         </div>
                         <div class=" px-5 py-3 text-end">
-                            <button type="submit" class="btn px-5 py-2 btn-primary fs-5">Filter</button>
+                            <button type="submit" class="btn px-5 py-2 btn-primary fs-5"><i class="fas fa-filter mx-2"></i>Apply Filter</button>
                         </div>
             </form>
             </div>

@@ -27,7 +27,9 @@
                     <select wire:model="idsGroup" id="idsGroup" class="form-select">
                         <option value="">Select IDS Group</option>
                         @foreach($idsGroups as $group)
-                            <option value="{{ $group }}">{{ $group }}</option>
+                        
+                            <option value="{{ $group['name'] ?? $group }}">{{ $group['name'] ?? $group }}</option>
+                        
                         @endforeach
                     </select>
                     @error('idsGroup') 

@@ -16,6 +16,22 @@ class LoginForm extends Component
         'password' => 'required',
     ];
   
+    public function mount()
+    {
+        // Redirect if the user is already logged in
+        if (Auth::check()) {
+            $user = Auth::user();
+
+            // Redirect based on the user's role
+            if ($user->role == 1) {
+                return redirect()->to('/user'); // Redirect to regular user dashboard
+            } elseif ($user->role == 2) {
+                return redirect()->to('/subadmin'); // Redirect to subadmin dashboard
+            } elseif ($user->role == 3) {
+                return redirect()->to('/admin'); // Redirect to admin dashboard
+            }
+        }
+    }
 
     public function login(Request $request)
     {
@@ -29,20 +45,19 @@ class LoginForm extends Component
 
     // Attempt to login as a regular user
     if (Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
+        // Regenerate session to prevent session fixation attacks
         $request->session()->regenerate();
-        return redirect('/user'); // Redirect to the regular user dashboard
-    }
 
-    // Attempt to login as admin
-    if (Auth::guard('admin')->attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
-        $request->session()->regenerate();
-        return redirect('/admin'); // Redirect to admin dashboard
-    }
+        // Redirect based on the user's role
+        $user = Auth::user();
 
-    if (Auth::guard('subadmin')->attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
-        // Redirect to the admin dashboard if logged in
-        $request->session()->regenerate();
-        return redirect('/subadmin');  // Change this to the appropriate admin dashboard route
+        if ($user->role == 1) {
+            return redirect('/user'); // Redirect to regular user dashboard
+        } elseif ($user->role == 2) {
+            return redirect('/subadmin'); // Redirect to subadmin dashboard
+        } elseif ($user->role == 3) {
+            return redirect('/admin'); // Redirect to admin dashboard
+        }
     }
 
     // If login fails, flash an error message
@@ -52,6 +67,7 @@ class LoginForm extends Component
 
     public function render()
     {
+        
         return view('livewire.login-form')->layout('components.layouts.app-default');
     }
 }

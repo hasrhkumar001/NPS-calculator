@@ -64,6 +64,14 @@
                                 Dashboard
                             </a>
                         </li>
+                        <li class="nav-item mb-2">
+                            <a href="/survey" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('survey') ? 'active' : '' }}" 
+                            style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;"
+                            aria-current="page">
+                                <i class="fa-solid fa-file-alt me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
+                                Send Survey
+                            </a>
+                        </li>
                        
                         <li class="nav-item mb-2">
                             <a href="/users" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('users') ? 'active' : '' }}" 
@@ -119,6 +127,14 @@
                             style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
                                 <i class="fa-solid fa-tachometer-alt me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
                                 Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item mb-2">
+                            <a href="/survey" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('survey') ? 'active' : '' }}" 
+                            style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;"
+                            aria-current="page">
+                                <i class="fa-solid fa-file-alt me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
+                                Send Survey
                             </a>
                         </li>
                         

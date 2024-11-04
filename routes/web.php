@@ -25,9 +25,10 @@ use App\Livewire\LoginForm;
 use App\Livewire\IdsGroupCreate;
 use App\Livewire\IdsGroupList;
 use App\Livewire\IdsGroupEdit;
+use App\Http\Middleware\RoleMiddleware;
 
 Route::get('/', function () {
-    // return view('new_home');
+   
     return redirect( route('login') );
 });
 
@@ -43,16 +44,26 @@ Route::get('/survey/failed', SurveyExpired::class );
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/survey', CustomerSatisfactionSurvey::class);
-    Route::get('/user', UserDashboard::class);
-    Route::get('/survey-status', UserClientsStatusList::class );
     Route::get('/user/edit/{userId}', EditUser::class)->name('users.edit.user');
     Route::get('/sent/{email}', SurveySent::class );
+    Route::get('/admin/user/{userId}/edit', EditUser::class)->name('users.edit');
+
 });
 
 
-Route::middleware('auth:admin')->group(function(){
+Route::middleware(RoleMiddleware::class.':1')->group(function(){
+    Route::get('/user', UserDashboard::class);
+    Route::get('/survey-status', UserClientsStatusList::class );
+});
+
+Route::middleware(RoleMiddleware::class.':2')->group(function(){
+    Route::get('/subadmin', SubAdminDashboard::class)->name('subadmin.dashboard');
+    Route::get('/users-surveys-status', SubadminUsersStatus::class);
+    Route::get('/subadmin/edit/{subAdminId}', EditSubAdmin::class)->name('subadmin.edit');
+});
+
+Route::middleware(RoleMiddleware::class.':3')->group(function(){
     Route::get('/admin', Dashboard::class );
-    Route::get('/admin/user/{userId}/edit', EditUser::class)->name('users.edit');
     Route::get('/admin/edit/{adminId}', EditAdmin::class)->name('admins.edit');
     Route::get('/users', UserList::class);
     Route::get('/all-surveys-status', UserStatusList::class);
@@ -60,17 +71,15 @@ Route::middleware('auth:admin')->group(function(){
     Route::get('/ids-groups', IdsGroupList::class)->name('ids-group.list');
     Route::get('/ids-groups/create', IdsGroupCreate::class)->name('ids-group.create');
     Route::get('/ids-groups/{group}/edit', IdsGroupEdit::class)->name('ids-group.edit');
-
 });
 
 Route::group(['middleware' => ['auth:subadmin']], function () {
-    Route::get('/subadmin', SubAdminDashboard::class)->name('subadmin.dashboard');
-    Route::get('/users-surveys-status', SubadminUsersStatus::class);
+    
     
 });
 
 Route::middleware(['auth:admin,subadmin'])->group(function() {  
     
     
-    Route::get('/subadmin/edit/{subAdminId}', EditSubAdmin::class)->name('subadmin.edit');
+
 });

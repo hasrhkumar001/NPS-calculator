@@ -10,8 +10,24 @@
                         {{ session('error') }}
                     </div>
                 @endif
-    <h2 class="mb-3">Groups List</h2>
-    <table class="table table-bordered">
+    
+    <div class="row justify-content-center">
+        <div class="col">
+            <h2>Groups List</h2>
+        </div>
+        <div class="col d-flex justify-content-end">
+            <!-- <input type="text" class="form-control me-2" placeholder="Search " wire:model="search" wire:keydown.enter="searchGroup"  style="width: 200px;">
+             -->
+             <input type="text" 
+           wire:model.live.debounce.300ms="search" 
+           wire:keydown.enter="searchGroup" 
+           class="form-control" 
+           placeholder="Search groups..." 
+           style="width: 300px;">
+            <a href="/ids-groups/create" class="btn btn-success float-end mx-2">Add New Group</a>
+        </div>
+    </div>
+    <table class="table table-bordered my-3 ">
         <thead>
             <tr class="text-center">
                 <th>Sr No.</th>

@@ -5,7 +5,7 @@
             <form  wire:submit.prevent="filter">
                         <div class="row px-5 py-3">
                             <!-- Group Selection -->
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="idsGroup" class="form-label">IDS Group</label>
                                 <select wire:model="idsGroup" id="idsGroup" class="form-select" >
                                     <option value="">All Groups</option>
@@ -15,13 +15,23 @@
                                 </select>
                             </div>
                             <!-- CSAT Selection -->
-                            <div class="col-md-6 mb-3">
+                            <div class="col-md-4 mb-3">
                                 <label for="csat" class="form-label">CSAT</label>
                                 <select id="csat" class="form-select" wire:model="csat">
                                     <option  value="">All</option>
                                     <option value="Monthly">Monthly</option>
                                     <option value="Quaterly">Quaterly</option>
                                     <option value="Yearly">Yearly</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="users" class="form-label">Users</label>
+                                <select id="users" class="form-select" wire:model="user">
+                                    <option  value="">All</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user['email'] }}">{{ $user['name'] }}</option>
+                                    @endforeach
+                                    
                                 </select>
                             </div>
                         </div>
@@ -38,7 +48,7 @@
                             </div>
                         </div>
                         <div class=" px-5 py-3 text-end">
-                            <button type="submit" class="btn px-5 py-2 btn-primary fs-5">Filter</button>
+                            <button type="submit" class="btn px-5 py-2 btn-primary fs-5"><i class="fas fa-filter mx-2"></i>Apply Filter</button>
                         </div>      
                     </div>
 
@@ -97,66 +107,53 @@
     <div class="d-flex justify-content-end mb-3">
         <button wire:click="downloadCSV" class="btn btn-success">Download as CSV</button>
     </div>
+    
 
       <!-- Table Rendering the Responses -->
       @if(count($userSubmissions) > 0)
       <div class="table-responsive my-4">
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th style="white-space: nowrap;">Question #</th>
-                    @foreach($userSubmissions as $submission)
-                        <th style="white-space: nowrap;"><strong data-group="{{$submission->idsGroup}}">{{ $submission->clientContactName }} ({{  $submission->updated_at->format('Y-m-d') }})</th>
-                    @endforeach
-                </tr>
-            </thead>
-            <tbody>
-                @foreach(range(1, 9) as $index)
-                    <tr>
-                        <th style="white-space: nowrap;">Q {{ $index }}</th>
-                        
-                        @foreach($userSubmissions as $submission)
-                            <td style="white-space: nowrap;">
-                                @isset($responses[$submission->id][$index - 1])
-                                    {{ $responses[$submission->id][$index - 1]->response ?? 'NA' }}
-                                @else
-                                    NA
-                                @endisset
-                            </td>
-                        @endforeach
-                    </tr>
-                    
+      <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th style="white-space: nowrap;">Question #</th>
+                @foreach($userSubmissions as $submission)
+                    <th style="white-space: nowrap;"><strong data-group="{{$submission->idsGroup}}">{{ $submission->clientContactName }} ({{  $submission->updated_at->format('Y-m-d') }})</strong></th>
                 @endforeach
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(range(1, 9) as $index)
                 <tr>
+                    <th style="white-space: nowrap;">Q {{ $index }}</th>
                     
-                    <th style="white-space: nowrap;">NPS</th> 
                     @foreach($userSubmissions as $submission)
-                    @php
-                        // Group responses by promoters, passives, and detractors
-                        $responsesForSubmission = collect($responses[$submission->id] ?? [])->filter(fn($response) => $response->response !== 'Na');
-                        
-                        $promoters = collect($responsesForSubmission)->filter(fn($response) => $response->response >= 9)->count();
-                        $passives = collect($responsesForSubmission)->filter(fn($response) => $response->response >= 7 && $response->response < 9)->count();
-                        $detractors = collect($responsesForSubmission)->filter(fn($response) =>$response->response >= 0 && $response->response < 7)->count();
-                        
-                        // Total responses for this submission
-                        $totalResponses = count($responsesForSubmission);
-
-                        // Calculate NPS
-                        $nps = round($totalResponses > 0
-                            ? (($promoters / $totalResponses) * 100) - (($detractors / $totalResponses) * 100)
-                            : 'NA',2);
-                            
-                    @endphp
-                        <td style="white-space: nowrap;">{{ $nps }}%</td>
+                        <td style="white-space: nowrap;">
+                            @isset($responses[$submission->id])
+                                {{ $responses[$submission->id]->{"Q{$index}"} ?? 'NA' }}
+                            @else
+                                Nope
+                            @endisset
+                        </td>
                     @endforeach
                 </tr>
-            </tbody>
-        </table>
-    </div>
-    @else
-    <p class="text-center">No submissions available.</p>
-    @endif
+            @endforeach
+            <tr>
+                <th style="white-space: nowrap;">NPS</th> 
+                @foreach($userSubmissions as $submission)
+                    <td style="white-space: nowrap;">
+                        {{ $responses[$submission->id]->Nps_percentage?? 'NA' }}%
+                    </td>
+                @endforeach
+            </tr>
+        </tbody>
+    </table>
+
+        </div>
+        @else
+        <div class="alert alert-info shadow-sm">
+            <i class="fas fa-info-circle me-2"></i>No submissions available.
+        </div>
+        @endif
     
 </div>
 

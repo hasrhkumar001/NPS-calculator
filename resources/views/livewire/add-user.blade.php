@@ -31,9 +31,9 @@
                         <label for="role" class="form-label fw-bold">Role</label>
                         <select id="role" wire:model="role"  class="form-select">
                             <option value="">Select Role</option>
-                            <option value="2">Admin</option>
-                            <option value="1">Sub Admin</option>
-                            <option value="0">User</option>
+                            <option value="3">Admin</option>
+                            <option value="2">Sub Admin</option>
+                            <option value="1">User</option>
                         </select>
                         @error('role')
                             <span class="text-danger">{{ $message }}</span>
@@ -105,7 +105,7 @@
                     var $idsGroupInput = $('#selectedGroups');
                     var $idsGroupDropdown = $('#dropdown');
 
-                    if (selectedRole === '2') { // Admin role
+                    if (selectedRole == '3') { // Admin role
                         // Disable and style the input
                         $idsGroupInput.prop('disabled', true)
                                     .css('background-color', '#e9ecef')

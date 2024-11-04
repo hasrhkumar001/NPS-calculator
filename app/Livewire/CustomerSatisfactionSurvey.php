@@ -30,7 +30,16 @@ class CustomerSatisfactionSurvey extends Component
     public function mount()
     {
         $this->date = now()->format('Y-m-d');
-        $this->idsGroups = json_decode(auth()->user()->idsGroup, true);
+        // Check if the logged-in user is an admin
+        if (auth()->user()->role == '3') {
+            // If admin, show all groups
+            $this->idsGroups = IdsGroup::all(); // Assuming you have a Group model to fetch all groups
+            
+        } else {
+            // For other users, decode their assigned groups and display only those
+            $this->idsGroups = json_decode(auth()->user()->idsGroup, true);
+            
+        }
         $this->emailContent = "Improvement is an ongoing process. In the wake of improving our services to our customers, IDS InfoTech shares Customer Satisfaction Survey on a periodic basis to be filled out by its esteemed Customers.\n\nWe appreciate your time and inputs to help us serve you better.";
     }
 
@@ -46,6 +55,8 @@ class CustomerSatisfactionSurvey extends Component
             'clientContactName' => 'required',
             'clientEmailAddress' => 'required|email',
         ]);
+
+        // dd($this->idsGroup);
         
         
         $client = Client::Create(
@@ -75,7 +86,7 @@ class CustomerSatisfactionSurvey extends Component
             'user_id' => auth()->id(),
             'client_id' => $client->id,
             'user_submission_id' => $userSubmission->id,
-            'exp' => time() + (60 * 60 * 24) // Token expires in 24 hours
+            'exp' => time() + (60 * 60 * 24 * 365) // Token expires in 365 days
         ], env('JWT_SECRET'), 'HS256');
 
         // $dcodeJWT = JWT::decode($token, new Key(env('JWT_SECRET'), 'HS256'));

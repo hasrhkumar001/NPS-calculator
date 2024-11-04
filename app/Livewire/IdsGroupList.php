@@ -6,12 +6,35 @@ use App\Models\IdsGroup;
 use Livewire\Component;
 
 class IdsGroupList extends Component
-{
-    public $groups;
+{public $groups; // To store the list of groups
+    public $search = ''; // To store the search term
 
     public function mount()
     {
-        $this->groups = IdsGroup::all();
+        $this->updateList(); // Initialize the groups list
+    }
+
+    public function updatedSearch()
+    {
+        $this->updateList(); // Update the list with the new search term
+    }
+
+    public function searchGroup()
+    {
+        $this->updateList(); // Update the list based on the current search value
+    }
+
+    public function updateList()
+    {
+        $query = IdsGroup::query();
+
+        // Apply search filter if there is input
+        if (!empty($this->search)) {
+            $query->where('name', 'like', '%' . $this->search . '%');
+        }
+
+        // Set the filtered list
+        $this->groups = $query->get();
     }
     public function delete($id)
     {
