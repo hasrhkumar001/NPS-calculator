@@ -12,7 +12,7 @@
             
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item">
-                    <ul class="nav flex-column ms-3">
+                    <ul class="nav flex-column">
                         <li class="nav-item ">
                             
                         </li>
@@ -31,7 +31,7 @@
                             <a href="/survey" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('survey') ? 'active' : '' }}" 
                             style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;"
                             aria-current="page">
-                                <i class="fa-solid fa-file-alt me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
+                                <i class="fa-solid fa-file-alt" style="font-size: 18px;"></i> <!-- Updated icon -->
                                 Send Survey
                             </a>
                         </li>
@@ -42,7 +42,7 @@
                         <li class="nav-item mb-2">
                             <a href="/survey-status" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('survey-status') ? 'active' : '' }}" 
                             style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
-                                <i class="fa-solid fa-users me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
+                                <i class="fa-solid fa-users" style="font-size: 18px;"></i> <!-- Updated icon -->
                                 Survey Status 
                             </a>
                         </li>
@@ -50,7 +50,7 @@
                         <li class="nav-item mb-2">
                             <a href="{{ route('users.edit.user', auth()->user()->id) }}" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('user/edit/*') ? 'active' : '' }}" 
                             style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
-                                <i class="fa-solid fa-user-circle me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
+                                <i class="fa-solid fa-user-circle" style="font-size: 18px;"></i> <!-- Updated icon -->
                                 Profile
                             </a>
                         </li>
@@ -60,7 +60,7 @@
                         <li class="nav-item mb-2">
                             <a href="/admin" wire:navigate  class="nav-link d-flex align-items-center {{ Request::is('admin') ? 'active' : '' }}" 
                             style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
-                                <i class="fa-solid fa-tachometer-alt me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
+                                <i class="fa-solid fa-tachometer-alt" style="font-size: 18px;"></i> <!-- Updated icon -->
                                 Dashboard
                             </a>
                         </li>
@@ -68,40 +68,66 @@
                             <a href="/survey" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('survey') ? 'active' : '' }}" 
                             style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;"
                             aria-current="page">
-                                <i class="fa-solid fa-file-alt me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
+                                <i class="fa-solid fa-file-alt" style="font-size: 18px;"></i> <!-- Updated icon -->
                                 Send Survey
                             </a>
                         </li>
+
+                        <li class="nav-item mb-2">
+                            <a class="nav-link text-white d-flex justify-content-around align-items-center" style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;" data-bs-toggle="collapse" href="#userManagement" role="button" aria-expanded="false" aria-controls="userManagement">
+                                <i class="fa-solid fa-user"></i>
+                                User Management
+                                <i class="ms-auto fa-solid fa-chevron-down toggle-icon"></i>
+                            </a>
+                            <div class="collapse" id="userManagement">
+                                <ul class="nav flex-column ms-3">
+                                <li class="nav-item mb-2">
+                                    <a href="/users" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('users') ? 'active' : '' }}" 
+                                    style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;"
+                                    aria-current="page">
+                                        <i class="fa-solid fa-users-cog" style="font-size: 18px;"></i> <!-- Updated icon -->
+                                        User List
+                                    </a>
+                                </li>
+                                <li class="nav-item mb-2">
+                                    <a href="/add-users" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('add-users') ? 'active' : '' }}" 
+                                    style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
+                                        <i class="fa-solid fa-user-plus" style="font-size: 18px;"></i> <!-- Updated icon -->
+                                        Add User
+                                    </a>
+                                </li>
+                                </ul>
+                            </div>
+                        </li>
                        
                         <li class="nav-item mb-2">
-                            <a href="/users" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('users') ? 'active' : '' }}" 
-                            style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;"
-                            aria-current="page">
-                                <i class="fa-solid fa-users-cog me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
-                                User List
+                            <a class="nav-link text-white d-flex align-items-center" style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;" data-bs-toggle="collapse" href="#groupsManagement" role="button" aria-expanded="false" aria-controls="groupsManagement">
+                                <i class="fa-solid fa-users me-3"></i>
+                                Groups 
+                                <i class="ms-auto fa-solid fa-chevron-down toggle-icon"></i>
                             </a>
+                            <div class="collapse" id="groupsManagement">
+                                <ul class="nav flex-column ms-3">
+                                
+                                    <li class="nav-item mb-2">
+                                        <a href="/ids-groups" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('ids-groups') ? 'active' : '' }}" 
+                                        style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
+                                            <i class="fa-solid fa-users me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
+                                            Groups List
+                                        </a>
+                                    </li>
+                                    <li class="nav-item mb-2">
+                                        <a href="/ids-groups/create" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('ids-groups/create') ? 'active' : '' }}" 
+                                        style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
+                                            <i class="fa-solid fa-users me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
+                                            Add Group
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                         </li>
-                        <li class="nav-item mb-2">
-                            <a href="/add-users" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('add-users') ? 'active' : '' }}" 
-                            style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
-                                <i class="fa-solid fa-user-plus me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
-                                Add User
-                            </a>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <a href="/ids-groups/create" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('ids-groups/create') ? 'active' : '' }}" 
-                            style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
-                                <i class="fa-solid fa-users me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
-                                Add Group
-                            </a>
-                        </li>
-                        <li class="nav-item mb-2">
-                            <a href="/ids-groups" wire:navigate class="nav-link d-flex align-items-center {{ Request::is('ids-groups') ? 'active' : '' }}" 
-                            style="color: #fff; padding: 10px; border-radius: 5px; transition: background-color 0.3s, color 0.3s;">
-                                <i class="fa-solid fa-users me-3" style="font-size: 18px;"></i> <!-- Updated icon -->
-                                Groups List
-                            </a>
-                        </li>
+                        
+                        
 
                         <!-- Clients Status List -->
                         <li class="nav-item mb-2">

@@ -13,26 +13,23 @@ class Navbar extends Component
     public function mount()
     {
         
-        if (Auth::guard('admin')->check()) {
-            $this->role = 'admin';
-            
-        } elseif (Auth::guard('web')->check()) {
-            $this->role = 'user';
-        }elseif (Auth::guard('subadmin')->check()) {
-            $this->role = 'subadmin';
-        }else {
+        if (Auth::check()) {
+            // Set the role based on the user's role field
+            $user = Auth::user();
+            if ($user->role == 3) {
+                $this->role = 'admin';
+            } elseif ($user->role == 2) {
+                $this->role = 'subadmin';
+            } elseif ($user->role == 1) {
+                $this->role = 'user';
+            } else {
+                $this->role = null; // Unknown role or not authenticated
+            }
+        } else {
             $this->role = null; // Not authenticated
         }
     }
-    public function logout()
-    {
-        if ($this->role === 'admin') {
-            Auth::guard('admin')->logout(); // Admin logout
-        } else {
-            Auth::guard('web')->logout(); // User logout
-        }
-        return redirect('/login'); // Redirect to the login page after logout
-    }
+  
 
     public function render()
     {

@@ -1,11 +1,11 @@
 
-    <div class="container my-4">
-        <div class="container my-5 bg-light shadow">
+    <div class="container-fluid my-4">
+        <div class="container-fluid  bg-light shadow topsection">
             <!-- Existing form for filters (IDS Group, CSAT, Date range) -->
             <form  wire:submit.prevent="filter">
-                        <div class="row px-5 py-3">
+                        <div class="row px-5 py-1">
                             <!-- Group Selection -->
-                            <div class="col-md-4 mb-3">
+                            <div class="col-lg-2 mb-1">
                                 <label for="idsGroup" class="form-label">IDS Group</label>
                                 <select wire:model="idsGroup" id="idsGroup" class="form-select" >
                                     <option value="">All Groups</option>
@@ -15,16 +15,16 @@
                                 </select>
                             </div>
                             <!-- CSAT Selection -->
-                            <div class="col-md-4 mb-3">
+                            <div class="col-lg-2 mb-1">
                                 <label for="csat" class="form-label">CSAT</label>
                                 <select id="csat" class="form-select" wire:model="csat">
                                     <option  value="">All</option>
                                     <option value="Monthly">Monthly</option>
-                                    <option value="Quaterly">Quaterly</option>
+                                    <option value="Quarterly">Quarterly</option>
                                     <option value="Yearly">Yearly</option>
                                 </select>
                             </div>
-                            <div class="col-md-4 mb-3">
+                            <div class="col-lg-2 mb-1">
                                 <label for="users" class="form-label">Users</label>
                                 <select id="users" class="form-select" wire:model="user">
                                     <option  value="">All</option>
@@ -34,29 +34,32 @@
                                     
                                 </select>
                             </div>
+                            <div class="col-lg-2 mb-1">
+                                <label for="dateFrom" class="form-label">Date From</label>
+                                <input type="date" id="dateFrom" wire:model="dateFrom" class="form-control" placeholder="Select Date" >
+                            </div>
+                            <div class="col-lg-2 mb-1">
+                                <label for="dateTo" class="form-label">Date To</label>
+                                <input type="date" id="dateTo" wire:model="dateTo" class="form-control" placeholder="Select Date" >
+                            </div>
+
+                            <div class=" col-lg-2 mb-1 d-flex justify-content-center align-items-end applynow">
+                            <button type="submit" class="btn btn-primary fs-5"><i class="fas fa-filter mx-2"></i>Apply Filter</button>
+                        </div>     
                         </div>
 
                         <!-- Date Range Inputs -->
                         <div class="row px-5 py-3">
-                            <div class="col-md-6 mb-3">
-                                <label for="dateFrom" class="form-label">Date From</label>
-                                <input type="date" id="dateFrom" wire:model="dateFrom" class="form-control" placeholder="Select Date" >
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label for="dateTo" class="form-label">Date To</label>
-                                <input type="date" id="dateTo" wire:model="dateTo" class="form-control" placeholder="Select Date" >
-                            </div>
+                            
                         </div>
-                        <div class=" px-5 py-3 text-end">
-                            <button type="submit" class="btn px-5 py-2 btn-primary fs-5"><i class="fas fa-filter mx-2"></i>Apply Filter</button>
-                        </div>      
+                         
                     </div>
 
                     
             </form>
 
         <!-- NPS and Total Survey Info -->
-        <div class="container shadow p-3" style="margin: 150px auto; padding: 0 20px;">
+        <div class="container-fluid shadow p-3" style="margin: 60px auto; padding: 0 20px;">
         
             <!-- Summary Row for Total Surveys and Overall NPS -->
             <div class="row mb-4 d-flex align-items-center p-2">
@@ -79,11 +82,11 @@
             <div class="row mt-4">
                 <!-- Bar Chart for Ratings and Votes -->
             
-                <div class="col-6 d-flex align-items-center justify-content-center">
-                    <div class="card p-3 w-100  ">
+                <div class="col-6 ">
+                    <div class="  ">
                         
-                        <div class=" text-center">
-                            <canvas id="ratingsBarChart" style=" max-height:524px; width:100%  "></canvas>
+                        <div class=" " style="display: flex; justify-content: center;">
+                            <canvas id="ratingsBarChart" width="300" height="300"></canvas>
                             
                         </div>
                     </div>
@@ -91,8 +94,8 @@
                 <div class="col-6 ">
                     <div class="">
                         
-                        <div class="  ">
-                            <canvas id="npsPieChart" style=" max-height:524px; "></canvas>
+                        <div class="  " style="display: flex; justify-content: center;">
+                            <canvas id="npsPieChart" width="400" height="300"></canvas>
                             
                         </div>
                     </div>
@@ -105,28 +108,28 @@
 
 
     <div class="d-flex justify-content-end mb-3">
-        <button wire:click="downloadCSV" class="btn btn-success">Download as CSV</button>
+        <button wire:click="downloadCSV" class="btn btn-success downloadbtn">Download as CSV</button>
     </div>
 
       <!-- Table Rendering the Responses -->
       @if(count($userSubmissions) > 0)
-      <div class="table-responsive my-4">
-        <table class="table table-bordered">
+      <div class="table-responsive tablecontainer my-4 table-wrapper">
+        <table class="table table-bordered fixed-table">
             <thead>
                 <tr>
-                    <th style="white-space: nowrap;">Question #</th>
+                    <th style="white-space: nowrap;" class="fixed-column">Question #</th>
                     @foreach($userSubmissions as $submission)
-                        <th style="white-space: nowrap;"><strong data-group="{{$submission->idsGroup}}">{{ $submission->clientContactName }} ({{  $submission->updated_at->format('Y-m-d') }})</strong></th>
+                        <th style="white-space: nowrap;">{{ $submission->clientContactName }} ({{  $submission->updated_at->format('Y-m-d') }})</th>
                     @endforeach
                 </tr>
             </thead>
             <tbody>
                 @foreach(range(1, 9) as $index)
                     <tr>
-                        <th style="white-space: nowrap;">Q {{ $index }}</th>
+                        <th style="white-space: nowrap;" class="fixed-column">Q {{ $index }}</th>
                         
                         @foreach($userSubmissions as $submission)
-                            <td style="white-space: nowrap;">
+                            <td style="white-space: nowrap; " >
                                 @isset($responses[$submission->id])
                                     {{ $responses[$submission->id]->{"Q{$index}"} ?? 'NA' }}
                                 @else
@@ -137,7 +140,7 @@
                     </tr>
                 @endforeach
                 <tr>
-                    <th style="white-space: nowrap;">NPS</th> 
+                    <th style="white-space: nowrap;" class="fixed-column">NPS</th> 
                     @foreach($userSubmissions as $submission)
                         <td style="white-space: nowrap;">
                             {{ $responses[$submission->id]->Nps_percentage?? 'NA' }}%
@@ -201,6 +204,9 @@ window.addEventListener('updateCharts', function handleUpdate(event) {
 function createNPSPieChart() {
     const ctxPie = document.getElementById('npsPieChart');
     if (!ctxPie) return;
+
+    ctxPie.style.width = '400px';
+    ctxPie.style.height = '300px';
     
     npsPieChart = new Chart(ctxPie, {
         type: 'pie',
@@ -213,7 +219,7 @@ function createNPSPieChart() {
             }]
         },
         options: {
-            responsive: true,
+            responsive: false,
             maintainAspectRatio: true,
             aspectRatio: 1,
             hover: {
@@ -230,11 +236,18 @@ function createNPSPieChart(data = null) {
     const ctxPie = document.getElementById('npsPieChart');
     if (!ctxPie) return;
 
-    const chartData = data ? [
-        data.detractorPercentage== 0 ? 1 : data.promoterPercentage,
-        data.neutralPercentage== 0 ? 1 : data.neutralPercentage,
-        data.detractorPercentage == 0 ? 1 : data.detractorPercentage
-    ] : [1, 1, 1]; // Default data if no data is provided
+    ctxPie.style.width = '400px';
+    ctxPie.style.height = '300px';
+
+    const chartData = data ? ([
+        data.promoterPercentage ?? 0,
+        data.neutralPercentage ?? 0,
+        data.detractorPercentage ?? 0
+      ].every(value => value === 0) ? [1, 1, 1] : [
+        data.promoterPercentage ?? 0,
+        data.neutralPercentage ?? 0,
+        data.detractorPercentage ?? 0
+      ]) : [1, 1, 1]; // Default data if no data is provided
 
     console.log(chartData);
     npsPieChart = new Chart(ctxPie, {
@@ -248,9 +261,25 @@ function createNPSPieChart(data = null) {
             }]
         },
         options: {
-            responsive: true,
+            responsive: false,
             maintainAspectRatio: true,
             aspectRatio: 1,
+            plugins: {
+                legend: {
+                    labels: {
+                        // Configure label styles
+                        color: '#333333', // Change label color
+                        font: {
+                            size: 14, // Change font size
+                            weight: 'bold' // Make labels bold
+                        },
+                        padding: 20, // Add padding between labels
+                         // Use circular point style
+                        boxWidth: 10 // Change the width of the color box
+                    },
+                    position: 'bottom'
+                }
+            },
             hover: {
                 mode: null,  // Disable hover effects entirely
             },
@@ -264,6 +293,9 @@ function createNPSPieChart(data = null) {
 function createRatingsBarChart(data) {
     const ctxBar = document.getElementById('ratingsBarChart');
     if (!ctxBar) return;
+
+    ctxBar.style.width = '300px';
+    ctxBar.style.height = '300px';
     // console.log(data.detractorPercentage== 0 ? 1 : data.promoterPercentage);
     const ratingLabels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
     const barColors = ratingLabels.map(rating => {
@@ -289,7 +321,7 @@ function createRatingsBarChart(data) {
             }]
         },
         options: {
-            responsive: true,
+            responsive: false,
             maintainAspectRatio: true,
             aspectRatio: 1,
             hover: {

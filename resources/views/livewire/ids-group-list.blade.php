@@ -1,4 +1,4 @@
-<div class="container">
+<div class="container-fluid">
     <div class="mb-3  mt-5">
     @if (session()->has('message'))
                     <div class="alert alert-success">
@@ -24,7 +24,7 @@
            class="form-control" 
            placeholder="Search groups..." 
            style="width: 300px;">
-            <a href="/ids-groups/create" class="btn btn-success float-end mx-2">Add New Group</a>
+            <a href="/ids-groups/create" class="btn btn-success float-end mx-2 addnewgroupbtn">Add New Group</a>
         </div>
     </div>
     <table class="table table-bordered my-3 ">
@@ -42,8 +42,8 @@
                 <td>{{$loop->iteration}}</td>
                 <td>{{ $group->name }}</td>
                 
-                <td ><a href="{{ route('ids-group.edit', $group->id) }}" wire:navigate class="btn btn-primary btn-sm shadow  px-3 mx-3">EDIT</a>
-                    <button class="btn btn-danger btn-sm shadow mx-3 px-3" wire:click="delete({{$group->id}})" wire:confirm="Are you sure you want to delete this? ">Delete</i></button></td>
+                <td ><a href="{{ route('ids-group.edit', $group->id) }}" wire:navigate class="btn btn-primary btn-sm shadow editdeletebtn  px-3 mx-3">EDIT</a>
+                    <button class="btn btn-danger btn-sm shadow editdeletebtn mx-3 px-3" wire:click="delete({{$group->id}})" wire:confirm="Are you sure you want to delete this? ">DELETE</i></button></td>
             </tr>
             @endforeach
         </tbody>

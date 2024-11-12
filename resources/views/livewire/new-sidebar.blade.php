@@ -1,8 +1,8 @@
 
-<nav class="navbar navbar-expand-lg shadow navbar-light bg-light" style="position:sticky; top:0;z-index:5;">
-    <div class="container-fluid d-flex align-items-baseline justify-content-between">
-        <!-- Brand -->
-        @if($role === 'admin')
+<div>
+    <div class="sidebar ">
+        <div class="logo-details">
+            <i class="bg-white w-100 " > @if($role === 'admin')
         <a class="navbar-brand" href="/admin"><svg width="65" height="50" viewBox="0 0 65 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M6.57307 0H0.661163V21.1866H6.57307V0Z" fill="#007DBD"></path>
                 <path fill-rule="evenodd" clip-rule="evenodd" d="M10.1325 0H33.1912C34.9634 0.00752289 36.4411 1.83344 36.4798 2.99411V18.099C36.4873 19.7938 34.7775 21.2156 33.0977 21.1866H10.1325V0ZM16.0433 4.68891H30.5744V15.9399H16.0444L16.0433 4.68891Z" fill="#007DBD"></path>
@@ -69,36 +69,277 @@
                 <path d="M59.276 26.8931C59.3327 27.2147 59.3706 27.47 59.3989 27.6686C59.3706 28.2171 59.2192 28.3779 58.6518 28.7278C58.4721 28.4819 58.2641 28.1888 57.9141 28.1698L59.276 26.8931ZM60.5622 28.4063C60.0988 28.7562 59.7299 29.0399 59.1247 28.9359C59.7299 28.5671 60.3541 27.9902 60.3541 27.2147C60.3541 26.7985 60.2123 26.477 60.1744 26.1176C60.1461 25.8528 60.0893 25.7677 59.8056 25.7677C59.4651 25.7677 59.2854 26.0703 59.2665 26.3824L57.2143 28.2644C57.1386 28.3401 56.9873 28.4725 56.9873 28.5954C56.9873 28.6805 57.0535 28.7751 57.1481 28.7751C57.2332 28.7751 57.2994 28.7089 57.3562 28.6522C57.5264 29.3426 58.2262 29.7019 58.8599 29.7303C59.6165 29.7681 60.6473 28.9075 61.2242 28.3306L61.1296 27.9712L60.5622 28.4063Z" fill="#231F20"></path>
                 <path d="M62.6747 26.8931C62.7315 27.2147 62.7693 27.47 62.7977 27.6686C62.7693 28.2171 62.618 28.3779 62.0505 28.7278C61.8708 28.4819 61.6628 28.1888 61.3129 28.1698L62.6747 26.8931ZM63.9609 28.4063C63.4975 28.7562 63.1287 29.0399 62.5234 28.9359C63.1287 28.5671 63.7529 27.9902 63.7529 27.2147C63.7529 26.7985 63.611 26.477 63.5732 26.1176C63.5448 25.8528 63.4881 25.7677 63.2043 25.7677C62.8639 25.7677 62.6842 26.0703 62.6653 26.3824L60.613 28.2644C60.5374 28.3401 60.386 28.4725 60.386 28.5954C60.386 28.6805 60.4522 28.7751 60.5468 28.7751C60.6319 28.7751 60.6981 28.7089 60.7549 28.6522C60.9251 29.3426 61.625 29.7019 62.2586 29.7303C63.0152 29.7681 64.046 28.9075 64.6229 28.3306L64.5284 27.9712L63.9609 28.4063Z" fill="#231F20"></path>
             </svg></a>
-        @endif
-        
-
-        <!-- Toggle Button (for smaller screens) -->
-        @if($role)
-        
-        <div class="d-flex align-items-baseline" style="color: #fff; padding: 10px;">
-                <div class="avatar-circle  d-flex justify-content-center align-items-center" style="width: 30px; height: 30px; border-radius: 50%; font-size: 18px; color: white;background-color:#007DBD;">
-                    <strong>{{ substr(auth()->user()->name, 0, 1) }}</strong> <!-- First letter of user name -->
-                </div>
-                <div><p class=" text-dark fw-bold ms-2">{{ auth()->user()->name }}</p></div>
+        @endif</i>
+            <span class="logo_name"></span>
         </div>
-        
-        <!-- Collapsible Content -->
-        <!-- <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
-            <ul class="navbar-nav">
-                
-               
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="settingsDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-gear"></i> 
+        <ul class="nav-links">
+            @if($role === 'user')
+            <li>
+                <a href="/user" wire:navigate class=" {{ Request::is('user') ? 'active' : '' }}">
+                    <i class="bx bx-tachometer"></i>
+                    <span class="link_name">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/survey" wire:navigate class="{{ Request::is('survey') ? 'active' : '' }}">
+                    <i class="bx bx-file"></i>
+                    <span class="link_name">Send Survey</span>
+                </a>
+            </li>
+            <li>
+                <a href="/survey-status" wire:navigate class="{{ Request::is('survey-status') ? 'active' : '' }}">
+                    <i class="bx bx-user-check"></i>
+                    <span class="link_name">Survey Status</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('profile.detail', auth()->user()->id) }}" wire:navigate class="{{ Request::is('user/edit/*') ? 'active' : '' }}">
+                    <i class="bx bx-user-circle"></i>
+                    <span class="link_name">Profile</span>
+                </a>
+            </li>
+
+            @elseif($role === 'admin')
+            <li>
+                <a href="/admin"  class="{{ Request::is('admin') ? 'active' : '' }}">
+                    <i class="bx bx-tachometer"></i>
+                    <span class="link_name">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/survey" wire:navigate class="{{ Request::is('survey') ? 'active' : '' }}">
+                    <i class="bx bx-file"></i>
+                    <span class="link_name">Send Survey</span>
+                </a>
+            </li>
+            <li>
+                <ul class="sub-menu blank">
+                    <li><a class="link_name" >User Management</a></li>
+                </ul>
+            </li>
+           <li>
+                <ul class="sub-menu blank">
+                    <li><a class="link_name" >User Management</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="iocn-link">
+                    <a >
+                        <i class="bx bx-user"></i>
+                        <span class="link_name">User Management</span>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="settingsDropdown">
-                    
-                        <li><a class="dropdown-item" href="#" wire:click.prevent="logout">Logout</a></li>
-                    </ul>
-                </li>
-            </ul>
-            
-        </div> -->
-        @endif
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+                
+                <ul class=" sub-menu" id="userManagement">
+                    <li><a class="link_name" >User Management</a></li>
+                    <li>
+                        <a href="/users" wire:navigate class="{{ Request::is('users') ? 'active' : '' }}">
+                            <i class="bx bx-user-circle"></i>
+                            <span >User List</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/add-users" wire:navigate class="{{ Request::is('add-users') ? 'active' : '' }}">
+                            <i class="bx bx-user-plus"></i>
+                            <span >Add User</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- <li class="iocn-link">
+                            <a  data-bs-toggle="collapse" href="#userManagement" role="button" aria-expanded="false" aria-controls="userManagement">
+                                <i class="bx bx-user"></i>
+                                <span class="link_name">User Management</span>
+                                <i class="ms-auto bx bxs-chevron-down toggle-icon"></i>
+                            </a>
+                            <div class="collapse" id="userManagement">
+                                <ul class="nav  flex-column ms-3">
+                                <li class="nav-item mb-2">
+                                    <a href="/users" wire:navigate class=" {{ Request::is('users') ? 'active' : '' }}" 
+                                   
+                                    aria-current="page">
+                                        <i class=" bx bx-user-circle" style="font-size: 18px;"></i> 
+                                        <span class="link_name"> User List</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item mb-2">
+                                    <a href="/add-users" wire:navigate class=" {{ Request::is('add-users') ? 'active' : '' }}" 
+                                    >
+                                        <i class="bx bx-user-plus" style="font-size: 18px;"></i> 
+                                        <span class="link_name">Add User</span>
+                                    </a>
+                                </li>
+                                </ul>
+                            </div>
+                        </li> -->
+                       
+
+            <li>
+                <ul class="sub-menu blank">
+                    <li><a class="link_name" >Groups</a></li>
+                </ul>
+            </li>
+            <li>
+                <div class="iocn-link">
+                    <a >
+                        <i class="bx bx-group"></i>
+                        <span class="link_name">Groups</span>
+                    </a>
+                    <i class="bx bxs-chevron-down arrow"></i>
+                </div>
+                <ul class=" sub-menu" id="groupsManagement">
+                    <li><a class="link_name" >Groups</a></li>
+                    <li>
+                        <a href="/ids-groups" wire:navigate class="{{ Request::is('ids-groups') ? 'active' : '' }}">
+                            <i class="bx bx-group"></i>
+                            <span>Groups List</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/ids-groups/create" wire:navigate class="{{ Request::is('ids-groups/create') ? 'active' : '' }}">
+                            <i class="bx bx-group"></i>
+                            <span >Add Group</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+
+            <!-- <li class="iocn-link">
+                            <a  data-bs-toggle="collapse" href="#groupsManagement" role="button" aria-expanded="false" aria-controls="userManagement">
+                                <i class="bx bx-group"></i>
+                                <span class="link_name">Groups </span>
+                                <i class="ms-auto bx bxs-chevron-down toggle-icon"></i>
+                            </a>
+                            <div class="collapse" id="groupsManagement">
+                                <ul class="nav  flex-column ms-3">
+                                <li class="nav-item mb-2">
+                                    <a href="/ids-groups" wire:navigate class="{{ Request::is('ids-groups') ? 'active' : '' }}" 
+                                   
+                                    aria-current="page">
+                                        <i class=" bx bx-group" style="font-size: 18px;"></i> 
+                                        <span class="link_name"> Group List</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item mb-2">
+                                    <a href="/ids-groups/create" wire:navigate class="{{ Request::is('ids-groups/create') ? 'active' : '' }}"
+                                    >
+                                        <i class="bx bx-group" style="font-size: 18px;"></i> 
+                                        <span class="link_name">Add Group</span>
+                                    </a>
+                                </li>
+                                </ul>
+                            </div>
+                        </li>
+                       
+ -->
+
+            <li>
+                <a href="/all-surveys-status" wire:navigate class="{{ Request::is('all-surveys-status') ? 'active' : '' }}">
+                    <i class="bx bx-check-circle"></i>
+                    <span class="link_name">Survey Status</span>
+                </a>
+            </li>
+            <li>
+                <a  href="{{ route('profile.detail', auth()->user()->id) }}" wire:navigate class="{{ Request::is('admin/edit/*') ? 'active' : '' }}">
+                    <i class="bx bx-user-circle"></i>
+                    <span class="link_name">Profile</span>
+                </a>
+            </li>
+
+            @elseif($role === 'subadmin')
+            <li>
+                <a href="/subadmin" class="{{ Request::is('subadmin') ? 'active' : '' }}">
+                    <i class="bx bx-tachometer"></i>
+                    <span class="link_name">Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="/survey" wire:navigate class="{{ Request::is('survey') ? 'active' : '' }}">
+                    <i class="bx bx-file"></i>
+                    <span class="link_name">Send Survey</span>
+                </a>
+            </li>
+            <li>
+                <a href="/users-surveys-status" wire:navigate class="{{ Request::is('users-surveys-status') ? 'active' : '' }}">
+                    <i class="bx bx-user-check"></i>
+                    <span class="link_name">Survey Status</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ route('profile.detail', auth()->user()->id) }}"  class="{{ Request::is('subadmin/edit/*') ? 'active' : '' }}">
+                    <i class="bx bx-user-circle"></i>
+                    <span class="link_name">Profile</span>
+                </a>
+            </li>
+            @endif
+            <li>
+                <a href="#" wire:click.prevent="logout">
+                    <i class="bx bx-log-out"></i>
+                    <span class="link_name">Logout</span>
+                </a>
+            </li>
+        </ul>
     </div>
-</nav>
+    <section class="home-section">
+        <div class="home-content">
+            @if (!Request::is('login') && !Request::is('signup'))
+                
+        <nav class="navbar navbar-expand-lg shadow navbar-light" style="width:100%;padding:5px;">
+            <div class="container-fluid d-flex align-items-center justify-content-between">
+                
+                <i class="bx bx-menu" id="sidebar-toggle"></i>
+
+                <!-- Toggle Button (for smaller screens) -->
+                @if($role)
+                
+                <div class="d-flex align-items-center" style="color: #fff; padding: 10px;">
+                        <div class="avatar-circle  d-flex justify-content-center align-items-center" style="width: 30px; height: 30px; border-radius: 50%; font-size: 18px; color: #007DBD;background-color:#fff;">
+                            <strong>{{ substr(auth()->user()->name, 0, 1) }}</strong> <!-- First letter of user name -->
+                        </div>
+                        <div><p class="usernames ms-2" style="color: #fff;margin: 0;" >{{ auth()->user()->name }}</p></div>
+                </div>
+                
+            
+                @endif
+            </div>
+        </nav>
+
+            @endif
+            
+            
+        </div>
+    </section>
+    
+   
+</div>
+
+
+
+    <script>
+      var arrow = document.querySelectorAll(".arrow");
+      for (var i = 0; i < arrow.length; i++) {
+        arrow[i].addEventListener("click", (e) => {
+          let arrowParent = e.target.parentElement.parentElement; //selecting main parent of arrow
+          arrowParent.classList.toggle("showMenu");
+        });
+      }
+      var sidebar = document.querySelector(".sidebar");
+      var maincontainer = document.querySelector(".main-container");
+      var sidebarBtn = document.querySelector(".bx-menu");
+     
+      sidebarBtn.addEventListener("click", () => {
+        sidebar.classList.toggle("close");
+        maincontainer.classList.toggle("close");
+      });
+
+      
+
+</script>
+
+
+
+
+
+

@@ -48,7 +48,7 @@ class EditSubAdmin extends Component
             'required',
             'email',
             'max:255',
-            Rule::unique('admins')->ignore($this->subAdminId),
+            Rule::unique('users')->ignore($this->subAdminId),
         ];
 
         $this->validate();

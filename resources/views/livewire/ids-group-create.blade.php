@@ -1,4 +1,4 @@
-<div class="container mt-4">
+<div class="container-fluid mt-4">
 @if (session()->has('message'))
                     <div class="alert alert-success">
                         {{ session('message') }}

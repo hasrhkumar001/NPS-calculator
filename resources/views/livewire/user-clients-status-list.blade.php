@@ -1,6 +1,6 @@
 
-    <div class="container my-4">
-        <div class="container my-5 bg-light shadow">
+    <div class="container-fluid my-4">
+        <div class="container-fluid my-5 bg-light shadow">
             <!-- Existing form for filters (IDS Group, CSAT, Date range) -->
             <form  wire:submit.prevent="filter">
                         <div class="row px-5 py-3">

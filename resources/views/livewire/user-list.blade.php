@@ -1,4 +1,4 @@
-<div class="container my-3 mt-4">
+<div class="container-fluid my-3 mt-4">
     @if (session()->has('message'))
         <div class="alert alert-success">
             {{ session('message') }}
@@ -22,7 +22,7 @@
                 <option value="admins">Admins</option>
                 <option value="subadmins">Sub Admins</option>
             </select>
-            <a href="/add-users" class="btn btn-success float-end mx-2">Add New User</a>
+            <a href="/add-users" class="btn btn-success float-end mx-2 addnewuser">Add New User</a>
         </div>
     </div>
 

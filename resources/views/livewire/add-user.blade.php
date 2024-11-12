@@ -1,6 +1,6 @@
 
 
-<div class="container my-3 mt-4">
+<div class="container-fluid my-3 mt-4">
         @if (session()->has('message'))
             <div class="alert alert-success">
                 {{ session('message') }}
@@ -28,7 +28,7 @@
                 <!-- Role Selection -->
                 <div class="row">
                     <div class="mb-3 col-6">
-                        <label for="role" class="form-label fw-bold">Role</label>
+                        <label for="role" class="form-label">Role</label>
                         <select id="role" wire:model="role"  class="form-select">
                             <option value="">Select Role</option>
                             <option value="3">Admin</option>
@@ -41,9 +41,9 @@
                     </div>
                     <!-- Custom Multiselect Dropdown -->
                     <div class="mb-3 col-6">
-                    <label for="idsGroup" class="form-label fw-bold">IDS Group</label>
+                    <label for="idsGroup" class="form-label">IDS Group</label>
                     <div class="custom-multiselect">
-                        <input type="text" placeholder="Select IDS Group" id="selectedGroups" style="height: 38px; border-radius: 5px;" class="form-select" onclick="toggleDropdown()" readonly>
+                        <input type="text" placeholder="Select IDS Group" id="selectedGroups" style="height: 32px; border-radius: 5px;" class="form-select" onclick="toggleDropdown()" readonly>
                         <div id="dropdown" class="dropdown-options">
                             @foreach ($idsGroups as $group)
                                 <div class="dropdown-item" onclick="toggleCheckbox('group_{{ $group->id }}')">
@@ -62,7 +62,7 @@
                 <div class="row">
                     <!-- Name Field -->
                     <div class="mb-3 col-6">
-                        <label for="name" class="form-label fw-bold">Name</label>
+                        <label for="name" class="form-label ">Name</label>
                         <input type="text" class="form-control" wire:model="name" id="name" placeholder="Enter Name">
                         @error('name')
                             <span class="text-danger">{{ $message }}</span>
@@ -71,7 +71,7 @@
 
                     <!-- Email Field -->
                     <div class="mb-3 col-6">
-                        <label for="email" class="form-label fw-bold">Email</label>
+                        <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" wire:model="email" id="email" placeholder="Enter Email">
                         @error('email')
                             <span class="text-danger">{{ $message }}</span>

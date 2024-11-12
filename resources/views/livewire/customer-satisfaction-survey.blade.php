@@ -2,9 +2,9 @@
    
 <div class="card">
         <div class="card-header   text-white" style="background-color:#007DBD">
-            <h2 class="mb-0 container p-5 display-3 text-center" style="height:200px">Customer Satisfaction Survey</h2>
+            <h2 class="mb-0 container-fluid p-5 display-3 text-center" style="">Customer Satisfaction Survey</h2>
         </div>
-        <div class="container mt-4">
+        <div class="container-fluid mt-4">
     
         <div class="card-body">
                 @if (session()->has('message'))

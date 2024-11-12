@@ -9,6 +9,8 @@ use App\Livewire\EditAdmin;
 use App\Livewire\EditSubAdmin;
 use App\Livewire\EditUser;
 use App\Livewire\EmailConfirmation;
+use App\Livewire\NewSidebar;
+use App\Livewire\ProfileDetail;
 use App\Livewire\SubAdminDashboard;
 use App\Livewire\SubAdminLoginForm;
 use App\Livewire\SubadminUsersStatus;
@@ -36,10 +38,11 @@ Route::get('/login', LoginForm::class)->name('login');
 // Route::get('/admin/login', AdminLoginForm::class)->name('admin.login');
 // Route::get('/subadmin/login', SubAdminLoginForm::class)->name('subadmin.login');
 
-
+Route::get('profile/{userId}',ProfileDetail::class)->name('profile.detail') ;
 Route::get('/customersatifactionsurvey/{token}', Survey2::class);
 Route::get('/survey/success', EmailConfirmation::class );
 Route::get('/survey/failed', SurveyExpired::class );
+Route::get('/newsidebar',NewSidebar::class);
 
 
 Route::middleware(['auth'])->group(function () {

@@ -69,6 +69,7 @@ class CustomerSatisfactionSurvey extends Component
             ]
         );
 
+       
         // Store the form data in the database
         $userSubmission =UserSubmission::create([
             'user_id' => auth()->id(),
