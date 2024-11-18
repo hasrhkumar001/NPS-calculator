@@ -16,11 +16,13 @@ class UserStatusList extends Component
     public $idsGroup;
     public $userSubmissions;
     public function mount (){
-        $this->idsGroups = IdsGroup::all();
+        $this->idsGroups = IdsGroup::all()->sortBy('name');
         $this->userSubmissions = UserSubmission::orderByRaw('updated_at DESC')->get();
-        $this->users = Users::all();
+        $this->users = Users::all()->sortBy('name');
     }
-
+    public function updateListBasedOnFilters(){
+        $this->filter();
+    }
     public function filter()
     {
         $idsGroup = $this->idsGroup;

@@ -42,7 +42,7 @@ class UserDashboard extends Component
                $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
             }
             
-        })->pluck('id')->toArray(); // Get the IDs of matching users
+        })->pluck('id')->sortBy('name')->toArray(); // Get the IDs of matching users
         
 
         // Fetch user submissions where user_id matches the matching users
@@ -87,6 +87,7 @@ class UserDashboard extends Component
         // ->toArray();
         
         $this->idsGroups = json_decode(auth()->user()->idsGroup, true);
+        sort($this->idsGroups);
         $this->calculateNPS();
         
 
@@ -138,7 +139,9 @@ class UserDashboard extends Component
         ]);
     }
 
-
+public function updateListBasedOnFilters(){
+    $this->filter();
+}
     public function filter()
 {
     $idsGroup = $this->idsGroup;

@@ -13,7 +13,7 @@
     <form wire:submit.prevent="updateAdmin">
         <div class="form-group mb-3">
             <label for="name" class="form-label">Name</label>
-            <input type="text" id="name" class="form-control" wire:model="name" disabled>
+            <input type="text" id="name" class="form-control" wire:model="name" >
             @error('name') 
                 <small class="text-danger">{{ $message }}</small> 
             @enderror

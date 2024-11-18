@@ -29,6 +29,8 @@ return new class extends Migration
             $table->string('Q13')->nullable();
             $table->string('Q14')->nullable();
             $table->string('Q15')->nullable();
+            $table->string('Q16')->nullable();
+            $table->string('Q17')->nullable();
             $table->string('additional_comments')->default('No comments');
             $table->string('Neutral');
             $table->string('Promoter');

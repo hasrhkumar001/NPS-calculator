@@ -5,9 +5,9 @@
             <form  wire:submit.prevent="filter">
                         <div class="row px-5 py-">
                             <!-- Group Selection -->
-                            <div class="col-lg-2 mb-1">
+                            <div class="col-lg-3 mb-1">
                                 <label for="idsGroup" class="form-label">IDS Group</label>
-                                <select wire:model="idsGroup" id="idsGroup" class="form-select" >
+                                <select wire:model="idsGroup" id="idsGroup" wire:change="updateListBasedOnFilters" class="form-select" >
                                     <option value="">All Groups</option>
                                     @foreach($idsGroups as $group)
                                         <option value="{{ $group }}">{{ $group }}</option>
@@ -15,26 +15,26 @@
                                 </select>
                             </div>
                             <!-- CSAT Selection -->
-                            <div class="col-md-2 mb-1">
+                            <div class="col-md-3 mb-1">
                                 <label for="csat" class="form-label">CSAT</label>
-                                <select id="csat" class="form-select" wire:model="csat">
+                                <select id="csat" class="form-select" wire:change="updateListBasedOnFilters" wire:model="csat">
                                     <option  value="">All</option>
                                     <option value="Monthly">Monthly</option>
                                     <option value="Quarterly">Quarterly</option>
                                     <option value="Yearly">Yearly</option>
                                 </select>
                             </div>
-                            <div class="col-md-2 mb-3">
+                            <div class="col-md-3 mb-3">
                                 <label for="dateFrom" class="form-label">Date From</label>
-                                <input type="date" id="dateFrom" wire:model="dateFrom" class="form-control" placeholder="Select Date" >
+                                <input type="date" id="dateFrom" wire:model="dateFrom" class="form-control" wire:change="updateListBasedOnFilters" placeholder="Select Date" >
                             </div>
-                            <div class="col-md-2 mb-1">
+                            <div class="col-md-3 mb-1">
                                 <label for="dateTo" class="form-label ">Date To</label>
-                                <input type="date" id="dateTo" wire:model="dateTo" class="form-control" placeholder="Select Date" >
+                                <input type="date" id="dateTo" wire:model="dateTo" wire:change="updateListBasedOnFilters" class="form-control" placeholder="Select Date" >
                             </div>
-                            <div class="col-md-4 mb-1 d-flex justify-content-end align-items-center applynow">
+                            <!-- <div class="col-md-4 mb-1 d-flex justify-content-end align-items-center applynow">
                                 <button type="submit" class="btn btn-primary fs-5"><i class="fas fa-filter mx-2"></i>Apply Filter</button>
-                            </div>  
+                            </div>   -->
                         </div>
 
                         <!-- Date Range Inputs -->
@@ -48,7 +48,7 @@
             </form>
 
         <!-- NPS and Total Survey Info -->
-        <div class="container-fluid shadow p-3" style="margin: 60px auto; padding: 0 20px;">
+        <div class="container-fluid shadow p-3" style="margin: 30px auto; padding: 0 20px;">
         
             <!-- Summary Row for Total Surveys and Overall NPS -->
             <div class="row mb-4 d-flex align-items-center p-2">
@@ -71,26 +71,25 @@
             <div class="row mt-4">
                 <!-- Bar Chart for Ratings and Votes -->
             
-                <div class="col-6 d-flex align-items-center justify-content-center">
-                    <div class=" ">
+                <div class="col-lg-6">
+                    <div class="    ">
                         
-                        <div class=" " style="display: flex; justify-content: center;">
-                            <canvas id="ratingsBarChart" width="300" height="300"></canvas>
+                        <div  style="display: flex; justify-content: center;">
+                            <canvas id="ratingsBarChart" ></canvas>
                             
                         </div>
                     </div>
                 </div>
-                <div class="col-6 ">
-                    <div class="" style="display: flex; justify-content: center;">
+                <div class="col-lg-6">
+                    <div style="display: flex; justify-content: center;">
                         
-                        <div class="  ">
-                            <canvas id="npsPieChart" width="400" height="300"></canvas>
+                        <div>
+                            <canvas id="npsPieChart" ></canvas>
                             
                         </div>
                     </div>
                 </div>
             </div>
-
     
    
 </div>
@@ -194,8 +193,7 @@ function createNPSPieChart() {
     const ctxPie = document.getElementById('npsPieChart');
     if (!ctxPie) return;
 
-    ctxPie.style.width = '400px';
-    ctxPie.style.height = '300px';
+    
     
     npsPieChart = new Chart(ctxPie, {
         type: 'pie',
@@ -208,7 +206,7 @@ function createNPSPieChart() {
             }]
         },
         options: {
-            responsive: false,
+            responsive: true,
             maintainAspectRatio: true,
             aspectRatio: 1,
             hover: {
@@ -225,8 +223,7 @@ function createNPSPieChart(data = null) {
     const ctxPie = document.getElementById('npsPieChart');
     if (!ctxPie) return;
 
-    ctxPie.style.width = '400px';
-    ctxPie.style.height = '300px';
+   
 
     const chartData = data ? ([
         data.promoterPercentage ?? 0,
@@ -250,7 +247,7 @@ function createNPSPieChart(data = null) {
             }]
         },
         options: {
-            responsive: false,
+            responsive: true,
             maintainAspectRatio: true,
             aspectRatio: 1,
             plugins: {
@@ -283,8 +280,6 @@ function createRatingsBarChart(data) {
     const ctxBar = document.getElementById('ratingsBarChart');
     if (!ctxBar) return;
 
-    ctxBar.style.width = '300px';
-    ctxBar.style.height = '300px';
     // console.log(data.detractorPercentage== 0 ? 1 : data.promoterPercentage);
     const ratingLabels = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
     const barColors = ratingLabels.map(rating => {
@@ -310,7 +305,7 @@ function createRatingsBarChart(data) {
             }]
         },
         options: {
-            responsive: false,
+            responsive: true,
             maintainAspectRatio: true,
             aspectRatio: 1,
             hover: {

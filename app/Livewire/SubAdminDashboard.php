@@ -90,11 +90,12 @@ class SubAdminDashboard extends Component
         $this->users = Users::where(function ($query) use ($authIdsGroupArray) {
                 foreach ($authIdsGroupArray as $group) {
                    $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
-                }})->where('role',1)->get()->toArray();
+                }})->where('role',1)->get()->sortBy('name')->toArray();
        
        
         
         $this->idsGroups = json_decode(auth()->user()->idsGroup, true);
+        sort($this->idsGroups);
         $this->calculateNPS();
         
 
@@ -146,7 +147,9 @@ class SubAdminDashboard extends Component
         ]);
     }
 
-
+    public function updateListBasedOnFilters(){
+        $this->filter();
+    }
     public function filter()
         {
             $idsGroup = $this->idsGroup;

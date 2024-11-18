@@ -195,15 +195,23 @@
                 });
             });
 
-            window.onclick = function(event) {
-                if (!event.target.matches('#selectedGroups')) {
-                    var dropdowns = document.getElementsByClassName("dropdown-options");
-                    for (var i = 0; i < dropdowns.length; i++) {
-                        var openDropdown = dropdowns[i];
-                        // if (openDropdown.classList.contains('show')) {
-                        //     openDropdown.classList.remove('show');
-                        // }
-                    }
+            // window.onclick = function(event) {
+            //     if (!event.target.matches('#selectedGroups')) {
+            //         var dropdowns = document.getElementsByClassName("dropdown-options");
+            //         for (var i = 0; i < dropdowns.length; i++) {
+            //             var openDropdown = dropdowns[i];
+            //             if (openDropdown.classList.contains('show')) {
+            //                 openDropdown.classList.remove('show');
+            //             }
+            //         }
+            //     }
+            // }
+            window.onclick = function (event) {
+                const dropdown = document.getElementById("dropdown");
+                const trigger = document.getElementById("selectedGroups");
+
+                if (!dropdown.contains(event.target) && !trigger.contains(event.target)) {
+                    dropdown.classList.remove("show");
                 }
-            }
+            };
         </script>

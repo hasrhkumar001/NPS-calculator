@@ -1,13 +1,13 @@
 
     <div class="container-fluid my-4">
-        <div class="container-fluid my-5 bg-light shadow">
+        <div class="container-fluid my-3 bg-light shadow">
             <!-- Existing form for filters (IDS Group, CSAT, Date range) -->
             <form  wire:submit.prevent="filter">
                         <div class="row px-5 py-3">
                             <!-- Group Selection -->
                             <div class="col-md-6 mb-3">
                                 <label for="idsGroup" class="form-label">IDS Group</label>
-                                <select wire:model="idsGroup" id="idsGroup" class="form-select" >
+                                <select wire:model="idsGroup" id="idsGroup" class="form-select" wire:change="updateListBasedOnFilters">
                                     <option value="">All Groups</option>
                                     @foreach($idsGroups as $group)
                                         <option value="{{ $group }}">{{ $group }}</option>
@@ -16,8 +16,8 @@
                             </div>
                             
                             <div class="col-md-6 mb-3">
-                                <label for="csat" class="form-label">Status</label>
-                                <select id="csat" class="form-select" wire:model="status">
+                                <label for="csat" class="form-label">Survey Status</label>
+                                <select id="csat" class="form-select" wire:model="status" wire:change="updateListBasedOnFilters">
                                     <option  value="">All</option>
                                     <option value="Pending">Pending</option>
                                     <option value="Done">Done</option>
@@ -27,9 +27,9 @@
                         </div>
 
                         
-                        <div class=" px-5 py-3 text-end">
+                        <!-- <div class=" px-5 py-3 text-end">
                             <button type="submit" class="btn px-5 py-2 btn-primary fs-5"><i class="fas fa-filter mx-2"></i>Apply Filter</button>
-                        </div>      
+                        </div>       -->
                     </div>
 
                     
@@ -69,7 +69,7 @@
                     <td >{{$users->idsLeadManager}} ({{ $leadManager ? $leadManager->email : 'Deleted User' }})</td>
                     <td >{{$users->clientContactName}}</td>
                     <td >{{$users->clientOrganization}}</td>
-                    <td >{{$users->clientEmailAddress}}</td>
+                    <td style="white-space: normal; overflow-wrap: break-word; max-width: 20ch;">{{$users->clientEmailAddress}}</td>
                     <td >{{$users->status}}</td>
                     <td >{{$users->updated_at}}</td>
                     

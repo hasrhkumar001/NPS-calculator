@@ -4,9 +4,9 @@
             <form  wire:submit.prevent="filter">
                         <div class="row px-5 py-3">
                             <!-- Group Selection -->
-                            <div class="col-lg-3 mb-3">
+                            <div class="col-lg-4 mb-3">
                                 <label for="idsGroup" class="form-label">IDS Group</label>
-                                <select wire:model="idsGroup" id="idsGroup" class="form-select" >
+                                <select wire:model="idsGroup" id="idsGroup" class="form-select" wire:change="updateListBasedOnFilters" >
                                     <option value="">All Groups</option>
                                     @foreach($idsGroups as $group)
                                         <option value="{{ $group->name }}">{{ $group->name }}</option>
@@ -14,17 +14,17 @@
                                 </select>
                             </div>
                             <!-- CSAT Selection -->
-                            <div class="col-lg-3 mb-3">
-                                <label for="status" class="form-label">Pending Email</label>
-                                <select id="status" class="form-select" wire:model="status">
+                            <div class="col-lg-4 mb-3">
+                                <label for="status" class="form-label">Survey Status</label>
+                                <select id="status" class="form-select" wire:model="status" wire:change="updateListBasedOnFilters">
                                     <option  value="">All</option>
                                     <option value="Pending">Pending</option>
                                     <option value="Done">Done</option>
                                 </select>
                             </div>
-                            <div class="col-lg-3 mb-3">
+                            <div class="col-lg-4 mb-3">
                                 <label for="users" class="form-label">Users</label>
-                                <select id="users" class="form-select" wire:model="user">
+                                <select id="users" class="form-select" wire:model="user" wire:change="updateListBasedOnFilters">
                                     <option  value="">All</option>
                                     @foreach($users as $user)
                                         <option value="{{ $user['email'] }}">{{ $user['name'] }}</option>
@@ -32,14 +32,15 @@
                                     
                                 </select>
                             </div>
-                            <div class=" col-lg-3 mb-3 d-flex align-items-end justify-content-center">
+                            <!-- <div class=" col-lg-3 mb-3 d-flex align-items-end justify-content-center">
                             <button type="submit" class="btn  btn-primary fs-5"><i class="fas fa-filter mx-2"></i>Apply Filter</button>
-                        </div>
+                        </div> -->
                             
                         </div>
-                        
+                        </div>
             </form>
-            </div>
+            
+            <div class="table-responsive my-4">
             <table class="table table-bordered">
                 <thead>
                     <tr class="text-center">
@@ -68,7 +69,7 @@
                     <td>{{ $users->idsLeadManager }} ({{ $leadManager ? $leadManager->email : 'Deleted User' }})</td>
                     <td >{{$users->clientContactName}}</td>
                     <td >{{$users->clientOrganization}}</td>
-                    <td >{{$users->clientEmailAddress}}</td>
+                    <td style="white-space: normal; overflow-wrap: break-word; max-width: 20ch;" >{{$users->clientEmailAddress}}</td>
                     <td >{{$users->status}}</td>
                     <td >{{$users->updated_at}}</td>
                     
@@ -79,4 +80,5 @@
                     
                 </tbody>
             </table>
+</div>
 </div>

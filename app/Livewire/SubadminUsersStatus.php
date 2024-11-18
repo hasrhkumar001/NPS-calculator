@@ -44,7 +44,7 @@ class SubadminUsersStatus extends Component
                $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
             }
             
-        })->get()->toArray();        
+        })->get()->sortBy('name')->toArray();        
         // dd($users);
         // Fetch user submissions where user_id matches the matching users
         $this->userSubmissions = UserSubmission::whereIn('id', $matchingUsers)
@@ -86,6 +86,7 @@ class SubadminUsersStatus extends Component
         //     ->toArray();
             
         $this->idsGroups = json_decode(auth()->user()->idsGroup, true);
+        sort($this->idsGroups);
 
         // Fetch the responses for each submission dynamically
         foreach ($this->userSubmissions as $submission) {
@@ -95,7 +96,9 @@ class SubadminUsersStatus extends Component
     }
 
    
-
+public function updateListBasedOnFilters(){
+    $this->filter();
+}
     public function filter()
     {
         $idsGroup = $this->idsGroup;

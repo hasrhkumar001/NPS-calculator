@@ -16,7 +16,8 @@
         href="https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css"
         rel="stylesheet"
         />
-   
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
     
 
     <style>
@@ -474,8 +475,20 @@ a.btn.btn-primary.float-end {
             background-color: #fff;
         }
 
+        #ratingsBarChart {
+            width: 400px !important;
+            height: 400px !important;
+        }
         
+        #npsPieChart{
+            width: 400px !important;
+            height: 400px !important;
         
+        }
+
+        
+       
+
         </style>
 
     @livewireStyles

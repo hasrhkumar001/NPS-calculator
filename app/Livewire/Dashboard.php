@@ -40,6 +40,7 @@ class Dashboard extends Component
     public function mount()
     {
         $this->userSubmissions = UserSubmission::where('status', 'done')->get();
+        
         $validResponses = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
         $columns = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15'];
 
@@ -63,7 +64,7 @@ class Dashboard extends Component
             return $count > 0;
         });
 
-        $this->users = Users::all();
+        $this->users = Users::all()->sortBy('name');
 
         // dd($this->responseCounts);
 
@@ -71,7 +72,7 @@ class Dashboard extends Component
 
         // $this->userSubmissions = UserSubmission::where('status', 'done')->get();
 
-        $this->idsGroups = IdsGroup::all();
+        $this->idsGroups = IdsGroup::all()->sortBy('name');
         
         $this->calculateNPS();
 
@@ -86,7 +87,7 @@ class Dashboard extends Component
     private function calculateNPS()
     {
         $this->totalSurveys = $this->userSubmissions->count();
-        
+       
         
 
         // Iterate over user submissions to gather survey responses
@@ -126,6 +127,9 @@ class Dashboard extends Component
         ]);
     }
 
+    public function updateListBasedOnFilters(){
+        $this->filter();
+    }
 
     public function filter()
     {
