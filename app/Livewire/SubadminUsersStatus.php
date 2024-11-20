@@ -22,6 +22,8 @@ class SubadminUsersStatus extends Component
     public $idsGroup;
     public $userSubmissions;
     public $responses = [];
+    public $searchGroup = '';
+    public $searchUser = '';
    
 
     public function mount()
@@ -44,7 +46,7 @@ class SubadminUsersStatus extends Component
                $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
             }
             
-        })->get()->sortBy('name')->toArray();        
+        })->where('role',1)->get()->sortBy('name')->toArray();        
         // dd($users);
         // Fetch user submissions where user_id matches the matching users
         $this->userSubmissions = UserSubmission::whereIn('id', $matchingUsers)
@@ -95,7 +97,21 @@ class SubadminUsersStatus extends Component
         }
     }
 
-   
+    public function selectGroup($value)
+    {
+        // dd($value);
+        $this->idsGroup = $value;
+       
+        $this->updateListBasedOnFilters();
+    }
+
+    public function selectUser($value)
+    {
+        $this->user = $value;
+       
+        $this->updateListBasedOnFilters();
+    }
+
 public function updateListBasedOnFilters(){
     $this->filter();
 }

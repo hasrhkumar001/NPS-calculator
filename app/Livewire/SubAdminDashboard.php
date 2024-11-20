@@ -33,6 +33,8 @@ class SubAdminDashboard extends Component
     public $promoterPercentage;
     public $detractorPercentage;
     public $neutralPercentage;
+    public $searchGroup = '';
+    public $searchUser = '';
    
 
     public function mount()
@@ -105,6 +107,21 @@ class SubAdminDashboard extends Component
                 ->first();
         }
     }
+    public function selectGroup($value)
+    {
+        // dd($value);
+        $this->idsGroup = $value;
+       
+        $this->updateListBasedOnFilters();
+    }
+
+    public function selectUser($value)
+    {
+        $this->user = $value;
+       
+        $this->updateListBasedOnFilters();
+    }
+
 
     private function calculateNPS()
     {

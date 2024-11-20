@@ -486,7 +486,49 @@ a.btn.btn-primary.float-end {
         
         }
 
-        
+       
+.custom-select {
+    position: relative;
+    width: 100%;
+}
+
+.select-header {
+    cursor: pointer;
+    font-size:12px;
+    user-select: none;
+}
+
+.select-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    z-index: 1000;
+    margin-top: 0.25rem;
+}
+
+.select-options {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.select-option {
+    padding: 0.5rem 1rem;
+    font-size:12px;
+    cursor: pointer;
+}
+
+.select-option:hover {
+    background-color: #f8f9fa;
+}
+
+/* Hide dropdown when clicking outside */
+.select-dropdown {
+    display: block;
+} 
        
 
         </style>

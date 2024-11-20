@@ -5,35 +5,102 @@
             <form  wire:submit.prevent="filter">
                         <div class="row px-5 py-3">
                             <!-- Group Selection -->
-                            <div class="col-md-4 mb-3">
-                                <label for="idsGroup" class="form-label">IDS Group</label>
-                                <select wire:model="idsGroup" id="idsGroup" class="form-select" wire:change="updateListBasedOnFilters">
-                                    <option value="">All Groups</option>
-                                    @foreach($idsGroups as $group)
-                                        <option value="{{ $group }}">{{ $group }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            
-                            <div class="col-md-4 mb-3">
-                                <label for="status" class="form-label">Status</label>
-                                <select id="status" class="form-select" wire:model="status" wire:change="updateListBasedOnFilters">
-                                    <option  value="">All</option>
-                                    <option value="Pending">Pending</option>
-                                    <option value="Done">Done</option>
+                            <div class="col-lg-4 mb-3">
+                            <label for="idsGroup" class="form-label">IDS Group</label>
+                            <div class="position-relative">
+                                <div class="custom-select" x-data="{ open: false }">
+                                    <div class="select-header form-select d-flex justify-content-between align-items-center cursor-pointer" 
+                                        @click="open = !open">
+                                        <span>{{ $idsGroup ?: 'All Groups' }}</span>
+                                        
+                                    </div>
                                     
-                                </select>
+                                    <div x-show="open" 
+                                        @click.outside="open = false"
+                                        class="select-dropdown shadow" 
+                                        style="display: none;">
+                                        <div class="px-2 py-2">
+                                            <input type="text" 
+                                                class="form-control" 
+                                                wire:model.live="searchGroup" 
+                                                placeholder="Search groups..."
+                                                @click.stop>
+                                        </div>
+                                        <div class="select-options max-h-60 overflow-y-auto">
+                                            <div class="select-option hover:bg-gray-100 cursor-pointer p-2" 
+                                                wire:click="selectGroup('')"
+                                                @click="open = false">
+                                                All Groups
+                                            </div>
+                                            @foreach($idsGroups as $group)
+                                                @if(empty($searchGroup) || str_contains(strtolower($group), strtolower($searchGroup)))
+                                                    <div class="select-option hover:bg-gray-100 cursor-pointer p-2" 
+                                                        wire:click="selectGroup('{{ $group }}')" 
+                                                        @click="open = false">
+                                                        {{ $group }}
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-4 mb-3">
-                                <label for="users" class="form-label">Users</label>
-                                <select id="users" class="form-select" wire:model="user" wire:change="updateListBasedOnFilters">
-                                    <option  value="">All</option>
-                                    @foreach($users as $user)
-                                        <option value="{{ $user['email'] }}">{{ $user['name'] }}</option>
-                                    @endforeach
+                        </div>
+
+                        <!-- Survey Status Selection -->
+                        <div class="col-lg-4 mb-3">
+                            <label for="status" class="form-label">Survey Status</label>
+                            <select id="status" class="form-select" wire:model="status" wire:change="updateListBasedOnFilters">
+                                <option value="">All</option>
+                                <option value="Pending">Pending</option>
+                                <option value="Done">Done</option>
+                            </select>
+                        </div>
+
+                        <!-- Users Selection -->
+                        <div class="col-lg-4 mb-3">
+                            <label for="users" class="form-label">Users</label>
+                            <div class="position-relative">
+                                <div class="custom-select" x-data="{ open: false }">
+                                    <div class="select-header form-select d-flex justify-content-between align-items-center cursor-pointer" 
+                                        @click="open = !open">
+                                        <span>{{ $user ? collect($users)->firstWhere('email', $user)['name'] : 'All Users' }}</span>
+                                        
+                                    </div>
                                     
-                                </select>
+                                    <div x-show="open" 
+                                        @click.outside="open = false"
+                                        class="select-dropdown shadow" 
+                                        style="display: none;">
+                                        <div class="px-2 py-2">
+                                            <input type="text" 
+                                                class="form-control" 
+                                                wire:model.live="searchUser" 
+                                                placeholder="Search users..."
+                                                @click.stop>
+                                        </div>
+                                        <div class="select-options max-h-60 overflow-y-auto">
+                                            <div class="select-option hover:bg-gray-100 cursor-pointer p-2" 
+                                                wire:click="selectUser('')"
+                                                @click="open = false">
+                                                All Users
+                                            </div>
+                                            @foreach($users as $userOption)
+                                                @if(empty($searchUser) || 
+                                                    str_contains(strtolower($userOption['name']), strtolower($searchUser)) || 
+                                                    str_contains(strtolower($userOption['email']), strtolower($searchUser)))
+                                                    <div class="select-option hover:bg-gray-100 cursor-pointer p-2" 
+                                                        wire:click="selectUser('{{ $userOption['email'] }}')"
+                                                        @click="open = false">
+                                                        {{ $userOption['name'] }}
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
                              <!-- <div class=" col-lg-3 mb-3 d-flex align-items-end justify-content-center">
                             <button type="submit" class="btn  btn-primary fs-5"><i class="fas fa-filter mx-2"></i>Apply Filter</button>
                         </div> -->

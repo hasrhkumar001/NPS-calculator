@@ -15,11 +15,39 @@ class UserStatusList extends Component
     public $user;
     public $idsGroup;
     public $userSubmissions;
+    public $searchGroup = '';
+    public $searchUser = '';
+    
+    // Dropdown state
+  
+
     public function mount (){
         $this->idsGroups = IdsGroup::all()->sortBy('name');
         $this->userSubmissions = UserSubmission::orderByRaw('updated_at DESC')->get();
         $this->users = Users::all()->sortBy('name');
     }
+    
+   
+
+    
+
+
+    public function selectGroup($value)
+    {
+        // dd($value);
+        $this->idsGroup = $value;
+       
+        $this->updateListBasedOnFilters();
+    }
+
+    public function selectUser($value)
+    {
+        $this->user = $value;
+       
+        $this->updateListBasedOnFilters();
+    }
+
+    
     public function updateListBasedOnFilters(){
         $this->filter();
     }

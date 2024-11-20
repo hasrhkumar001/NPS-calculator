@@ -5,15 +5,47 @@
             <form  wire:submit.prevent="filter">
                         <div class="row px-5 py-">
                             <!-- Group Selection -->
-                            <div class="col-lg-3 mb-1">
-                                <label for="idsGroup" class="form-label">IDS Group</label>
-                                <select wire:model="idsGroup" id="idsGroup" wire:change="updateListBasedOnFilters" class="form-select" >
-                                    <option value="">All Groups</option>
-                                    @foreach($idsGroups as $group)
-                                        <option value="{{ $group }}">{{ $group }}</option>
-                                    @endforeach
-                                </select>
+                            <div class="col-md-3 mb-3">
+                            <label for="idsGroup" class="form-label">IDS Group</label>
+                            <div class="position-relative">
+                                <div class="custom-select" x-data="{ open: false }">
+                                    <div class="select-header form-select d-flex justify-content-between align-items-center cursor-pointer" 
+                                        @click="open = !open">
+                                        <span>{{ $idsGroup ?: 'All Groups' }}</span>
+                                        
+                                    </div>
+                                    
+                                    <div x-show="open" 
+                                        @click.outside="open = false"
+                                        class="select-dropdown shadow" 
+                                        style="display: none;">
+                                        <div class="px-2 py-2">
+                                            <input type="text" 
+                                                class="form-control" 
+                                                wire:model.live="searchGroup" 
+                                                placeholder="Search groups..."
+                                                @click.stop>
+                                        </div>
+                                        <div class="select-options max-h-60 overflow-y-auto">
+                                            <div class="select-option hover:bg-gray-100 cursor-pointer p-2" 
+                                                wire:click="selectGroup('')"
+                                                @click="open = false">
+                                                All Groups
+                                            </div>
+                                            @foreach($idsGroups as $group)
+                                                @if(empty($searchGroup) || str_contains(strtolower($group), strtolower($searchGroup)))
+                                                    <div class="select-option hover:bg-gray-100 cursor-pointer p-2" 
+                                                        wire:click="selectGroup('{{ $group }}')" 
+                                                        @click="open = false">
+                                                        {{ $group }}
+                                                    </div>
+                                                @endif
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                        </div>
                             <!-- CSAT Selection -->
                             <div class="col-md-3 mb-1">
                                 <label for="csat" class="form-label">CSAT</label>
@@ -74,14 +106,14 @@
                 <div class="col-lg-6">
                     <div class="    ">
                         
-                        <div  style="display: flex; justify-content: center;">
+                        <div  style="display: flex; justify-content: center;" wire:ignore>
                             <canvas id="ratingsBarChart" ></canvas>
                             
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-6">
-                    <div style="display: flex; justify-content: center;">
+                    <div style="display: flex; justify-content: center;" wire:ignore>
                         
                         <div>
                             <canvas id="npsPieChart" ></canvas>

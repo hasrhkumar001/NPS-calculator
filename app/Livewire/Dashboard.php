@@ -34,6 +34,8 @@ class Dashboard extends Component
     public $users;
     public $user;
 
+    public $searchGroup = '';
+    public $searchUser = '';
 
 
 
@@ -129,6 +131,20 @@ class Dashboard extends Component
 
     public function updateListBasedOnFilters(){
         $this->filter();
+    }
+    public function selectGroup($value)
+    {
+        // dd($value);
+        $this->idsGroup = $value;
+       
+        $this->updateListBasedOnFilters();
+    }
+
+    public function selectUser($value)
+    {
+        $this->user = $value;
+       
+        $this->updateListBasedOnFilters();
     }
 
     public function filter()

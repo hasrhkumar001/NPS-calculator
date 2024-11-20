@@ -23,7 +23,7 @@ class UserClientsStatusList extends Component
     public $idsGroup;
     public $userSubmissions;
     public $responses = [];
-   
+    public $searchGroup = '';
 
     public function mount()
     {
@@ -91,7 +91,16 @@ class UserClientsStatusList extends Component
         }
     }
 
+    public function selectGroup($value)
+    {
+        // dd($value);
+        $this->idsGroup = $value;
+       
+        $this->updateListBasedOnFilters();
+    }
+
    
+
     public function updateListBasedOnFilters(){
         $this->filter();
     }

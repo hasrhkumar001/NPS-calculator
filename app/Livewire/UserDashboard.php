@@ -28,6 +28,7 @@ class UserDashboard extends Component
     public $csat;
     public $promoterPercentage;
     public $detractorPercentage;
+    public $searchGroup = '';
     public $neutralPercentage;
 
     public function mount()
@@ -96,6 +97,13 @@ class UserDashboard extends Component
             $this->responses[$submission->id] = Survey2Response::where('client_id', $submission->client_id)
                 ->first();
         }
+    }
+    public function selectGroup($value)
+    {
+        // dd($value);
+        $this->idsGroup = $value;
+       
+        $this->updateListBasedOnFilters();
     }
 
     private function calculateNPS()
