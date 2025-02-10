@@ -123,7 +123,7 @@
 
                 <!-- Quality of Delivery -->
                 <div class="mb-3 mt-5">
-                    <label class="form-label outer-label">Quality of Delivery</label>
+                    <label class="form-label outer-label">Accessible and responsive to employee requests and concerns - Timeliness of Responses & Issue Resolution</label>
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="quality{{ $i }}" wire:model="responses.1" value="{{ $i }}">
@@ -137,7 +137,7 @@
 
                 <!-- Quality of Responses -->
                 <div class="mb-3">
-                    <label class="form-label outer-label">Quality of Responses</label>
+                    <label class="form-label outer-label">Understands and addresses BU needs timely & effectively. Supports with data-based inputs</label>
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="responses{{ $i }}" wire:model="responses.2" value="{{ $i }}">
@@ -151,7 +151,7 @@
 
                 <!-- Timeliness of Responses -->
                 <div class="mb-3">
-                    <label class="form-label outer-label">Timeliness of Responses</label>
+                    <label class="form-label outer-label">HR strategy and approach is aligned with Business Objectives</label>
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="timeliness{{ $i }}" wire:model="responses.3" value="{{ $i }}">
@@ -165,7 +165,7 @@
 
                 <!-- IT Support -->
                 <div class="mb-3"> 
-                    <label class="form-label outer-label">IT Support</label>
+                    <label class="form-label outer-label">HR/TA team understands critical talent requirement and hiring needs are met in line with BU requirements</label>
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="support{{ $i }}" wire:model="responses.4" value="{{ $i }}">
@@ -179,7 +179,7 @@
 
                 <!-- Project Management -->
                 <div class="mb-3">
-                    <label class="form-label outer-label">Project Management</label>
+                    <label class="form-label outer-label">Advocates effectively for employee needs and concerns</label>
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="management{{ $i }}" wire:model="responses.5" value="{{ $i }}">
@@ -192,7 +192,7 @@
                 </div>
                 <!-- Adherence to Deadlines -->
                 <div class="mb-3">
-                    <label class="form-label outer-label">Adherence to Deadlines</label>
+                    <label class="form-label outer-label">Helps with learning & development opportunities for employee in line with business requirements</label>
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="deadlines{{ $i }}" wire:model="responses.6" value="{{ $i }}">
@@ -206,7 +206,7 @@
 
                 <!-- Communication Effectiveness -->
                 <div class="mb-3">
-                    <label class="form-label outer-label">Communication Effectiveness</label>
+                    <label class="form-label outer-label">Ensure proactive communication & research-based inputs to each business unit</label>
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="communication{{ $i }}" wire:model="responses.7" value="{{ $i }}">
@@ -220,7 +220,7 @@
 
                 <!-- Problem Solving Skills -->
                 <div class="mb-3">
-                    <label class="form-label outer-label">Problem Solving Skills</label>
+                    <label class="form-label outer-label">Create opportunities for meaningful employee engagement and participation</label>
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="problemsolving{{ $i }}" wire:model="responses.8" value="{{ $i }}">
@@ -234,7 +234,7 @@
 
                 <!-- Innovation & Creativity -->
                 <div class="mb-3">
-                    <label class="form-label outer-label">Innovation & Creativity</label>
+                    <label class="form-label outer-label">HR contributes effectively to the overall success of the BU and the organization</label>
                     <div class="radio-group">
                         @for ($i = 0; $i <= 10; $i++)
                             <input type="radio" id="innovation{{ $i }}" wire:model="responses.9" value="{{ $i }}">

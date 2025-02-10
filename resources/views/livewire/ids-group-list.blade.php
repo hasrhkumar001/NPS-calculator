@@ -32,7 +32,7 @@
             <tr class="text-center">
                 <th>Sr No.</th>
                 <th>Name</th>
-                
+                <th>Questions</th>
                 <th>Action</th>
             </tr>
         </thead>
@@ -41,7 +41,7 @@
             <tr class="text-center">
                 <td>{{$loop->iteration}}</td>
                 <td>{{ $group->name }}</td>
-                
+                <td><a href="{{ route('group.questions', $group->id) }}" wire:navigate class="btn btn-success btn-sm shadow editdeletebtn  px-3 mx-3">Questions</a></td>
                 <td ><a href="{{ route('ids-group.edit', $group->id) }}" wire:navigate class="btn btn-primary btn-sm shadow editdeletebtn  px-3 mx-3">EDIT</a>
                     <button class="btn btn-danger btn-sm shadow editdeletebtn mx-3 px-3" wire:click="delete({{$group->id}})" wire:confirm="Are you sure you want to delete this? ">DELETE</i></button></td>
             </tr>

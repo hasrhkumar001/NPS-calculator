@@ -47,7 +47,7 @@ class LoginForm extends Component
     if (Auth::attempt(['email' => $validated['email'], 'password' => $validated['password']])) {
         // Regenerate session to prevent session fixation attacks
         $request->session()->regenerate();
-
+        
         // Redirect based on the user's role
         $user = Auth::user();
 

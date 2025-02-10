@@ -6,47 +6,56 @@
                         <div class="row px-5 py-1">
                             <!-- Group Selection -->
                             
-                            <div class="col-lg-2 mb-3">
+                            <div class="col-lg-2 mb-3" x-data="{ selectedGroups: @entangle('selectedGroups') }">
                                 <label for="idsGroup" class="form-label">IDS Group</label>
                                 <div class="position-relative">
-                                    <div class="custom-select" x-data="{ open: false }">
-                                        <div class="select-header form-select d-flex justify-content-between align-items-center cursor-pointer" 
-                                            @click="open = !open">
-                                            <span>{{ $idsGroup ?: 'All Groups' }}</span>
-                                            
+                                    <div class="custom-select">
+                                        <div class="select-header form-select d-flex justify-content-between align-items-center cursor-pointer"
+                                            wire:click="$toggle('isOpen')">
+                                            <span>{{ count($selectedGroups) ? count($selectedGroups) . ' Selected' : 'All Groups' }}</span>
                                         </div>
-                                        
-                                        <div x-show="open" 
-                                            @click.outside="open = false"
-                                            class="select-dropdown shadow" 
-                                            style="display: none;">
+
+                                        @if($isOpen)
+                                        <div class="select-dropdown shadow position-absolute w-100 bg-white rounded mt-1" style="z-index: 1000;">
                                             <div class="px-2 py-2">
-                                                <input type="text" 
-                                                    class="form-control" 
-                                                    wire:model.live="searchGroup" 
-                                                    placeholder="Search groups..."
-                                                    >
+                                                <input type="text" class="form-control" wire:model.live="searchGroup" placeholder="Search groups...">
                                             </div>
-                                            <div class="select-options max-h-60 overflow-y-auto">
-                                                <div class="select-option hover:bg-gray-100 cursor-pointer p-2" 
-                                                    wire:click="selectGroup('')"
-                                                    @click="open = false">
-                                                    All Groups
+
+                                            <!-- Select All Checkbox -->
+                                            <div class="px-2 py-2 border-bottom">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="selectAll"
+                                                        wire:click="toggleAllGroups"
+                                                        @click="$nextTick(() => $refresh())"
+                                                        x-bind:checked="selectedGroups.length === {{ count($idsGroups) }}">
+                                                    <label class="form-check-label" for="selectAll"> Select All </label>
                                                 </div>
+                                            </div>
+
+                                            <div class="select-options max-h-60 overflow-y-auto">
                                                 @foreach($idsGroups as $group)
                                                     @if(empty($searchGroup) || str_contains(strtolower($group->name), strtolower($searchGroup)))
-                                                        <div class="select-option hover:bg-gray-100 cursor-pointer p-2" 
-                                                            wire:click="selectGroup('{{ $group->name }}')"
-                                                            @click="open = false">
-                                                            {{ $group->name }}
+                                                        <div class="select-option hover:bg-gray-100 p-2">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" id="group_{{ $loop->index }}"
+                                                                    value="{{ $group->name }}"
+                                                                    wire:click="toggleGroup('{{ $group->name }}')"
+                                                                    @click="$nextTick(() => $refresh())"
+                                                                    x-bind:checked="selectedGroups.includes('{{ $group->name }}')">
+                                                                <label class="form-check-label" for="group_{{ $loop->index }}">
+                                                                    {{ $group->name }}
+                                                                </label>
+                                                            </div>
                                                         </div>
                                                     @endif
                                                 @endforeach
                                             </div>
                                         </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
+
 
                         
 
@@ -346,6 +355,10 @@ function createNPSPieChart(data = null) {
         data.detractorPercentage ?? 0
       ]) : [1, 1, 1]; // Default data if no data is provided
 
+      const isUsingDefaultValues = !data || chartData.every((value, index) => 
+            value === 1 && chartData.length === 3
+        );
+
     console.log(chartData);
     npsPieChart = new Chart(ctxPie, {
         type: 'pie',
@@ -374,7 +387,22 @@ function createNPSPieChart(data = null) {
                          // Use circular point style
                         boxWidth: 10 // Change the width of the color box
                     },
+                    
                     position: 'bottom'
+                },
+                datalabels: {  
+                    display: function(context) {
+                        // Hide data labels if using default values
+                        return !isUsingDefaultValues;
+                    },
+                    color: '#fff',
+                    font: { size: 14, weight: 'bold' },
+                    formatter: (value, ctx) => {
+                        if (isUsingDefaultValues) return '';
+                        let total = ctx.dataset.data.reduce((acc, val) => acc + val, 0);
+                        let percentage = ((value / total) * 100).toFixed(1);
+                        return `${percentage}%`;
+                    }
                 }
             },
             hover: {
@@ -383,7 +411,8 @@ function createNPSPieChart(data = null) {
             animation: {
                 duration: 0,  // Disable animation effects, or set it to a lower value like 200 for subtle animations
             }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 }
 
@@ -416,6 +445,7 @@ function createRatingsBarChart(data) {
                 backgroundColor: barColors,
             }]
         },
+        
         options: {
             responsive: true,
             maintainAspectRatio: true,
@@ -427,8 +457,17 @@ function createRatingsBarChart(data) {
                 duration: 0,  // Disable animation effects, or set it to a lower value like 200 for subtle animations
             },
             plugins: {
-                legend: {
-                    display: false,
+                legend: { display: false },
+                datalabels: { 
+                    anchor: 'end',
+                    align: 'top',
+                    color: '#000',
+                    offset:-5,
+                    clamp: true,
+                    font: { weight: 'bold', size: 10 },
+                    formatter: function(value) {
+                        return value > 0 ? value : ''; // Show only non-zero values
+                    }
                 }
             },
             scales: {
@@ -449,7 +488,8 @@ function createRatingsBarChart(data) {
                     }
                 }
             }
-        }
+        },
+        plugins: [ChartDataLabels] // Activate the data labels plugin
     });
 }
 </script>

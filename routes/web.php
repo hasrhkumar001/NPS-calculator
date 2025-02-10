@@ -11,6 +11,7 @@ use App\Livewire\EditUser;
 use App\Livewire\EmailConfirmation;
 use App\Livewire\NewSidebar;
 use App\Livewire\ProfileDetail;
+use App\Livewire\Questions\ManageQuestions;
 use App\Livewire\SubAdminDashboard;
 use App\Livewire\SubAdminLoginForm;
 use App\Livewire\SubadminUsersStatus;
@@ -74,6 +75,7 @@ Route::middleware(RoleMiddleware::class.':3')->group(function(){
     Route::get('/ids-groups', IdsGroupList::class)->name('ids-group.list');
     Route::get('/ids-groups/create', IdsGroupCreate::class)->name('ids-group.create');
     Route::get('/ids-groups/{group}/edit', IdsGroupEdit::class)->name('ids-group.edit');
+    Route::get('/questions/{groupId}',ManageQuestions::class)->name('group.questions');
 });
 
 Route::group(['middleware' => ['auth:subadmin']], function () {

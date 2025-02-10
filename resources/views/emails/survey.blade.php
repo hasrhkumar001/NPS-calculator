@@ -17,7 +17,7 @@
     <p>
         We appreciate your time and inputs to help us serve you better.
     </p>    
-        <a href="http://127.0.0.1:8000/customersatifactionsurvey/{{$token}}" target="_blank" style="border:1px solid blue; background-color:blue;border-radius:5px;padding:5px;color:white;text-decoration:none;">Take Survey</a>
+        <a href="http://nps.idsil.in/customersatifactionsurvey/{{$token}}" target="_blank" style="border:1px solid blue; background-color:blue;border-radius:5px;padding:5px;color:white;text-decoration:none;">Take Survey</a>
     
 
     <p>The survey parameters (How it works?):</p>

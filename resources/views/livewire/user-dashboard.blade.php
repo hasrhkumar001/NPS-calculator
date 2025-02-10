@@ -266,6 +266,9 @@ function createNPSPieChart(data = null) {
         data.neutralPercentage ?? 0,
         data.detractorPercentage ?? 0
       ]) : [1, 1, 1]; // Default data if no data is provided
+      const isUsingDefaultValues = !data || chartData.every((value, index) => 
+            value === 1 && chartData.length === 3
+        );
 
     console.log(chartData);
     npsPieChart = new Chart(ctxPie, {
@@ -296,6 +299,20 @@ function createNPSPieChart(data = null) {
                         boxWidth: 10 // Change the width of the color box
                     },
                     position: 'bottom'
+                },
+                datalabels: {  
+                    display: function(context) {
+                        // Hide data labels if using default values
+                        return !isUsingDefaultValues;
+                    },
+                    color: '#fff',
+                    font: { size: 14, weight: 'bold' },
+                    formatter: (value, ctx) => {
+                        if (isUsingDefaultValues) return '';
+                        let total = ctx.dataset.data.reduce((acc, val) => acc + val, 0);
+                        let percentage = ((value / total) * 100).toFixed(1);
+                        return `${percentage}%`;
+                    }
                 }
             },
             hover: {
@@ -304,7 +321,8 @@ function createNPSPieChart(data = null) {
             animation: {
                 duration: 0,  // Disable animation effects, or set it to a lower value like 200 for subtle animations
             }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 }
 
@@ -347,8 +365,17 @@ function createRatingsBarChart(data) {
                 duration: 0,  // Disable animation effects, or set it to a lower value like 200 for subtle animations
             },
             plugins: {
-                legend: {
-                    display: false,
+                legend: { display: false },
+                datalabels: { 
+                    anchor: 'end',
+                    align: 'top',
+                    color: '#000',
+                    offset:-5,
+                    clamp: true,
+                    font: { weight: 'bold', size: 10 },
+                    formatter: function(value) {
+                        return value > 0 ? value : ''; // Show only non-zero values
+                    }
                 }
             },
             scales: {
@@ -369,7 +396,8 @@ function createRatingsBarChart(data) {
                     }
                 }
             }
-        }
+        },
+        plugins: [ChartDataLabels]
     });
 }
 </script>

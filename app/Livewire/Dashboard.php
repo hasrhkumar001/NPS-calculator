@@ -18,6 +18,7 @@ class Dashboard extends Component
     public $total = 0;
     public $promoters = 0;
     public $neutrals = 0;
+    public $selectedGroups = [];     
     public $detractors = 0;
     public $nps = 0;
     public $idsGroups;
@@ -34,9 +35,11 @@ class Dashboard extends Component
     public $users;
     public $user;
 
-    public $searchGroup = '';
     public $searchUser = '';
+    public $searchGroup = '';
 
+    public $isOpen =false;
+    
 
 
     public function mount()
@@ -128,16 +131,50 @@ class Dashboard extends Component
             'responseCounts' => $this->responseCounts,
         ]);
     }
+    public function toggleGroup($groupName)
+    {
+        if (!is_array($this->selectedGroups)) {
+            $this->selectedGroups = [];
+        }
+    
+        if (in_array($groupName, $this->selectedGroups)) {
+            // Remove the group
+            $this->selectedGroups = array_values(array_diff($this->selectedGroups, [$groupName]));
+        } else {
+            // Append the group (Livewire-friendly way)
+            $this->selectedGroups[] = $groupName;
+        }
+        // Call filter method if needed
+        $this->filter();
+    }
+    
+
+    public function toggleAllGroups()
+    {
+        if (count($this->selectedGroups) === count($this->idsGroups)) {
+            $this->selectedGroups = [];
+        } else {
+            $this->selectedGroups = $this->idsGroups->pluck('name')->toArray();
+        }
+        
+        $this->filter();
+        
+    }
+
+   
 
     public function updateListBasedOnFilters(){
         $this->filter();
     }
+    
+    
     public function selectGroup($value)
     {
-        // dd($value);
+       
+        dd();
         $this->idsGroup = $value;
        
-        $this->updateListBasedOnFilters();
+        $this->filter();
     }
 
     public function selectUser($value)
@@ -149,7 +186,7 @@ class Dashboard extends Component
 
     public function filter()
     {
-        $idsGroup = $this->idsGroup;
+        $idsGroup = $this->selectedGroups;
     $dateFrom = $this->dateFrom;
     $dateTo = $this->dateTo;
     $csat = $this->csat;
@@ -160,7 +197,7 @@ class Dashboard extends Component
 
     // If an idsGroup is provided, filter user submissions based on it
     if (!empty($idsGroup)) {
-        $query->where('idsGroup', $idsGroup);
+        $query->whereIn('idsGroup', $idsGroup);
     }
 
     // If dateFrom is provided, filter user submissions updated on or after dateFrom

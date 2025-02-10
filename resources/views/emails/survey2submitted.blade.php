@@ -16,15 +16,15 @@
     <p><strong>Survey Date:</strong> {{ $surveyData['survey_date'] }}</p>
     <p><strong>CSAT:</strong> Quarterly</p>
     <table  border="1" style="border-collapse:collapse">
-    <tr><th>Quality of Delivery</th> <td>{{ $surveyData['quality_of_delivery'] }}</td></tr>
-    <tr><th>Quality of Responses</th> <td> {{ $surveyData['quality_of_responses'] }}</td></tr>
-    <tr><th>Timeliness of Responses</th> <td> {{ $surveyData['timeliness_of_responses'] }}</td></tr>
-    <tr><th>IT Support</th> <td> {{ $surveyData['it_support'] }}</td></tr>
-    <tr><th>Project Management</th> <td> {{ $surveyData['project_management'] }}</td></tr>
-    <tr><th>Use of Latest Tools/Technology</th> <td> {{ $surveyData['latest_tools'] }}</td></tr>
-    <tr><th>Value for Money</th> <td> {{ $surveyData['value_for_money'] }}</td></tr>
-    <tr><th>Overall Support</th> <td> {{ $surveyData['overall_support'] }}</td></tr>
-    <tr><th>How likely are you to work with us again on other projects?</th> <td> {{ $surveyData['work_with_us_again'] }}</td></tr>
+    <tr><th>Accessible and responsive to employee requests and concerns - Timeliness of Responses & Issue Resolution</th> <td>{{ $surveyData['response_1'] }}</td></tr>
+    <tr><th>Understands and addresses BU needs timely & effectively. Supports with data-based inputs</th> <td> {{ $surveyData['response_2'] }}</td></tr>
+    <tr><th>HR strategy and approach is aligned with Business Objectives</th> <td> {{ $surveyData['response_3'] }}</td></tr>
+    <tr><th>HR/TA team understands critical talent requirement and hiring needs are met in line with BU requirements</th> <td> {{ $surveyData['response_4'] }}</td></tr>
+    <tr><th>Advocates effectively for employee needs and concerns</th> <td> {{ $surveyData['response_5'] }}</td></tr>
+    <tr><th>Helps with learning & development opportunities for employee in line with business requirements</th> <td> {{ $surveyData['response_6'] }}</td></tr>
+    <tr><th>Ensure proactive communication & research-based inputs to each business unit</th> <td> {{ $surveyData['response_7'] }}</td></tr>
+    <tr><th>Create opportunities for meaningful employee engagement and participation</th> <td> {{ $surveyData['response_8'] }}</td></tr>
+    <tr><th>HR contributes effectively to the overall success of the BU and the organization</th> <td> {{ $surveyData['response_9'] }}</td></tr>
 
     <tr><th>Additional Comments </th> <td> {{ $surveyData['additional_comments'] }}</td></tr>
     </table>
