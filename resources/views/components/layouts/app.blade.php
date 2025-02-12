@@ -520,7 +520,7 @@ a.btn.btn-primary.float-end {
 .select-option {
     padding: 0.5rem 1rem;
     font-size:12px;
-    cursor: pointer;
+  
 }
 
 .select-option:hover {

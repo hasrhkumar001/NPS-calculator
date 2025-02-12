@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Client;
+use App\Models\Question;
 use App\Models\UserSubmission;
 use Livewire\Component;
 use Illuminate\Support\Facades\Mail;
@@ -30,14 +31,34 @@ class CustomerSatisfactionSurvey extends Component
     public function mount()
     {
         $this->date = now()->format('Y-m-d');
-        // Check if the logged-in user is an admin
+           
+       // Get group IDs where at least one of Q1 to Q9 is not null or empty
+        $groupIdsWithQuestions = Question::where(function ($query) {
+            for ($i = 1; $i <= 9; $i++) {
+                $query->whereNotNull("Q{$i}")->where("Q{$i}", '!=', '');
+            }
+        })->distinct()->pluck('group_id');
+        
+
         if (auth()->user()->role == '3') {
-            // If admin, show all groups
-            $this->idsGroups = IdsGroup::all(); // Assuming you have a Group model to fetch all groups
+            // If admin, show only groups that have questions
+            $this->idsGroups = IdsGroup::whereIn('id', $groupIdsWithQuestions)->get();
+               
             
         } else {
             // For other users, decode their assigned groups and display only those
             $this->idsGroups = json_decode(auth()->user()->idsGroup, true);
+            
+            $userGroupNames = json_decode(auth()->user()->idsGroup, true);
+            if (!is_array($userGroupNames)) {
+                $userGroupNames = []; // Ensure it’s an array
+            }
+            
+            $this->idsGroups = IdsGroup::whereIn('id', $groupIdsWithQuestions)
+            ->whereIn('name', $userGroupNames)
+            ->get();
+            
+            
             
         }
         $this->emailContent = "Improvement is an ongoing process. In the wake of improving our services to our customers, IDS InfoTech shares Customer Satisfaction Survey on a periodic basis to be filled out by its esteemed Customers.\n\nWe appreciate your time and inputs to help us serve you better.";

@@ -120,131 +120,30 @@
                 <hr>
 
                 <h4 >Please rate us on our services/offerings/products such as:</h4>
+                @if (session()->has('error'))
+                    <div class="alert alert-danger">
+                        {{ session('error') }}
+                    </div>
+                @endif
 
-                <!-- Quality of Delivery -->
-                <div class="mb-3 mt-5">
-                    <label class="form-label outer-label">Accessible and responsive to employee requests and concerns - Timeliness of Responses & Issue Resolution</label>
-                    <div class="radio-group">
-                        @for ($i = 0; $i <= 10; $i++)
-                            <input type="radio" id="quality{{ $i }}" wire:model="responses.1" value="{{ $i }}">
-                            <label class="radio-label" for="quality{{ $i }}">{{ $i }}</label>
-                        @endfor
-                        <input type="radio" id="qualityNa"  wire:model="responses.1" value="Na">
-                        <label class="radio-label"  for="qualityNa">N/A</label>
+                @for ($i = 1; $i <= 9; $i++)
+                    @if(isset($questions[$i]))
+                    <div class="mb-3 mt-5">
+                        <label class="form-label outer-label">{{ $questions[$i] }}</label>
+                        <div class="radio-group">
+                            @for ($j = 0; $j <= 10; $j++)
+                                <input type="radio" id="question{{ $i }}_{{ $j }}" wire:model="responses.{{ $i }}" value="{{ $j }}">
+                                <label class="radio-label" for="question{{ $i }}_{{ $j }}">{{ $j }}</label>
+                            @endfor
+                            <input type="radio" id="question{{ $i }}_na" wire:model="responses.{{ $i }}" value="Na">
+                            <label class="radio-label" for="question{{ $i }}_na">N/A</label>
+                        </div>
+                        @error('responses.' . $i) <span class="text-danger">{{ $message }}</span> @enderror
                     </div>
-                    @error('responses.1') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
+                    @endif
+                @endfor
 
-                <!-- Quality of Responses -->
-                <div class="mb-3">
-                    <label class="form-label outer-label">Understands and addresses BU needs timely & effectively. Supports with data-based inputs</label>
-                    <div class="radio-group">
-                        @for ($i = 0; $i <= 10; $i++)
-                            <input type="radio" id="responses{{ $i }}" wire:model="responses.2" value="{{ $i }}">
-                            <label class="radio-label" for="responses{{ $i }}">{{ $i }}</label>
-                        @endfor
-                        <input type="radio" id="responsesNa" wire:model="responses.2" value="Na">
-                        <label class="radio-label" for="responsesNa">N/A</label>
-                    </div>
-                    @error('responses.2') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Timeliness of Responses -->
-                <div class="mb-3">
-                    <label class="form-label outer-label">HR strategy and approach is aligned with Business Objectives</label>
-                    <div class="radio-group">
-                        @for ($i = 0; $i <= 10; $i++)
-                            <input type="radio" id="timeliness{{ $i }}" wire:model="responses.3" value="{{ $i }}">
-                            <label class="radio-label" for="timeliness{{ $i }}">{{ $i }}</label>
-                        @endfor
-                        <input type="radio" id="timelinessNa" wire:model="responses.3" value="Na">
-                        <label class="radio-label" for="timelinessNa">N/A</label>
-                    </div>
-                    @error('responses.3') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- IT Support -->
-                <div class="mb-3"> 
-                    <label class="form-label outer-label">HR/TA team understands critical talent requirement and hiring needs are met in line with BU requirements</label>
-                    <div class="radio-group">
-                        @for ($i = 0; $i <= 10; $i++)
-                            <input type="radio" id="support{{ $i }}" wire:model="responses.4" value="{{ $i }}">
-                            <label class="radio-label" for="support{{ $i }}">{{ $i }}</label>
-                        @endfor
-                        <input type="radio" id="supportNa" wire:model="responses.4" value="Na">
-                        <label class="radio-label" for="supportNa">N/A</label>
-                    </div>
-                    @error('responses.4') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Project Management -->
-                <div class="mb-3">
-                    <label class="form-label outer-label">Advocates effectively for employee needs and concerns</label>
-                    <div class="radio-group">
-                        @for ($i = 0; $i <= 10; $i++)
-                            <input type="radio" id="management{{ $i }}" wire:model="responses.5" value="{{ $i }}">
-                            <label class="radio-label" for="management{{ $i }}">{{ $i }}</label>
-                        @endfor
-                        <input type="radio" id="managementNa" wire:model="responses.5" value="Na">
-                        <label class="radio-label" for="managementNa">N/A</label>
-                    </div>
-                    @error('responses.5') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-                <!-- Adherence to Deadlines -->
-                <div class="mb-3">
-                    <label class="form-label outer-label">Helps with learning & development opportunities for employee in line with business requirements</label>
-                    <div class="radio-group">
-                        @for ($i = 0; $i <= 10; $i++)
-                            <input type="radio" id="deadlines{{ $i }}" wire:model="responses.6" value="{{ $i }}">
-                            <label class="radio-label" for="deadlines{{ $i }}">{{ $i }}</label>
-                        @endfor
-                        <input type="radio" id="deadlinesNa" wire:model="responses.6" value="Na">
-                        <label class="radio-label" for="deadlinesNa">N/A</label>
-                    </div>
-                    @error('responses.6') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Communication Effectiveness -->
-                <div class="mb-3">
-                    <label class="form-label outer-label">Ensure proactive communication & research-based inputs to each business unit</label>
-                    <div class="radio-group">
-                        @for ($i = 0; $i <= 10; $i++)
-                            <input type="radio" id="communication{{ $i }}" wire:model="responses.7" value="{{ $i }}">
-                            <label class="radio-label" for="communication{{ $i }}">{{ $i }}</label>
-                        @endfor
-                        <input type="radio" id="communicationNa" wire:model="responses.7" value="Na">
-                        <label class="radio-label" for="communicationNa">N/A</label>
-                    </div>
-                    @error('responses.7') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Problem Solving Skills -->
-                <div class="mb-3">
-                    <label class="form-label outer-label">Create opportunities for meaningful employee engagement and participation</label>
-                    <div class="radio-group">
-                        @for ($i = 0; $i <= 10; $i++)
-                            <input type="radio" id="problemsolving{{ $i }}" wire:model="responses.8" value="{{ $i }}">
-                            <label class="radio-label" for="problemsolving{{ $i }}">{{ $i }}</label>
-                        @endfor
-                        <input type="radio" id="problemsolvingNa" wire:model="responses.8" value="Na">
-                        <label class="radio-label" for="problemsolvingNa">N/A</label>
-                    </div>
-                    @error('responses.8') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
-
-                <!-- Innovation & Creativity -->
-                <div class="mb-3">
-                    <label class="form-label outer-label">HR contributes effectively to the overall success of the BU and the organization</label>
-                    <div class="radio-group">
-                        @for ($i = 0; $i <= 10; $i++)
-                            <input type="radio" id="innovation{{ $i }}" wire:model="responses.9" value="{{ $i }}">
-                            <label class="radio-label" for="innovation{{ $i }}">{{ $i }}</label>
-                        @endfor
-                        <input type="radio" id="innovationNa" wire:model="responses.9" value="Na">
-                        <label class="radio-label" for="innovationNa">N/A</label>
-                    </div>
-                    @error('responses.9') <span class="text-danger">{{ $message }}</span> @enderror
-                </div>
+                
                 <div class="mb-3">
                     <label class="form-label outer-label">Additional Comments</label>
                     <div class="">
@@ -253,8 +152,6 @@
                     </div>
                     
                 </div>
-
-              
 
                 <!-- Submit Button -->
                 <button type="submit"  class="btn btn-primary px-3 py-2 ">Submit</button>

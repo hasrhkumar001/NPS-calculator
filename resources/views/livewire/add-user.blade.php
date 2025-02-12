@@ -42,11 +42,11 @@
                     <!-- Custom Multiselect Dropdown -->
                     <div class="mb-3 col-6">
                     <label for="idsGroup" class="form-label">IDS Group</label>
-                    <div class="custom-multiselect">
+                    <div class="custom-multiselect" >
                         <input type="text" placeholder="Select IDS Group" id="selectedGroups" style="height: 32px; border-radius: 5px;" class="form-select" onclick="toggleDropdown()" readonly>
                         <div id="dropdown" class="dropdown-options">
                             @foreach ($idsGroups as $group)
-                                <div class="dropdown-item" onclick="toggleCheckbox('group_{{ $group->id }}')">
+                                <div class="dropdown-item">
                                     <input type="checkbox" value="{{ $group->name }}" id="group_{{ $group->id }}" onclick="updateSelectedGroups(event)">
                                     <label for="group_{{ $group->id }}">{{ $group->name }}</label>
                                 </div>

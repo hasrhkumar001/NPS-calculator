@@ -38,12 +38,12 @@
         @if(auth()->user()->role == 3) 
         <div class="mb-3 col-12">
             <label for="idsGroup" class="form-label fw-bold">IDS Group</label>
-            <div class="custom-multiselect">
+            <div class="custom-multiselect" >
                 <input type="text" value="{{ implode(', ', $idsGroup) }}" placeholder="Select IDS Group" id="selectedGroups" style="height: 38px;border-radius: 5px;" class="form-select" onclick="toggleDropdown()" readonly>
                 <div id="dropdown" class="dropdown-options">
                     @foreach ($idsGroups as $group)
                         <!-- Make entire row clickable -->
-                        <div class="dropdown-item" onclick="toggleCheckbox(event, '{{ $group->name }}')">
+                        <div class="dropdown-item">
                             <input type="checkbox" value="{{ $group->name }}" id="group_{{ $group->id }}" 
                                 @if(in_array($group->name, $idsGroup)) checked @endif>
                             <label for="group_{{ $group->id }}">{{ $group->name }}</label>

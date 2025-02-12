@@ -17,6 +17,8 @@ class UserStatusList extends Component
     public $userSubmissions;
     public $searchGroup = '';
     public $searchUser = '';
+    public $selectedGroups=[];
+    public $selectedUsers =[];
     
     // Dropdown state
   
@@ -29,6 +31,57 @@ class UserStatusList extends Component
     
    
 
+    public function toggleGroup($groupName)
+    {
+        if (!is_array($this->selectedGroups)) {
+            $this->selectedGroups = [];
+        }
+    
+        if (in_array($groupName, $this->selectedGroups)) {
+            // Remove the group
+            $this->selectedGroups = array_values(array_diff($this->selectedGroups, [$groupName]));
+        } else {
+            // Append the group (Livewire-friendly way)
+            $this->selectedGroups[] = $groupName;
+        }
+        // Call filter method if needed
+        $this->filter();
+    }
+    
+
+    public function toggleAllGroups()
+    {
+        if (count($this->selectedGroups) === count($this->idsGroups)) {
+            $this->selectedGroups = [];
+        } else {
+            $this->selectedGroups = $this->idsGroups->pluck('name')->toArray();
+        }
+        
+        $this->filter();
+        
+    }
+    public function toggleUser($email)
+    {
+        if (!is_array($this->selectedUsers)) {
+            $this->selectedUsers = [];
+        }
+        if (in_array($email, $this->selectedUsers)) {
+            $this->selectedUsers = array_values(array_diff($this->selectedUsers, [$email]));
+        } else {
+            $this->selectedUsers[] = $email;
+        }
+        $this->filter();
+    }
+
+    public function toggleAllUsers()
+    {
+        if (count($this->selectedUsers) === count($this->users)) {
+            $this->selectedUsers = [];
+        } else {
+            $this->selectedUsers = $this->users->pluck('email')->toArray();
+        }
+        $this->filter();
+    }
     
 
 
@@ -53,21 +106,21 @@ class UserStatusList extends Component
     }
     public function filter()
     {
-        $idsGroup = $this->idsGroup;
+        $idsGroup = $this->selectedGroups;
         $status = $this->status;
-        $selectedUser = $this->user;
+        $selectedUser = $this->selectedUsers;
         // dd($selectedUser);
 
         if (!empty($idsGroup)) {
             // Filter user submissions based on idsGroup
-            $query = UserSubmission::where('idsGroup', $idsGroup);
+            $query = UserSubmission::whereIn('idsGroup', $idsGroup);
         
             if(!empty($status)){
                 $query = $query->where('status', $status);
             }
             if (!empty($selectedUser)) {
-                $user = Users::where('email', $selectedUser)->pluck('id'); 
-                $query = $query->where('user_id', $user); 
+                $user = Users::whereIn('email', $selectedUser)->pluck('id'); 
+                $query = $query->whereIn('user_id', $user); 
             }
         }
         else{
@@ -76,8 +129,8 @@ class UserStatusList extends Component
                 $query = $query->where('status', $status);
             }
             if (!empty($selectedUser)) {
-                $user = Users::where('email', $selectedUser)->pluck('id'); 
-                $query = $query->where('user_id', $user); 
+                $user = Users::whereIn('email', $selectedUser)->pluck('id'); 
+                $query = $query->whereIn('user_id', $user); 
             }
         }
 
@@ -96,7 +149,12 @@ class UserStatusList extends Component
     public function render()
     {
         return view('livewire.user-status-list',[
-            'usersubmissions' => $this->userSubmissions
+            'usersubmissions' => $this->userSubmissions,
+            'filteredUsers' => $this->searchUser
+            ? $this->users->filter(fn($user) => stripos($user->name, $this->searchUser) !== false)
+            : $this->users,
+       
+  
         ]);
     }
 }

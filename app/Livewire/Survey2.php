@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 use App\Mail\ResponseEmail;
+use App\Models\IdsGroup;
+use App\Models\Question;
 use App\Models\Users;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
@@ -17,6 +19,8 @@ class Survey2 extends Component
     public $responses = [];
     public $additionalComment;
     public $submissionDetails;
+    public $questions = [];
+    public $idsGroupId;
     public $token;
 
     public function mount($token = null)
@@ -36,7 +40,32 @@ class Survey2 extends Component
             
 
             $this->submissionDetails = UserSubmission::find($decoded->user_submission_id);
+            
+             // Get IDS group ID from user submission
+             $this->idsGroupId = IdsGroup::where('name',$this->submissionDetails->idsGroup)->pluck('id')->first(); 
+            //  dd($this->idsGroupId);
+             // Fetch questions for the specific IDS group
+             $questionsData = Question::where('group_id', $this->idsGroupId)->first();
+            //  dd($questionsData);
+             
+             if ($questionsData) {
+                 $this->questions = [
+                     1 => $questionsData->Q1,
+                     2 => $questionsData->Q2,
+                     3 => $questionsData->Q3,
+                     4 => $questionsData->Q4,
+                     5 => $questionsData->Q5,
+                     6 => $questionsData->Q6,
+                     7 => $questionsData->Q7,
+                     8 => $questionsData->Q8,
+                     9 => $questionsData->Q9
+                 ];
+             } else {
+                 session()->flash('error', 'No questions found for this group.');
+                 return redirect('/survey/failed');
+             }
 
+            
             if (!$this->submissionDetails) {
                 session()->flash('error', 'No submission found for this token.');
                 return redirect('/survey/failed');
@@ -87,7 +116,7 @@ class Survey2 extends Component
             $promoterPercentage = 0;
             $detractorPercentage = 0;
             $neutralPercentage = 0;
-            $nps = null; // No responses, NPS cannot be calculated
+            $nps = 0; // No responses, NPS cannot be calculated
         }
         
         Survey2Response::updateOrCreate(
@@ -135,6 +164,7 @@ class Survey2 extends Component
             'response_8' => $this->responses[8],
             'response_9' => $this->responses[9],
             'additional_comments' => $this->additionalComment ?? 'No additional comments.', // Replace this with actual comment if available
+            'idsGroup_id' =>  $this->idsGroupId,
         ];
 
         // Mark the token as used after submission

@@ -24,6 +24,9 @@ class SubadminUsersStatus extends Component
     public $responses = [];
     public $searchGroup = '';
     public $searchUser = '';
+
+    public $selectedUsers =[];
+    public $selectedGroups =[];
    
 
     public function mount()
@@ -97,6 +100,69 @@ class SubadminUsersStatus extends Component
         }
     }
 
+    public function toggleGroup($groupName)
+    {
+        if (!is_array($this->selectedGroups)) {
+            $this->selectedGroups = [];
+        }
+    
+        if (in_array($groupName, $this->selectedGroups)) {
+            // Remove the group
+            $this->selectedGroups = array_values(array_diff($this->selectedGroups, [$groupName]));
+        } else {
+            // Append the group (Livewire-friendly way)
+            $this->selectedGroups[] = $groupName;
+        }
+        // Call filter method if needed
+        $this->filter();
+    }
+    
+
+    public function toggleAllGroups()
+    {
+        if (count($this->selectedGroups) === count($this->idsGroups)) {
+            
+            $this->selectedGroups = [];
+            $this->idsGroups = json_decode(auth()->user()->idsGroup, true);
+        } else {
+            $this->selectedGroups = $this->idsGroups;
+        }
+        
+        $this->filter();
+        
+    }
+    public function toggleUser($email)
+    {
+        if (!is_array($this->selectedUsers)) {
+            $this->selectedUsers = [];
+        }
+        if (in_array($email, $this->selectedUsers)) {
+            $this->selectedUsers = array_values(array_diff($this->selectedUsers, [$email]));
+        } else {
+            $this->selectedUsers[] = $email;
+        }
+        $this->filter();
+    }
+
+    public function toggleAllUsers()
+
+    {
+        $usersCollection = collect($this->users);
+
+        // Debugging: Check if users collection is correctly retrieved
+        if (!is_array($this->selectedUsers)) {
+            $this->selectedUsers = [];
+        }
+    
+        if ($usersCollection->count() === count($this->selectedUsers)) {
+            $this->selectedUsers = [];
+        } else {
+            $this->selectedUsers = $usersCollection->pluck('email')->toArray(); // ✅ Corrected
+        }
+    
+        $this->filter(); // Ensure filtering logic is applied
+    }
+
     public function selectGroup($value)
     {
         // dd($value);
@@ -117,9 +183,9 @@ public function updateListBasedOnFilters(){
 }
     public function filter()
     {
-        $idsGroup = $this->idsGroup;
+        $idsGroup = $this->selectedGroups;
         $status = $this->status;  
-        $selectedUser = $this->user;
+        $selectedUser = $this->selectedUsers;
         
         // Fetch the idsGroup array from the authenticated user
         $authIdsGroupArray = json_decode(auth()->user()->idsGroup, true);
@@ -136,7 +202,7 @@ public function updateListBasedOnFilters(){
         
         if (!empty($idsGroup)) {
             // Filter user submissions based on idsGroup
-            $query = UserSubmission::where('idsGroup', $idsGroup);
+            $query = UserSubmission::whereIn('idsGroup', $idsGroup);
             
            
             if (!empty($status)) {
@@ -144,8 +210,8 @@ public function updateListBasedOnFilters(){
             }
 
             if (!empty($selectedUser)) {
-                $user = Users::where('email', $selectedUser)->pluck('id'); 
-                $query = $query->where('user_id', $user); 
+                $user = Users::whereIn('email', $selectedUser)->pluck('id'); 
+                $query = $query->whereIn('user_id', $user); 
             }
 
             
@@ -173,14 +239,15 @@ public function updateListBasedOnFilters(){
                 foreach ($authIdsGroupArray as $group) {
                    $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
                 };});
+             $query = UserSubmission::whereIn('idsGroup', $authIdsGroupArray);
             
             if (!empty($status)) {
                 $query = $query->where('status',  $status);
             }
 
             if (!empty($selectedUser)) {
-                $user = Users::where('email', $selectedUser)->pluck('id'); 
-                $query = $query->where('user_id', $user); 
+                $user = Users::whereIn('email', $selectedUser)->pluck('id'); 
+                $query = $query->whereIn('user_id', $user); 
             }
             
           

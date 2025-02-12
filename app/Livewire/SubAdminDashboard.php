@@ -25,6 +25,8 @@ class SubAdminDashboard extends Component
     public $idsGroup;
     public $userSubmissions;
     public $responses = [];
+    public $selectedGroups = [];
+    public $selectedUsers = [];
     public $dateFrom;
     public $dateTo;
     public $csat;
@@ -79,20 +81,14 @@ class SubAdminDashboard extends Component
                  return $count > 0;
              });
  
-         // Fetch the response counts from survey_responses table
-        //  $this->responseCounts = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
-        //      ->join('user_submissions', 'survey_responses.client_id', '=', 'user_submissions.client_id')
-        //      ->whereIn('user_submissions.id', $matchingUsers)
-        //      ->whereIn('response', [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
-        //      ->groupBy('response')
-        //      ->get()
-        //      ->pluck('count', 'response')
-        //      ->toArray();
+         
        
         $this->users = Users::where(function ($query) use ($authIdsGroupArray) {
                 foreach ($authIdsGroupArray as $group) {
                    $query->orWhere('idsGroup', 'LIKE', '%' . $group . '%');
                 }})->where('role',1)->get()->sortBy('name')->toArray();
+
+                
        
        
         
@@ -167,13 +163,77 @@ class SubAdminDashboard extends Component
     public function updateListBasedOnFilters(){
         $this->filter();
     }
+    public function toggleGroup($groupName)
+    {
+        if (!is_array($this->selectedGroups)) {
+            $this->selectedGroups = [];
+        }
+    
+        if (in_array($groupName, $this->selectedGroups)) {
+            // Remove the group
+            $this->selectedGroups = array_values(array_diff($this->selectedGroups, [$groupName]));
+        } else {
+            // Append the group (Livewire-friendly way)
+            $this->selectedGroups[] = $groupName;
+        }
+        // Call filter method if needed
+        $this->filter();
+    }
+    
+
+    public function toggleAllGroups()
+    {
+        if (count($this->selectedGroups) === count($this->idsGroups)) {
+            
+            $this->selectedGroups = [];
+            
+        } else {
+            $this->selectedGroups = $this->idsGroups;
+        }
+        
+        $this->filter();
+        
+    }
+    public function toggleUser($email)
+    {
+        if (!is_array($this->selectedUsers)) {
+            $this->selectedUsers = [];
+        }
+        if (in_array($email, $this->selectedUsers)) {
+            $this->selectedUsers = array_values(array_diff($this->selectedUsers, [$email]));
+        } else {
+            $this->selectedUsers[] = $email;
+        }
+        $this->filter();
+    }
+
+    public function toggleAllUsers()
+
+    {
+        $usersCollection = collect($this->users);
+
+        // Debugging: Check if users collection is correctly retrieved
+        if (!is_array($this->selectedUsers)) {
+            $this->selectedUsers = [];
+        }
+    
+        if ($usersCollection->count() === count($this->selectedUsers)) {
+            $this->selectedUsers = [];
+        } else {
+            $this->selectedUsers = $usersCollection->pluck('email')->toArray(); // ✅ Corrected
+        }
+    
+        $this->filter(); // Ensure filtering logic is applied
+    }
     public function filter()
         {
-            $idsGroup = $this->idsGroup;
+            $idsGroup = $this->selectedGroups;
             $dateFrom = $this->dateFrom;  
             $dateTo = $this->dateTo;      
             $csat = $this->csat;
-            $selectedUser = $this->user;
+            $selectedUser = $this->selectedUsers;
+
+            // dd(empty($idsGroup));
             // dd( $selectedUser);
             
             // Fetch the idsGroup array from the authenticated user
@@ -190,16 +250,16 @@ class SubAdminDashboard extends Component
 
             if (!empty($idsGroup)) {
                 // Filter user submissions based on idsGroup
-                $query = UserSubmission::where('idsGroup', $idsGroup);
+                $query = UserSubmission::whereIn('idsGroup', $idsGroup);
 
                 // If dateFrom is provided, filter user submissions updated after or on dateFrom
                 if (!empty($dateFrom)) {
                     $query = $query->where('updated_at', '>=', $dateFrom);
                 }
                 if (!empty($selectedUser)) {
-                    $user = Users::where('email', $selectedUser)->pluck('id'); 
+                    $user = Users::whereIn('email', $selectedUser)->pluck('id'); 
                     
-                    $query = $query->where('user_id', $user); 
+                    $query = $query->whereIn('user_id', $user); 
                 }
 
                 // If dateTo is provided, filter user submissions updated before or on dateTo
@@ -217,6 +277,7 @@ class SubAdminDashboard extends Component
                 $submissionIds = $this->userSubmissions->pluck('client_id')->toArray();
 
             } else {
+                $query = UserSubmission::whereIn('idsGroup', $authIdsGroupArray);
                 if (!empty($matchingUsers)) {
                     $query->whereIn('id', $matchingUsers);
                 }
@@ -226,9 +287,9 @@ class SubAdminDashboard extends Component
                     $query = $query->where('updated_at', '>=', $dateFrom);
                 }
                 if (!empty($selectedUser)) {
-                    $user = Users::where('email', $selectedUser)->pluck('id'); 
+                    $user = Users::whereIn('email', $selectedUser)->pluck('id'); 
                     
-                    $query = $query->where('user_id', $user); 
+                    $query = $query->whereIn('user_id', $user); 
                 }
 
                 // If dateTo is provided, filter by updated_at before or on dateTo
@@ -374,6 +435,8 @@ class SubAdminDashboard extends Component
             'userSubmissions' => $this->userSubmissions,
             'responses' => $this->responses,
             'totalNps' => $this->nps,
+            
+          
             
         ]);
     }

@@ -33,7 +33,7 @@
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             <span><strong>Q{{ $q }}:</strong> {{ $questionList['Q' . $q] }}</span>
                             <div>
-                                <button class="btn btn-sm btn-warning" wire:click="">Edit</button>
+                               
                                 <button class="btn btn-sm btn-danger" wire:click="deleteQuestion({{ $questionList->id }}, {{ $q }})">Delete</button>
                             </div>
                         </li>

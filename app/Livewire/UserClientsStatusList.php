@@ -25,6 +25,8 @@ class UserClientsStatusList extends Component
     public $responses = [];
     public $searchGroup = '';
 
+    public $selectedGroups =[];
+
     public function mount()
     {
         
@@ -98,6 +100,37 @@ class UserClientsStatusList extends Component
        
         $this->updateListBasedOnFilters();
     }
+    public function toggleGroup($groupName)
+    {
+        if (!is_array($this->selectedGroups)) {
+            $this->selectedGroups = [];
+        }
+    
+        if (in_array($groupName, $this->selectedGroups)) {
+            // Remove the group
+            $this->selectedGroups = array_values(array_diff($this->selectedGroups, [$groupName]));
+        } else {
+            // Append the group (Livewire-friendly way)
+            $this->selectedGroups[] = $groupName;
+        }
+        // Call filter method if needed
+        $this->filter();
+    }
+    
+
+    public function toggleAllGroups()
+    {
+        if (count($this->selectedGroups) === count($this->idsGroups)) {
+            
+            $this->selectedGroups = [];
+           
+        } else {
+            $this->selectedGroups = $this->idsGroups;
+        }
+        
+        $this->filter();
+        
+    }
 
    
 
@@ -106,7 +139,7 @@ class UserClientsStatusList extends Component
     }
     public function filter()
     {
-        $idsGroup = $this->idsGroup;
+        $idsGroup = $this->selectedGroups;
         $status = $this->status;
         
         $authIdsGroupArray = json_decode(auth()->user()->idsGroup, true);
@@ -124,7 +157,7 @@ class UserClientsStatusList extends Component
         if (!empty($idsGroup)) {
             
             // Filter user submissions based on idsGroup
-            $query = UserSubmission::where('idsGroup', $idsGroup);
+            $query = UserSubmission::whereIn('idsGroup', $idsGroup);
             
            
             if (!empty($status)) {
@@ -151,6 +184,7 @@ class UserClientsStatusList extends Component
         } else {
             // If no idsGroup is selected, show all user submissions
             $query = UserSubmission::where('user_id', auth()->id());;
+            $query = UserSubmission::whereIn('idsGroup', $authIdsGroupArray);
             
             if (!empty($status)) {
                 $query = $query->where('status',  $status);

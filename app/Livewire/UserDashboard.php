@@ -30,6 +30,8 @@ class UserDashboard extends Component
     public $detractorPercentage;
     public $searchGroup = '';
     public $neutralPercentage;
+    public $selectedGroups = [];
+    
 
     public function mount()
     {
@@ -77,15 +79,7 @@ class UserDashboard extends Component
                  return $count > 0;
              });
  
-        // $this->responseCounts = Survey2Response::select('response', Survey2Response::raw('count(*) as count'))
-        // ->join('user_submissions', 'survey_responses.client_id', '=', 'user_submissions.client_id')
-        //  // Filter by the authenticated user's ID
-        // ->where('user_submissions.user_id', auth()->id())
-        // ->whereIn('response', [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10])  
-        // ->groupBy('response')
-        // ->get()
-        // ->pluck('count', 'response')
-        // ->toArray();
+        
         
         $this->idsGroups = json_decode(auth()->user()->idsGroup, true);
         sort($this->idsGroups);
@@ -146,13 +140,45 @@ class UserDashboard extends Component
             'responseCounts' => $filteredResponses,
         ]);
     }
+    public function toggleGroup($groupName)
+    {
+        if (!is_array($this->selectedGroups)) {
+            $this->selectedGroups = [];
+        }
+    
+        if (in_array($groupName, $this->selectedGroups)) {
+            // Remove the group
+            $this->selectedGroups = array_values(array_diff($this->selectedGroups, [$groupName]));
+        } else {
+            // Append the group (Livewire-friendly way)
+            $this->selectedGroups[] = $groupName;
+        }
+        // Call filter method if needed
+        $this->filter();
+    }
+    
+
+    public function toggleAllGroups()
+    {
+        if (count($this->selectedGroups) === count($this->idsGroups)) {
+            
+            $this->selectedGroups = [];
+           
+        } else {
+            $this->selectedGroups = $this->idsGroups;
+        }
+        
+        $this->filter();
+        
+    }
+  
 
 public function updateListBasedOnFilters(){
     $this->filter();
 }
     public function filter()
 {
-    $idsGroup = $this->idsGroup;
+    $idsGroup = $this->selectedGroups;
     $dateFrom = $this->dateFrom;  
     $dateTo = $this->dateTo;      
     $csat = $this->csat;
@@ -161,11 +187,12 @@ public function updateListBasedOnFilters(){
     $validResponses = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     $columns = ['Q1', 'Q2', 'Q3', 'Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12', 'Q13', 'Q14', 'Q15']; // Replace with actual response columns if needed
     $counts = [];
+    $authIdsGroupArray = json_decode(auth()->user()->idsGroup, true);
 
     // Filter when idsGroup is provided
     if (!empty($idsGroup)) {
         // Filter user submissions based on idsGroup
-        $query = UserSubmission::where('idsGroup', $idsGroup);
+        $query = UserSubmission::whereIn('idsGroup', $idsGroup);
 
         // If dateFrom is provided, filter user submissions updated after or on dateFrom
         if (!empty($dateFrom)) {
@@ -191,6 +218,7 @@ public function updateListBasedOnFilters(){
     } else {
         // If no idsGroup is selected, show all user submissions
         $query = UserSubmission::query();
+        $query = UserSubmission::whereIn('idsGroup', $authIdsGroupArray);
 
         // If dateFrom is provided, filter by updated_at after or on dateFrom
         if (!empty($dateFrom)) {

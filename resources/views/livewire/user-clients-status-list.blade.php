@@ -5,47 +5,56 @@
             <form  wire:submit.prevent="filter">
                         <div class="row px-5 py-3">
                             <!-- Group Selection -->
-                            <div class="col-lg-6 mb-3">
-                            <label for="idsGroup" class="form-label">IDS Group</label>
-                            <div class="position-relative">
-                                <div class="custom-select" x-data="{ open: false }">
-                                    <div class="select-header form-select d-flex justify-content-between align-items-center cursor-pointer" 
+                            <div class="col-lg-6 mb-3" x-data="{ selectedGroups: @entangle('selectedGroups') }">
+                                <label for="idsGroup" class="form-label">IDS Group</label>
+                                <div class="position-relative">
+                                    <div class="custom-select"  x-data="{ open: false }">
+                                        <div class="select-header form-select d-flex justify-content-between align-items-center "
                                         @click="open = !open">
-                                        <span>{{ $idsGroup ?: 'All Groups' }}</span>
+                                            <span>{{ count($selectedGroups) ? count($selectedGroups) . ' Selected' : 'All Groups' }}</span>
+                                        </div>
+
                                         
-                                    </div>
-                                    
-                                    <div x-show="open" 
-                                        @click.outside="open = false"
-                                        class="select-dropdown shadow" 
-                                        style="display: none;">
-                                        <div class="px-2 py-2">
-                                            <input type="text" 
-                                                class="form-control" 
-                                                wire:model.live="searchGroup" 
-                                                placeholder="Search groups..."
-                                                @click.stop>
-                                        </div>
-                                        <div class="select-options max-h-60 overflow-y-auto">
-                                            <div class="select-option hover:bg-gray-100 cursor-pointer p-2" 
-                                                wire:click="selectGroup('')"
-                                                @click="open = false">
-                                                All Groups
+                                        <div x-show="open" 
+                                        @click.outside="open = false" style="display: none;" class="select-dropdown shadow position-absolute w-100 bg-white rounded mt-1" style="z-index: 1000;">
+                                            <div class="px-2 py-2">
+                                                <input type="text" class="form-control" wire:model.live="searchGroup" placeholder="Search groups...">
                                             </div>
-                                            @foreach($idsGroups as $group)
-                                                @if(empty($searchGroup) || str_contains(strtolower($group), strtolower($searchGroup)))
-                                                    <div class="select-option hover:bg-gray-100 cursor-pointer p-2" 
-                                                        wire:click="selectGroup('{{ $group }}')" 
-                                                        @click="open = false">
-                                                        {{ $group }}
-                                                    </div>
-                                                @endif
-                                            @endforeach
+
+                                            <!-- Select All Checkbox -->
+                                            <div class="select-option hover:bg-gray-100 p-2 border-bottom  ">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" id="selectAll"
+                                                        wire:click="toggleAllGroups"
+                                                        @click="$wire.$refresh()"
+                                                        x-bind:checked="selectedGroups.length === {{ count($idsGroups) }}">
+                                                    <label class="form-check-label" for="selectAll"> Select All </label>
+                                                </div>
+                                            </div>
+
+                                            <div class="select-options max-h-60 overflow-y-auto">
+                                                @foreach($idsGroups as $group)
+                                                    @if(empty($searchGroup) || str_contains(strtolower($group->name), strtolower($searchGroup)))
+                                                        <div class="select-option hover:bg-gray-100 p-2  ">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="checkbox" id="group_{{ $loop->index }}"
+                                                                    value="{{ $group}}"
+                                                                    wire:click="toggleGroup('{{ $group }}')"
+                                                                    @click="$wire.$refresh()"
+                                                                    x-bind:checked="selectedGroups.includes('{{ $group }}')">
+                                                                <label class="form-check-label" for="group_{{ $loop->index }}">
+                                                                    {{ $group }}
+                                                                </label>
+                                                            </div>
+                                                        </div>
+                                                    @endif
+                                                @endforeach
+                                            </div>
                                         </div>
+                                       
                                     </div>
                                 </div>
                             </div>
-                        </div>
                             
                             <div class="col-md-6 mb-3">
                                 <label for="csat" class="form-label">Survey Status</label>

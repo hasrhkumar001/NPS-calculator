@@ -19,6 +19,7 @@ class Dashboard extends Component
     public $promoters = 0;
     public $neutrals = 0;
     public $selectedGroups = [];     
+    public $selectedUsers = [];  
     public $detractors = 0;
     public $nps = 0;
     public $idsGroups;
@@ -71,7 +72,7 @@ class Dashboard extends Component
 
         $this->users = Users::all()->sortBy('name');
 
-        // dd($this->responseCounts);
+        
 
 
 
@@ -160,6 +161,29 @@ class Dashboard extends Component
         $this->filter();
         
     }
+    public function toggleUser($email)
+    {
+        if (!is_array($this->selectedUsers)) {
+            $this->selectedUsers = [];
+        }
+        if (in_array($email, $this->selectedUsers)) {
+            $this->selectedUsers = array_values(array_diff($this->selectedUsers, [$email]));
+        } else {
+            $this->selectedUsers[] = $email;
+        }
+        $this->filter();
+    }
+
+    public function toggleAllUsers()
+    {
+        if (count($this->selectedUsers) === count($this->users)) {
+            $this->selectedUsers = [];
+        } else {
+            $this->selectedUsers = $this->users->pluck('email')->toArray();
+        }
+        $this->filter();
+    }
+    
 
    
 
@@ -168,14 +192,7 @@ class Dashboard extends Component
     }
     
     
-    public function selectGroup($value)
-    {
-       
-        dd();
-        $this->idsGroup = $value;
-       
-        $this->filter();
-    }
+  
 
     public function selectUser($value)
     {
@@ -190,7 +207,7 @@ class Dashboard extends Component
     $dateFrom = $this->dateFrom;
     $dateTo = $this->dateTo;
     $csat = $this->csat;
-    $selectedUser =$this->user;
+    $selectedUser =$this->selectedUsers;
 
     // Initialize the user submissions query
     $query = UserSubmission::query();
@@ -205,8 +222,8 @@ class Dashboard extends Component
         $query->where('updated_at', '>=', $dateFrom);
     }
     if (!empty($selectedUser)) {
-        $user = Users::where('email', $selectedUser)->pluck('id'); 
-        $query = $query->where('user_id', $user); 
+        $user = Users::whereIn('email', $selectedUser)->pluck('id'); 
+        $query = $query->whereIn('user_id', $user); 
     }
 
     // If dateTo is provided, filter user submissions updated on or before dateTo
@@ -233,24 +250,7 @@ class Dashboard extends Component
     // Initialize an array to store counts for each response
     $this->responseCounts = [];
 
-    // Loop through each valid response and count occurrences for each column
-    // foreach ($validResponses as $response) {
-    //     $counts = Survey2Response::selectRaw(
-    //         implode(', ', array_map(function ($column) use ($response) {
-    //             return "SUM(CASE WHEN {$column} = '{$response}' THEN 1 ELSE 0 END) AS {$column}_count";
-    //         }, $columns))
-    //     )
-    //     ->whereIn('client_id', $submissionIds)
-    //     ->first(); // Get the first result since we are aggregating
     
-    //     // Store the counts for the current response for each question
-    //     foreach ($columns as $column) {
-    //         // Check if $counts is not null and has the expected properties
-    //         if ($counts) {
-    //             $this->responseCounts[$response][$column] = $counts->{$column . '_count'} ?? 0; // Default to 0 if null
-    //         }
-    //     }
-    // }
     foreach ($validResponses as $response) {
         $this->responseCounts = Survey2Response::selectRaw(
             // Dynamically create the SUM(CASE WHEN) for each column
@@ -377,7 +377,10 @@ class Dashboard extends Component
             'userSubmissions' => $this->userSubmissions,
             'responses' => $this->responses,
             'totalNps' => $this->nps,
-
+            'filteredUsers' => $this->searchUser
+                ? $this->users->filter(fn($user) => stripos($user->name, $this->searchUser) !== false)
+                : $this->users,
+           
         ]);
     }
 }
